@@ -25,7 +25,7 @@ bm_options = [
 
 default_bm_arguments = []
 
-				   	   #default min max range
+				   	   //default min max range
 default_bm_options = [	8.5, 	 0,  10, 0.1, // default od
 						5, 		 3,  7,  0.1, // default hp
 						4, 		 3,  6,  0.1, // default cs
