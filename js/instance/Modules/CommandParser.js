@@ -32,6 +32,10 @@ class CommandParser {
           const command = match[1]; 
           const argumentsAfterCommand = match[2]; 
           parsedFilters = this.filtersParser.parse(argumentsAfterCommand);
+          const filtersErrors = parsedFilters.errors
+          if(filtersErrors.length){
+            return { error: filtersErrors[0].error, message: filtersErrors[0].error_name, output :"Invalid Parameter"};
+          }
         } else {
           parsedFilters = null;
         }
