@@ -1,0 +1,9 @@
+[submodule "python/libs/python_utils"]
+	path = python/libs/python_utils
+	url = https://github.com/lakazatong/python_utils
+[submodule "libs/beatmap_parser"]
+	path = libs/beatmap_parser
+	url = https://github.com/lakazatong/beatmap_parser
+[submodule "libs/c_utils"]
+	path = libs/c_utils
+	url = https://github.com/lakazatong/c_utils
