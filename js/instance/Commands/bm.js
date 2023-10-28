@@ -1,12 +1,12 @@
 class Bm {
-  constructor(from, inputString, parsedFilters) {
-    this.from = from;
-    this.parsedFilters =  parsedFilters
+  constructor() {
   }
 
-  execute() {
-    console.log('parsed filter: '+this.parsedFilters)
-    return { error: `0`, message :`Résultat de la commande`, filters: this.parsedFilters};
+  execute(from, inputString, parsedFilters) {
+    if(parsedFilters.errors.length > 1){
+      return { error: `2`, message :`Erreur de syntaxe`, output: parsedFilters.errors};
+    }
+    return { error: `0`, message :`Résultat de la commande`, output: null, filters: parsedFilters};
   }
 }
 
