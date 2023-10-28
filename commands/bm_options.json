@@ -1,39 +1,33 @@
-bm_options = [
-	[true, "", "od"],
-	[true, "", "od_min"],
-	[true, "", "od_max"],
-	[true, "", "od_range"],
-	[true, "", "hp"],
-	[true, "", "hp_min"],
-	[true, "", "hp_max"],
-	[true, "", "hp_range"],
-	[true, "", "cs"],
-	[true, "", "cs_min"],
-	[true, "", "cs_max"],
-	[true, "", "cs_range"],
-	[true, "", "sr"],
-	[true, "", "sr_min"],
-	[true, "", "sr_max"],
-	[true, "", "sr_range"],
-	[true, "", "mapper"],
-	[true, "", "pp"],
-	[true, "", "bpm"],
-	[true, "", "status"],
-	[false, "s", "save"],
-	[false, "h", "help", "?"]
-]
-
-default_bm_arguments = []
-
-				   	   //default min max range
-default_bm_options = [	8.5, 	 0,  10, 0.1, // default od
-						5, 		 3,  7,  0.1, // default hp
-						4, 		 3,  6,  0.1, // default cs
-						5, 		 2,  8,  0.1, // default sr
-						"", // default mapper (any)
-						-1, // default pp (any)
-						-1, // default bpm (any)
-						1, // default status (ranked)
-						false, // save command by default (no)
-						false // show help message by default (no)
-					 ]
+{
+	"bm_options": [
+		[true, "", "od"],
+		[true, "", "od_min"],
+		[true, "", "od_max"],
+		[true, "", "od_range"],
+		[true, "", "hp"],
+		[true, "", "hp_min"],
+		[true, "", "hp_max"],
+		[true, "", "hp_range"],
+		[true, "", "cs"],
+		[true, "", "cs_min"],
+		[true, "", "cs_max"],
+		[true, "", "cs_range"],
+		[true, "", "sr"],
+		[true, "", "sr_min"],
+		[true, "", "sr_max"],
+		[true, "", "sr_range"],
+		[true, "", "mapper"],
+		[true, "", "pp"],
+		[true, "", "bpm"],
+		[true, "", "status"],
+		[false, "s", "save"],
+		[false, "h", "help", "?"]
+	],
+	"default_bm_arguments": [],
+	"default_bm_options": [	8.5, 	 0,  10, 0.1,
+							5, 		 3,  7,  0.1,
+							4, 		 3,  6,  0.1,
+							5, 		 2,  8,  0.1,
+							"", -1, -1, 1, false, false
+						 	]
+}
