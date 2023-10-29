@@ -1,5 +1,5 @@
 # BETA !
-
+# The current codes are the v2 of the bot which is in development mode. 
 Developed by Pupariaa in JavaScript, this bot primarily uses Bancho's IRC and the Osu! v1 API.
 
 
