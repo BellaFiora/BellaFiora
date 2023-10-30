@@ -1,12 +1,17 @@
+const UserDatas = require('../Modules/UserDatas');
+const userDatas = new UserDatas();
+const ExecTime = require("../Metrics/Modules/ExecTime")
+const timer= new ExecTime()
+
 class Bm {
   constructor() {
   }
 
-  execute(from, inputString, parsedFilters) {
-    if(parsedFilters.errors.length > 1){
-      return { error: `2`, message :`Erreur de syntaxe`, output: parsedFilters.errors};
-    }
-    return { error: `0`, message :`Résultat de la commande`, output: null, filters: parsedFilters};
+  async execute(from, inputString, parsedFilters, id) {
+    timer.start('Execute Command');
+    const Data = await userDatas.get(from);
+    timer.stop('Execute Command');
+    return { error: `0`, message :`Résultat de la commande`, output: null, filters: parsedFilters, id: id, data: Data};
   }
 }
 
