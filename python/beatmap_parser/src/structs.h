@@ -11,7 +11,7 @@ typedef struct {
 	int countdown;
 	char* sampleSet;
 	float stackLeniency;
-	int mode;
+	int mode; // 0 std 1 taiko 2 ctb 3 mania
 	int letterboxInBreaks;
 	int storyFireInFront;
 	int useSkinSprites;
