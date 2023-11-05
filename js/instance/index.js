@@ -1,5 +1,10 @@
 const CommandParser = require('./Modules/CommandParser');
 const IdGenerate = require('./Modules/IdGenerate');
+const memoryCache = require('memory-cache');
+
+
+// const map_meta_data = JSON.parse(fs.readFileSync('./Ressources/MapsMetaData.json', 'utf-8'));
+// memoryCache.put('maps_', map_meta_data);
 
 const commandParser = new CommandParser();
 const ID = new IdGenerate()
