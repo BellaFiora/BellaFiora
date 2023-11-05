@@ -3,7 +3,7 @@
 Developed by Pupariaa in JavaScript, this bot primarily uses Bancho's IRC and the Osu! v1 API.
 
 
-# **Directly DM the Osu! account Pupariaa**
+# **Directly DM the Osu! account Bella Fiora**
 ## Features
 The Osu! bot provides the following commands:
 
