@@ -1,9 +1,5 @@
 import re
-try:
-	from bs4 import BeautifulSoup
-except:
-	os.system('pip install beautifulsoup4')
-	from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 
 # allows for indent_width with BeautifulSoup.prettify
 # source : https://stackoverflow.com/a/15513483
