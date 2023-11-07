@@ -1,39 +1,49 @@
-import sys, os
-from python_utils.utils.all import *
+import osu_irc, re
+from osu_irc.Utils.regex import *
+from commands import *
 
-def get_commands_options():
-	global bm_options, default_bm_arguments, default_bm_options
-	options = None
-	with open('../commands/bm_options.json', 'r') as f:
-		options = json.loads(f.read())
-	bm_options = options["bm_options"]
-	default_bm_arguments = options["default_bm_arguments"]
-	default_bm_options = options["default_bm_options"]
+class BellaFiora(osu_irc.Client):
+    async def onReady(self):
+        self.prefix = '!'
+        await self.joinChannel("#osu")
+        print(f'{self.nickname} connected and joined channel #osu')
 
-def send_to_beatmap_parser(osufile_path):
-	global jsonified_bm
-	os.system('cd beatmap_parser/bin && bm_parser.exe ' + osufile_path)
-	while not os.path.exists('beatmap_parser/bin/out'):
-		pass
-	with open('beatmap_parser/bin/out', 'r', encoding='utf-8') as f:
-		jsonified_bm =json.loads(f.read())
-	os.remove('beatmap_parser/bin/out')
+    async def bmCommand(self, pseudo:str, command:str) -> None:
+    	response = bm_command(command)
+    	await self.sendContent(f"PRIVMSG {pseudo} :{response}\r\n")
+        # await self.sendPM(pseudo, response)
 
-def bm_command(string):
-	arguments, options = parse(string, bm_options, 0, default_bm_arguments, default_bm_options)
-	if (options[-1]):
-		print('bm help message')
-	else:
-		print(arguments, options)
-	# find map...
-	path = '../../bms/kimi.osu'
-	send_to_beatmap_parser(path)
-	print_json(jsonified_bm)
+    async def onRaw(self, raw:bytes) -> None:
+        string = str(raw, encoding='utf-8')
+        match = re.search(ReAll, string)
+        if not match: return
+        pseudo = match.group(1)
+        code = match.group(2)
+        content = match.group(3)
+        if code == "PRIVMSG Bella_Fiora":
+            # private messages to Bella_Fiora
+            if content.startswith("\x01ACTION"):
+                # is an action
+                match = re.search(ReActionNp, content)
+                if match:
+                    # is a np action
+                    url = match.group(1)
+                    artist = match.group(2)
+                    title = match.group(3)
+                    print(f"received np action \"{url}\" ({artist} - {title}) from {pseudo}")
+            else:
+                # is not an action
+                print(f"received pm \"{content}\" from {pseudo}")
+                await self.bmCommand(pseudo, content)
 
 def main():
-	get_commands_options()
-	input_string = 'bot.py -h' if len(sys.argv) < 2 else ' '.join(sys.argv)
-	bm_command(input_string)
+    nickname = 'Bella_Fiora'
+    token = ''
+    with open('.token', 'r') as f:
+        token = f.read()
+    bot = BellaFiora(nickname=nickname, token=token)
+    load_commands()
+    bot.run()
 
-if __name__ == '__main__':
-	main()
+if __name__ == "__main__":
+    main()
