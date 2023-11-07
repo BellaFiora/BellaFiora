@@ -20,10 +20,9 @@ def send_to_beatmap_parser(osufile_path):
 	os.remove('beatmap_parser/bin/out')
 
 def bm_command(string):
-	print(string)
-	arguments, options = parse(string, bm_options, False, default_bm_arguments, default_bm_options)
-	print(arguments, options)
-	if options[-1]:
+	args, opts = parse(string, bm_options, False, default_bm_arguments, default_bm_options)
+	print(args, opts)
+	if opts[-1]:
 		return 'bm help message'
 	return 'mmh'
 	# find map...
