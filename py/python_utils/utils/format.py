@@ -147,6 +147,18 @@ def ansi_text(text, esc_format=None, esc=None, end=None):
 	r = text+end if end else text+esc+'[0m'
 	return r
 
+def _parse_check_option_value(value):
+	if not value[1] or len(value[1]) == 0:
+		if not value[2] or len(value[2]) == 0:
+			print('parse: shorts and longs cannot be both empty')
+			return 1
+		value[1] = list([])
+		value[2] = list(value[2])
+	else:
+		value[1] = list(value[1])
+		value[2] = list(value[2] if value[2] else [])
+	return 0
+
 def parse(input_string, options, first=False, default_arguments=[], default_options=None, default_help=True, default_help_value=True):
 	# considers that shorts begin with '-' and longs with '--'
 	# options format:
@@ -161,9 +173,11 @@ def parse(input_string, options, first=False, default_arguments=[], default_opti
 	# parsed_options being the list of all options values (including the default ones if provided)
 	# parsed_options[0] being the value of the first option in the options list
 	# set first to True if the input_string does not contain the command name
-	# a default help option is added: [False, ["h", "?"], "help"], you can disable that by setting default_help to False
+	# a default help option is added: [False, ["h", "?"], ["help"]], you can disable that by setting default_help to False
 	# also by default, it will be at the end so parsed_options[-1] is the help option value
 	# it is 1 if no argument and no option is provided, u can disable that by setting default_help_value to False (requires default_help to be True)
+	
+	# init / prepare parsing
 	txt = input_string.strip()
 	while '  ' in txt: txt = txt.replace('  ', ' ')
 	l = list(txt.split(' '))
@@ -172,33 +186,21 @@ def parse(input_string, options, first=False, default_arguments=[], default_opti
 	if default_options:
 		parsed_options = copy.deepcopy(default_options)
 		for value in options:
-			if not value[1] or len(value[1]) == 0:
-				if not value[2] or len(value[2]) == 0:
-					print('parse: shorts and longs cannot be both empty')
-					exit(1)
-				value[1] = list([])
-				value[2] = list(value[2])
-			else:
-				value[1] = list(value[1])
-				value[2] = list(value[2] if value[2] else [])
+			if _parse_check_option_value(value):
+				return None, None
 	else:
 		for value in options:
 			if value[0]: parsed_options.append(None)
 			else: parsed_options.append(False)
-			if not value[1] or len(value[1]) == 0:
-				if not value[2] or len(value[2]) == 0:
-					print('parse: shorts and longs cannot be both empty')
-					exit(1)
-				value[1] = list([])
-				value[2] = list(value[2])
-			else:
-				value[1] = list(value[1])
-				value[2] = list(value[2] if value[2] else [])
+			if _parse_check_option_value(value):
+				return None, None
 	if default_help:
 		options.append([False, list(["h", "?"]), list(["help"])])
 		parsed_options.append(False)
 	options_found = 0
 	i = 0 if first else 1
+	
+	# parse input_string
 	while i < len(l):
 		e = l[i]
 		is_arg = True
@@ -256,8 +258,10 @@ def parse(input_string, options, first=False, default_arguments=[], default_opti
 				break
 		if is_arg: arguments.append(e)
 		i += 1
+	
 	if default_help:
 		if default_help_value and len(arguments) == 0 and options_found == 0:
 			parsed_options[-1] = True
 		options.pop()
+	
 	return arguments, parsed_options

@@ -1,14 +1,21 @@
 import sys, os
-from python_utils.utils.all import *
+from python_utils.utils.format import parse
 
-def load_commands() -> None:
+def load_commands_options() -> None:
 	global bm_options, default_bm_arguments, default_bm_options
-	options = None
-	with open('../commands/bm_options.json', 'r') as f:
-		options = json.loads(f.read())
-	bm_options = options["options"]
-	default_bm_arguments = options["default_arguments"]
-	default_bm_options = options["default_options"]
+	bm_options = [
+		[True, None, ["od"]],
+		[True, None, ["hp"]],
+		[True, None, ["cs"]],
+		[True, None, ["sr"]],
+		[True, None, ["mapper"]],
+		[True, None, ["pp"]],
+		[True, None, ["bpm"]],
+		[True, None, ["status"]],
+		[False, ["s"], ["save"]]
+	]
+	default_bm_arguments = []
+	default_bm_options = ["-1", "-1", "-1", "-1", None, "-1", "-1", "1", False]
 
 def send_to_beatmap_parser(osufile_path:str) -> None:
 	global jsonified_bm
@@ -18,6 +25,10 @@ def send_to_beatmap_parser(osufile_path:str) -> None:
 	with open('beatmap_parser/bin/out', 'r', encoding='utf-8') as f:
 		jsonified_bm =json.loads(f.read())
 	os.remove('beatmap_parser/bin/out')
+
+def unknown_command(string:str) ->str:
+	command = string.split(' ')[0]
+	return f'unknown command {command}, current commands are: help, ping, echo, bm'
 
 def help_command(string:str) -> str:
 	return 'current commands: help, ping, echo, bm'
