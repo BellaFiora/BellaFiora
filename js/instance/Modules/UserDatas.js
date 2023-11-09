@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const ExecTime = require("../Metrics/Modules/ExecTime")
+const ExecTime = require("../Metrics/Modules/Metrics")
 const timer= new ExecTime()
 
 

@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const FiltersParser =  require('./FiltersParser');
-const ExecTime = require("../Metrics/Modules/ExecTime")
-const timer= new ExecTime()
+const lst = require('../Commands/listening')
+const FiltersParser = require('../Modules/FiltersParser')
 
+const listening = new lst();
 class CommandParser {
   constructor() {
     this.commands = {};
@@ -11,7 +11,6 @@ class CommandParser {
     this.loadCommands(path.join(__dirname, '..', 'Commands'));
   }
   loadCommands(commandsDirectory) {
-    timer.start('Load Commands');
     const commandFiles = fs.readdirSync(commandsDirectory);
     for (const commandFile of commandFiles) {
       if (commandFile.endsWith('.js')) {
@@ -20,10 +19,8 @@ class CommandParser {
         this.commands[commandName] = new CommandClass();
       }
     }
-    timer.stop('Load Commands');
   }
   parseCommand(inputString, from, id) {
-    timer.start('Parse Command');
     if (inputString.startsWith('!')) {
       const commandTokens = inputString.split(' ');
       const commandName = commandTokens[0].slice(1);  
@@ -36,22 +33,40 @@ class CommandParser {
           const argumentsAfterCommand = match[2]; 
           parsedFilters = this.filtersParser.parse(argumentsAfterCommand, id);
           const filtersErrors = parsedFilters.errors
-          if(filtersErrors.length){
-            timer.stop('Parse Command');
-            return { error: filtersErrors[0].error, message: filtersErrors[0].error_name, output :"Invalid Parameter", id: id};
+          if(!filtersErrors[0].error === 0){
+            return {id: id, error: filtersErrors[0].error, message: filtersErrors[0].error_name, output :"Invalid Parameter"};
           }
         } else {
           parsedFilters = null;
         }
-        timer.stop('Parse Command');
         return command.execute(from, inputString, parsedFilters, id);
       } else {
-        timer.stop('Parse Command');
-        return { error: `1`, message :`Commande inconnue`};
+        return {id: id, error: `3`, message :`Commande inconnue`};
       }
+    } else if(inputString.startsWith(`\x01ACTION`)){      
+        const prefix = "is listening to ";
+        const startIndex = inputString.indexOf(prefix);
+        if (startIndex !== -1) {
+            const textAfterListening = inputString.substring(startIndex + prefix.length);
+            var regex = /\[([^\]]+)\]/;
+            var match = textAfterListening.match(regex);
+            if (match && match.length >= 2) {
+                const contentWithinBrackets = match[1];
+                const regex = /https:\/\/osu\.ppy\.sh\/beatmapsets\/([0-9]+)#\/([0-9]+) (.+)/;
+                match = contentWithinBrackets.match(regex);
+                if (match && match.length >= 4) {
+                  return listening.execute(from,match[1], match[2], id);
+                } else {
+                  return {id: id,error: `1`, message :`Erreur de parsing`};
+                }
+            } else {
+              return {id: id,error: `1`, message :`Erreur de parsing`};
+            }
+        } else {
+          return {id: id, error: `1`, message :`Erreur de parsing`};
+        }  
     } else {
-      timer.stop('Parse Command');
-      return { error: `2`, message :`Ignore`};
+      return {id: id, error: `4`, message :`Ignore`};
     }
   }
 }

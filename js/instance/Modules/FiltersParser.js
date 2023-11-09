@@ -1,5 +1,4 @@
-const ExecTime = require("../Metrics/Modules/ExecTime")
-const timer= new ExecTime()
+const { type } = require("os");
 
 
 class ParseFilters {
@@ -147,80 +146,77 @@ class ParseFilters {
       status: false,
       s: false,
     };
-    this.errors = [];
+    this.errors = [{error: 0, error_name: null}];
   }
-  parse(inputString, id) {
-    timer.start('FilterParser');
-    const inputArray = inputString.match(/"[^"]+"|\S+/g);
-    let currentOption = null;
-    for (let i = 0; i < inputArray.length; i++) {
-      const currentToken = inputArray[i];
-      const optionName = currentToken.split(" ")[0];
-      if (currentToken.startsWith("--")) {
-        const option = this.options.find(opt => opt.prefixAllowed + opt.option === optionName);
-        if (option) {
-          currentOption = option;
-          let argument = null;
-          const argumentIndex = i + 1;
-          if (option.arguments > 0 && argumentIndex < inputArray.length) {
-            argument = inputArray[argumentIndex];
-            if (option.format === "string" && option.acceptedArgument.length > 0 && !option.acceptedArgument.includes(argument)) {
-              this.errors.push({ error: 6, error_name: `Invalid argument for ${option.option}: ${argument}. ${option.description}`  });
-              argument = null;
-            }
-            if(option.format === "string" && option.arguments === 1){
-              this.parameterValues[`${option.option}`] = argument
-            }
-          } else if (option.arguments > 0) {
-            this.errors.push({ error: 3, error_name: `Missing argument for ${option.option}. ${option.description}` });
-          } else {
-            this.parameterValues[`${option.option}`] = true
-          }
-          if (option.min_value !== null && option.max_value !== null) {
-            if (typeof argument !== 'string') {
-              argument = argument.toString();
-            }
-            if (argument.startsWith('>')) {
-              const argValue = parseFloat(argument.substring(1));
-              this.parameterValues[`${option.option}_min`] = argValue;
-              this.parameterValues[`${option.option}_max`] = option.max_value;
-            } else if (argument.startsWith('<')) {
-              const argValue = parseFloat(argument.substring(1));
-              console.log(argValue)
-              this.parameterValues[`${option.option}_min`] = 0;
-              this.parameterValues[`${option.option}_max`] = argValue;
-            } else {
-              argument = parseFloat(argument);
-              if (argument < option.min_value) {
-                argument = option.min_value;
-              } else if (argument > option.max_value) {
-                argument = option.max_value;
+    parse(inputString, id) {
+      const inputArray = inputString.match(/"[^"]+"|\S+/g);
+      let currentOption = null;
+      for (let i = 0; i < inputArray.length; i++) {
+        const currentToken = inputArray[i];
+        const optionName = currentToken.split(" ")[0];
+        if (currentToken.startsWith("--")) {
+          const option = this.options.find(opt => opt.prefixAllowed + opt.option === optionName);
+          if (option) {
+            currentOption = option;
+            let argument = null;
+            const argumentIndex = i + 1;
+            if (option.arguments > 0 && argumentIndex < inputArray.length) {
+              argument = inputArray[argumentIndex];
+              if (option.format === "string" && option.acceptedArgument.length > 0 && !option.acceptedArgument.includes(argument)) {
+                this.errors.push({ error: 6, error_name: `Invalid argument for ${option.option}: ${argument}. ${option.description}` });
+                argument = null;
               }
-              this.parameterValues[`${option.option}_min`] = (argument - option.threshold).toFixed(1);
-              this.parameterValues[`${option.option}_max`] = (argument + option.threshold).toFixed(1);
+              if (option.format === "string" && option.arguments === 1) {
+                this.parameterValues[option.option] = argument;
+              }
+            } else if (option.arguments > 0) {
+              this.errors.push({ error: 5, error_name: `Missing argument for ${option.option}. ${option.description}` });
+            } else {
+              this.parameterValues[option.option] = true;
             }
-          }
-          i = argumentIndex;
-        } else {
-          this.errors.push({ error: 2, error_name: `Invalid option: ${optionName}` });
-        }
-      } else {
-        const option = this.options.find(opt => opt.option === optionName);
-        if(option){
-          if(option.acceptedArgument[0].toLowerCase() === optionName.toLowerCase()){
-            this.parameterValues[`${option.option}`] = true
+            if (option.min_value !== null && option.max_value !== null) {
+              if (typeof argument !== 'string') {
+                argument = argument.toString();
+              }
+              if (argument.startsWith('>')) {
+                const argValue = parseFloat(argument.substring(1));
+                this.parameterValues[`${option.option}_min`] = argValue;
+                this.parameterValues[`${option.option}_max`] = option.max_value;
+              } else if (argument.startsWith('<')) {
+                const argValue = parseFloat(argument.substring(1));
+                this.parameterValues[`${option.option}_min`] = 0;
+                this.parameterValues[`${option.option}_max`] = argValue;
+              } else {
+                argument = parseFloat(argument);
+                if (argument < option.min_value) {
+                  argument = option.min_value;
+                } else if (argument > option.max_value) {
+                  argument = option.max_value;
+                }
+                this.parameterValues[`${option.option}_min`] = (argument - option.threshold).toFixed(1);
+                this.parameterValues[`${option.option}_max`] = (argument + option.threshold).toFixed(1);
+              }
+            }
+            i = argumentIndex;
           } else {
-            this.errors.push({ error: 2, error_name: `Invalid option: ${optionName}`});
+            this.errors.push({ error: 6, error_name: `Invalid option: ${optionName}` });
           }
         } else {
-          this.errors.push({ error: 2, error_name: `Invalid option: ${optionName}` });
+          const option = this.options.find(opt => opt.option === optionName);
+          if (option) {
+            if (option.acceptedArgument[0].toLowerCase() === optionName.toLowerCase()) {
+              this.parameterValues[option.option] = true;
+            } else {
+              this.errors.push({ error: 6, error_name: `Invalid option: ${optionName}` });
+            }
+          } else {
+            this.errors.push({ error: 6, error_name: `Invalid option: ${optionName}` });
+          }
         }
       }
+      const result = { id, error: (this.errors[0]?.error ?? 0), message: null, parameterValues: this.parameterValues, errors: this.errors };
+      return result;
     }
-    const result = { parameterValues: this.parameterValues, errors: this.errors , id: id };
-    timer.stop('FilterParser');
-    return result
   }
-}
+  module.exports = ParseFilters;
   
-module.exports = ParseFilters;
