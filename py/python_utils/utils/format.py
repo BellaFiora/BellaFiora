@@ -1,13 +1,9 @@
-import time, re
-try:
-	import pytz
-except:
-	import os
-	os.system('pip install pytz')
-	import pytz
+import time, re, copy
+import pytz
 from datetime import datetime, timezone
 from python_utils.utils.str import *
 from python_utils.utils.print import *
+from python_utils.utils.list import *
 
 def convert_to_unix_time(date_str, format_str):
 	parsed_date = datetime.strptime(date_str, format_str)
@@ -151,72 +147,106 @@ def ansi_text(text, esc_format=None, esc=None, end=None):
 	r = text+end if end else text+esc+'[0m'
 	return r
 
-def parse(input_string, options, first=False, default_arguments=[], default_options=None):
+def _parse_check_option_value(value):
+	if not value[1] or len(value[1]) == 0:
+		if not value[2] or len(value[2]) == 0:
+			print('parse: shorts and longs cannot be both empty')
+			return 1
+		value[1] = list([])
+		value[2] = list(value[2])
+	else:
+		value[1] = list(value[1])
+		value[2] = list(value[2] if value[2] else [])
+	return 0
+
+def parse(input_string, options, first=False, default_arguments=[], default_options=None, default_help=True, default_help_value=True):
 	# considers that shorts begin with '-' and longs with '--'
 	# options format:
 	# options = [
-	#	[option1_takes_arg, "option1_short", "option1_long1", "option1_long2", ...],
-	#	[option2_takes_arg, "option2_short", "option2_long1", "option2_long2", ...],
+	#	[option1_takes_arg, ["option1_short1", "option1_short2", ...], ["option1_long1", "option1_long2", ...]],
+	#	[option2_takes_arg, ["option2_short2", "option2_short2", ...], ["option2_long1", "option2_long2", ...]],
 	# 	...
 	# ]
+	# the shorts or longs list can be empty or null (considered as empty) in which case the other must not be empty
 	# returns arguments, parsed_options
 	# arguments being the list of all arguments (including the default ones if provided)
 	# parsed_options being the list of all options values (including the default ones if provided)
 	# parsed_options[0] being the value of the first option in the options list
+	# set first to True if the input_string does not contain the command name
+	# a default help option is added: [False, ["h", "?"], ["help"]], you can disable that by setting default_help to False
+	# also by default, it will be at the end so parsed_options[-1] is the help option value
+	# it is 1 if no argument and no option is provided, u can disable that by setting default_help_value to False (requires default_help to be True)
+	
+	# init / prepare parsing
 	txt = input_string.strip()
 	while '  ' in txt: txt = txt.replace('  ', ' ')
 	l = list(txt.split(' '))
 	arguments = default_arguments
-	parsed_options = []
+	parsed_options = list()
 	if default_options:
-		parsed_options = default_options
+		parsed_options = copy.deepcopy(default_options)
+		for value in options:
+			if _parse_check_option_value(value):
+				return None, None
 	else:
 		for value in options:
 			if value[0]: parsed_options.append(None)
 			else: parsed_options.append(False)
+			if _parse_check_option_value(value):
+				return None, None
+	if default_help:
+		options.append([False, list(["h", "?"]), list(["help"])])
+		parsed_options.append(False)
+	options_found = 0
 	i = 0 if first else 1
+	
+	# parse input_string
 	while i < len(l):
 		e = l[i]
 		is_arg = True
 		for k, tmp in enumerate(options):
 			takes_arg = tmp[0]
-			short = tmp[1]
-			longs = tmp[2:]
+			shorts = tmp[1]
+			longs = tmp[2]
 			if len(e) >= 3 and e[0] == '-' and e[1] == '-' and e[2:] in longs:
 				if takes_arg:
 					if i+1 < len(l):
 						parsed_options[k] = l[i+1]
+						options_found += 1
 					i += 1
 				else:
 					parsed_options[k] = True
+					options_found += 1
 				is_arg = False
 				break
-			elif e[0] != '_' and len(e) >= 2 and e[0] == '-' and e[1] == short:
+			elif e[0] != '_' and len(e) >= 2 and e[0] == '-' and e[1] in shorts:
 				if len(e) == 2:
 					if takes_arg:
 						if i+1 < len(l):
 							parsed_options[k] = l[i+1]
+							options_found += 1
 						i += 1
 					else:
 						parsed_options[k] = True
+						options_found += 1
 					is_arg = False
 				else:
 					if not takes_arg:
 						multiple_short_options = True
 						multiple_short_options_indexes = [k]
-						for c in e[2:]:
+						for c in e[2]:
 							option = None
 							takes_arg = False
-							index = -1
+							j = -1
 							for o, tmp in enumerate(options):
-								short = tmp[1]
-								if short == c:
-									option = short
+								index = tmp[1].get(c)
+								if index >= 0:
+									option = tmp[1][index]
 									takes_arg = tmp[0]
-									index = o
+									j = o
 									break
 							if option and not takes_arg:
-								multiple_short_options_indexes.append(index)
+								multiple_short_options_indexes.append(j)
 							else:
 								multiple_short_options = False
 								break
@@ -224,7 +254,14 @@ def parse(input_string, options, first=False, default_arguments=[], default_opti
 							is_arg = False
 							for o in multiple_short_options_indexes:
 								parsed_options[o] = True
+								options_found += 1
 				break
 		if is_arg: arguments.append(e)
 		i += 1
+	
+	if default_help:
+		if default_help_value and len(arguments) == 0 and options_found == 0:
+			parsed_options[-1] = True
+		options.pop()
+	
 	return arguments, parsed_options

@@ -1,9 +1,5 @@
 import os, io
-try:
-	from PIL import Image
-except:
-	os.system('pip install pillow')
-	from PIL import Image
+from PIL import Image
 
 def resize_image(input_img_path, output_img_path, new_width, new_height):
 	image = Image.open(input_img_path)

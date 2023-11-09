@@ -1,2 +1,10 @@
 *.env
 *.osu
+.token
+.apikeys
+*.pyc
+*.stackdump
+py/cache
+js/cache
+beatmapsests
+beatmaps

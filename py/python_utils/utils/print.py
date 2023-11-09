@@ -1,10 +1,5 @@
 import json, inspect, pprint, zlib
-try:
-	from bs4 import BeautifulSoup
-except:
-	import os
-	os.system('pip install beautifulsoup4')
-	from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 
 BLACK, RED, GREEN, YELLOW, BLUE, PURPLE, CYAN, WHITE = 30, 31, 32, 33, 34, 35, 36, 37
 # in case not all was imported (from debug import *)

@@ -1,9 +1,5 @@
 import os, urllib, webbrowser
-try:
-	import requests
-except:
-	os.system('pip install requests')
-	import requests
+import requests
 from python_utils.utils.os import from_windows
 from python_utils.utils.print import cprint
 '''
