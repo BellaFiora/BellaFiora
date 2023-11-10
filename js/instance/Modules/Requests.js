@@ -1,43 +1,38 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
-const url = require('../Modules/UrlConstructor')
+const UrlConstructor = require('../Modules/UrlConstructor'); 
 dotenv.config();
+
 class Osu {
-  constructor() {
-
-  }
- async getUser(user, method = 'get', limit = 100, mode = null, data = null){
-    if(user){
-        var valueType;
-        if(typeof(user) === "number"){
-            valueType = "id";
-        } else {
-            valueType = "string";
-        }   
-        const k = await API()
-        const Url = new url()
-        const osuUrl = await Url.get_user(user, valueType, k, 100) 
-        if(osuUrl){
-            try {
-                const response =  await axios.get(osuUrl);
-                data = response.data
-                return data;
-            } catch(e){
-                throw new Error('Error to fetch')
-            }
-        } else {
-            console.log('Base Data is invalid')
-        }
-    } else {
-        throw new Error('Please specify a user')
+    constructor() {
+        // API key ou toute autre initialisation peut être ajoutée ici
     }
- }
-//  async getUserBest(user, max=100){
+    async getUser(user, limit = 100, mode = null) {
+        try {
+            if (!user) {
+                throw new Error('Please specify a user');
+            }
+            let valueType = typeof user === 'number' ? 'id' : 'string';
+            const osuUrl = UrlConstructor.get_user_url(user, valueType, 100); 
+            if (osuUrl) {
+                const response = await axios.get(osuUrl);
+                return response.data; 
 
-//  }
+            } else {
+                throw new Error('Invalid base data');
+            }
+
+        } catch (error) {
+            if (error.response) {
+                throw new Error(`Error: ${error.response.status} - ${error.response.statusText}`);
+            } else if (error.request) {
+                throw new Error('Error: No response received');
+            } else {
+                throw new Error('Error: ' + error.message);
+            }
+        }
+    }
 }
-
-
 
 async function API() {
     try {
