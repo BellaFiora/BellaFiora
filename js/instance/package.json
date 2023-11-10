@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "assert": "^2.1.0",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
     "node": "^21.1.0",
