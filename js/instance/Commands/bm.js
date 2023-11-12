@@ -1,6 +1,3 @@
-const UserDatas = require('../Modules/UserDatas');
-const userDatas = new UserDatas();
-
 class Bm {
   constructor() {
   }

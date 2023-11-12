@@ -1,0 +1,112 @@
+{
+    "md": {
+        "registration_date": "Sun Nov 12 2023",
+        "default_mode": 0,
+        "user_id": "5146531",
+        "updated_date": null
+    },
+    "osu": [
+        {
+            "user_id": "5146531",
+            "username": "Pupariaa",
+            "join_date": "2014-11-02 15:26:00",
+            "count300": "2773540",
+            "count100": "528522",
+            "count50": "61844",
+            "playcount": "20436",
+            "ranked_score": "3467017343",
+            "total_score": "12930808390",
+            "pp_rank": "261328",
+            "level": "98.0834",
+            "pp_raw": "2639.57",
+            "accuracy": "93.89388275146484",
+            "count_rank_ss": "2",
+            "count_rank_ssh": "0",
+            "count_rank_s": "362",
+            "count_rank_sh": "0",
+            "count_rank_a": "368",
+            "country": "FR",
+            "total_seconds_played": "1191528",
+            "pp_country_rank": "9172",
+            "events": []
+        }
+    ],
+    "taiko": [
+        {
+            "user_id": "5146531",
+            "username": "Pupariaa",
+            "join_date": "2014-11-02 15:26:00",
+            "count300": "10772",
+            "count100": "2574",
+            "count50": "0",
+            "playcount": "117",
+            "ranked_score": "3690771",
+            "total_score": "6932630",
+            "pp_rank": "107053",
+            "level": "10.3727",
+            "pp_raw": "0",
+            "accuracy": "86.73645853996277",
+            "count_rank_ss": "0",
+            "count_rank_ssh": "0",
+            "count_rank_s": "5",
+            "count_rank_sh": "0",
+            "count_rank_a": "9",
+            "country": "FR",
+            "total_seconds_played": "9514",
+            "pp_country_rank": "19407",
+            "events": []
+        }
+    ],
+    "ctb": [
+        {
+            "user_id": "5146531",
+            "username": "Pupariaa",
+            "join_date": "2014-11-02 15:26:00",
+            "count300": "6208",
+            "count100": "1571",
+            "count50": "7469",
+            "playcount": "27",
+            "ranked_score": "7690722",
+            "total_score": "9138260",
+            "pp_rank": "390554",
+            "level": "11.3511",
+            "pp_raw": "26.7354",
+            "accuracy": "89.08319854736328",
+            "count_rank_ss": "0",
+            "count_rank_ssh": "0",
+            "count_rank_s": "1",
+            "count_rank_sh": "0",
+            "count_rank_a": "2",
+            "country": "FR",
+            "total_seconds_played": "2825",
+            "pp_country_rank": "15306",
+            "events": []
+        }
+    ],
+    "mania": [
+        {
+            "user_id": "5146531",
+            "username": "Pupariaa",
+            "join_date": "2014-11-02 15:26:00",
+            "count300": "18349045",
+            "count100": "2860870",
+            "count50": "128527",
+            "playcount": "26552",
+            "ranked_score": "2190428950",
+            "total_score": "10960533319",
+            "pp_rank": "21927",
+            "level": "97.4839",
+            "pp_raw": "4859.83",
+            "accuracy": "95.80854797363281",
+            "count_rank_ss": "352",
+            "count_rank_ssh": "3",
+            "count_rank_s": "1613",
+            "count_rank_sh": "45",
+            "count_rank_a": "291",
+            "country": "FR",
+            "total_seconds_played": "1960134",
+            "pp_country_rank": "348",
+            "events": []
+        }
+    ]
+}

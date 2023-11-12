@@ -7,14 +7,15 @@ class UrlConstructor {
         // Les initialisations peuvent être ajoutées ici si nécessaire
     }
 
-    async get_user_url(user, type, apiKey, limit = 100, mode = null) {
+    async get_user_url(user, type, apiKey, limit = 100, mode = 0) {
         try {
             if (!user || !apiKey || !type) {
                 throw new Error('Missing user, apiKey, or type');
             }
 
-            mode = mode !== null ? `&mode=${mode}` : "";
+            mode = mode !== null ? `&m=${mode}` : "";
             const Url = `https://osu.ppy.sh/api/get_user?k=${apiKey}&u=${user}&type=${type}&limit=${limit}${mode}`;
+            console.log(Url)
             return Url;
 
         } catch (error) {

@@ -5,18 +5,52 @@ dotenv.config();
 
 class Osu {
     constructor() {
-        // API key ou toute autre initialisation peut être ajoutée ici
+        
     }
+
     async getUser(user, limit = 100, mode = null) {
+        const userData = {
+            md: {
+                registration_date: null,
+                default_mode: null,
+                user_id: null,
+                updated_date: null
+            },
+
+            osu: [],
+            taiko:  [],
+            ctb: [],
+            mania: []
+        };
+        const url = new UrlConstructor()
         try {
             if (!user) {
                 throw new Error('Please specify a user');
             }
             let valueType = typeof user === 'number' ? 'id' : 'string';
-            const osuUrl = UrlConstructor.get_user_url(user, valueType, 100); 
+            var osuUrl = await url.get_user_url(user, valueType, "", 100, 0);
             if (osuUrl) {
-                const response = await axios.get(osuUrl);
-                return response.data; 
+                var response = await axios.get(osuUrl);
+                response.data; 
+                userData.osu.push(response.data[0]);
+
+                osuUrl = await url.get_user_url(user, valueType, "", 100, 1);
+                response = await axios.get(osuUrl);
+                userData.taiko.push(response.data[0]);
+
+                osuUrl = await url.get_user_url(user, valueType, "", 100, 2);
+                response = await axios.get(osuUrl);
+                userData.ctb.push(response.data[0]);
+
+                osuUrl = await url.get_user_url(user, valueType, "", 100, 3);
+                response = await axios.get(osuUrl);
+                userData.mania.push(response.data[0]);
+
+                userData.md.registration_date = new Date().toDateString();
+                userData.md.default_mode = 0;
+                userData.md.user_id = response.data[0].user_id
+                return userData
+
 
             } else {
                 throw new Error('Invalid base data');

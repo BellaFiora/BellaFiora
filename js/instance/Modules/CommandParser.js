@@ -20,7 +20,7 @@ class CommandParser {
       }
     }
   }
-  parseCommand(inputString, from, id) {
+  parseCommand(inputString, from, id, user_id, user_data) {
     if (inputString.startsWith('!')) {
       const commandTokens = inputString.split(' ');
       const commandName = commandTokens[0].slice(1);  
@@ -31,7 +31,7 @@ class CommandParser {
         if (match) {
           const command = match[1]; 
           const argumentsAfterCommand = match[2]; 
-          parsedFilters = this.filtersParser.parse(argumentsAfterCommand, id);
+          parsedFilters = this.filtersParser.parse(argumentsAfterCommand, id, user_id);
           const filtersErrors = parsedFilters.errors
           if(!filtersErrors[0].error === 0){
             return {id: id, error: filtersErrors[0].error, message: filtersErrors[0].error_name, output :"Invalid Parameter"};
@@ -39,7 +39,7 @@ class CommandParser {
         } else {
           parsedFilters = null;
         }
-        return command.execute(from, inputString, parsedFilters, id);
+        return command.execute(from, inputString, parsedFilters, id, user_id, user_data);
       } else {
         return {id: id, error: `3`, message :`Commande inconnue`};
       }

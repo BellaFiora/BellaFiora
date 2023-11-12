@@ -1,5 +1,3 @@
-const UserDatas = require('../Modules/UserDatas');
-const userDatas = new UserDatas();
 
 class Lst {
   constructor() {

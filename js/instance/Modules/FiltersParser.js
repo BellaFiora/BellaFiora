@@ -1,6 +1,5 @@
 const { type } = require("os");
 
-
 class ParseFilters {
   constructor() {
     this.options = [
@@ -148,7 +147,7 @@ class ParseFilters {
     };
     this.errors = [{error: 0, error_name: null}];
   }
-    parse(inputString, id) {
+    parse(inputString, id, user_id) {
       const inputArray = inputString.match(/"[^"]+"|\S+/g);
       let currentOption = null;
       for (let i = 0; i < inputArray.length; i++) {
@@ -214,7 +213,7 @@ class ParseFilters {
           }
         }
       }
-      const result = { id, error: (this.errors[0]?.error ?? 0), message: null, parameterValues: this.parameterValues, errors: this.errors };
+      const result = { id, error: (this.errors[0]?.error ?? 0), message: null, parameterValues: this.parameterValues, errors: this.errors, user_id};
       return result;
     }
   }

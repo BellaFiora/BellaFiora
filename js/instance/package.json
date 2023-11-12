@@ -12,6 +12,7 @@
     "assert": "^2.1.0",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
+    "memory-cache": "^0.2.0",
     "node": "^21.1.0",
     "path": "^0.12.7"
   }
