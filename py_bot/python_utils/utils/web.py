@@ -1,7 +1,8 @@
-import os, urllib, webbrowser
+import os, urllib, webbrowser, paramiko
 import requests
-from python_utils.utils.os import from_windows
-from python_utils.utils.print import cprint
+from .os import from_windows
+from .print import cprint
+from dotenv import load_dotenv
 '''
 status codes
 
@@ -157,3 +158,81 @@ def wget(url:str, output_filename:str=None, output_dir:str=None, show_progress:b
 		cprint(f'\nthis command:\n{cmd}\nseemed to have failed', 'red')
 		return False
 	return True
+
+# class SftpManager:
+# 	def __init__(self, )
+
+class DockerManager:
+	def __init__(self, hostname, port, username, password, dotenv_path):
+		self.ssh = paramiko.SSHClient()
+		self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		
+		# init ssh
+		try:
+			self.ssh.connect(hostname, port, username, password)
+		except Exception as e:
+			print(f'DockerManager: ssh failed to connect: {e}')
+			return None
+		# init sftp
+		try:
+			self.sftp = self.ssh.open_sftp()
+		except Exception as e:
+			print(f'DockerManager: ssh sftp failed to open: {e}')
+			self.ssh.close()
+			return None
+
+		load_dotenv(dotenv_path=dotenv_path)
+
+	def get_container_id(self, container_name):
+		return os.getenv(container_name, None)
+
+	def execute_docker_command(self, command, container_name, additional_args=None):
+		container_id = self.get_container_id(container_name)
+		if not container_id: return False, None
+		additional_args = additional_args or []
+		_, stdout, _ = self.ssh.exec_command(f"docker {command} {container_id} {' '.join(additional_args)}")
+		data = stdout.read().decode().strip()
+		return True, data
+		
+	def start(self, container_name):
+		return self.execute_docker_command('start', container_name)
+
+	def stop(self, container_name):
+		return self.execute_docker_command('stop', container_name)
+
+	def suspend(self, container_name):
+		return self.execute_docker_command('pause', container_name)
+
+	def exec_command(self, container_name, command, additional_args=None):
+		return self.execute_docker_command('exec', container_name, [command, *additional_args])
+
+	def send_file(self, localpath, remotepath):
+		self.sftp.put(localpath, remotepath)
+
+	def get_file(self, localpath, remotepath):
+		self.sftp.get(remotepath, localpath)
+
+	def read_file(self, remotepath):
+		content = ''
+		with self.sftp.file(remotepath, 'r') as rf:
+			content = rf.read()
+		return content
+
+	def remove(self, remotepath):
+		self.sftp.remove(remotepath)
+
+	def mkdir(self, remotepath):
+		self.sftp.mkdir(remotepath)
+
+	def rmdir(self, remotepath):
+		self.sftp.rmdir(remotepath)
+
+	def exists(self, remotepath):
+		return self.sftp.stat(remotepath) != None
+
+	def stat(self, remotepath):
+		return self.sftp.stat(remotepath)
+
+	def close_manager(self):
+		self.ssh.close()
+		self.sftp.close()

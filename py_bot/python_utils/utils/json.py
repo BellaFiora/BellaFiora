@@ -1,5 +1,5 @@
 import os, json
-from python_utils.utils.print import cprint
+from .print import cprint
 
 def get_attributes(obj):
 	return [a for a in dir(obj) if not a.startswith('__') and not callable(getattr(obj, a))]

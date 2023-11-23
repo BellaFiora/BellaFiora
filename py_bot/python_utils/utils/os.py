@@ -1,5 +1,5 @@
 import os, threading, platform, io, sys, asyncio
-from python_utils.utils.print import cprint
+from .print import cprint
 
 def from_windows():
 	return platform.system() == 'Windows'
@@ -21,6 +21,17 @@ def read_file(path, mode='r'):
 		except:
 			cprint('read_file: failed tp read '+path, 'red')
 	return r
+
+def count_files_in_dir(directory, check_if_file=True):
+	count = 0
+	if check_if_file:
+		for path in os.scandir(directory):
+			if os.path.is_file():
+				count += 1
+	else:
+		for path in os.scandir(directory):
+			count += 1
+	return count
 
 # source: ChatGPT
 # returns what func printed to the console if it did, otherwise its return value

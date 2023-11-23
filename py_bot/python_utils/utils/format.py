@@ -1,9 +1,9 @@
 import time, re, copy
 import pytz
 from datetime import datetime, timezone
-from python_utils.utils.str import *
-from python_utils.utils.print import *
-from python_utils.utils.list import *
+from .str import *
+from .print import *
+from .list import *
 
 def convert_to_unix_time(date_str, format_str):
 	parsed_date = datetime.strptime(date_str, format_str)
