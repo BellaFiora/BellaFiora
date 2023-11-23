@@ -1,5 +1,5 @@
 import os, sys
-from bot_py.python_utils.utils.all import *
+from py_bot.python_utils.utils.all import *
 
 docker_manager = DockerManager(*read_file('.ssh').split('\n')[0:5])
 
@@ -12,7 +12,7 @@ if os.path.exists('done_commits'):
 		content = f.read()
 	done_commits = content.split('\n')[:-1]
 
-docker_names = ['private_api', 'public_api', 'bm_manager', 'bot_js', 'bot_py', 'user_manager', 'webapp']
+docker_names = ['private_api', 'public_api', 'bm_manager', 'js_bot', 'py_bot', 'user_manager', 'webapp']
 logs = os.popen('git log --name-status --oneline --no-decorate --format="///%H"').read()
 commits = logs.split('///')[1:]
 for commit in commits:
@@ -28,6 +28,8 @@ for commit in commits:
 		if len(full_path) <= 1: continue
 		docker = full_path[0]
 		if path in done_paths or not docker in docker_names: continue
+		print(path)
+		continue
 		for folder in full_path[1:-1]:
 			if not docker_manager.exists(folder):
 				docker_manager.mkdir(folder)
