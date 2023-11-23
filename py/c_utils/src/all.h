@@ -3,5 +3,8 @@
 
 #include "list.h"
 #include "queue.h"
+#include "math.h"
+#include "os.h"
+#include "web.h"
 
 #endif

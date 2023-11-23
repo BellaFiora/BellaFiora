@@ -1,190 +1,396 @@
 #include "queue.h"
 
-Queue* new_queue(int initial_capacity) {
-	Queue* queue = (Queue*)malloc(sizeof(Queue));
-	queue->elements = (void**)malloc(initial_capacity * sizeof(void*));
-	queue->size = 0;
-	queue->capacity = initial_capacity;
-	return queue;
-}
+// common bits
 
-iQueue* new_iqueue(int initial_capacity) {
-	iQueue* queue = (iQueue*)malloc(sizeof(iQueue));
-	queue->elements = (int*)malloc(initial_capacity * sizeof(int));
-	queue->size = 0;
-	queue->capacity = initial_capacity;
-	return queue;
-}
-
-dQueue* new_dqueue(int initial_capacity) {
-	dQueue* queue = (dQueue*)malloc(sizeof(dQueue));
-	queue->elements = (double*)malloc(initial_capacity * sizeof(double));
-	queue->size = 0;
-	queue->capacity = initial_capacity;
-	return queue;
-}
-
-sQueue* new_squeue(int initial_capacity) {
-	sQueue* queue = (sQueue*)malloc(sizeof(sQueue));
-	queue->elements = (char**)malloc(initial_capacity * sizeof(char*));
-	queue->size = 0;
-	queue->capacity = initial_capacity;
-	return queue;
-}
-
-
-void queue_push(Queue* queue, void* element) {
-	if (queue->size == queue->capacity) {
-		queue->capacity *= 2;  // Double the capacity if the queue is full
-		queue->elements = (void**)realloc(queue->elements, queue->capacity * sizeof(void*));
+#define NULL_CHECK(return_value) \
+	if (!q) \
+	{ \
+		fprintf(stderr, "%s: null queue\n", __func__); \
+		errno = ENOMEM; \
+		return return_value; \
 	}
-	queue->elements[queue->size++] = element;
-}
 
-void iqueue_push(iQueue* queue, int element) {
-	if (queue->size == queue->capacity) {
-		queue->capacity *= 2;
-		queue->elements = (int*)realloc(queue->elements, queue->capacity * sizeof(int));
+#define SAFE_NEW(queue_type, data_type) \
+	queue_type* q = calloc(1, sizeof(queue_type)); \
+	if (!q) \
+	{ \
+		fprintf(stderr, "%s: calloc failed\n", __func__); \
+		errno = ENOMEM; \
+		return NULL; \
+	} \
+	q->elements = calloc(1, initial_capacity * sizeof(data_type)); \
+	if (!q->elements) \
+	{ \
+		fprintf(stderr, "%s: calloc failed\n", __func__); \
+		errno = ENOMEM; \
+		free(q); \
+		return NULL; \
 	}
-	queue->elements[queue->size++] = element;
-}
 
-void dqueue_push(dQueue* queue, double element) {
-	if (queue->size == queue->capacity) {
-		queue->capacity *= 2;
-		queue->elements = (double*)realloc(queue->elements, queue->capacity * sizeof(double));
+#define RISKY_NEW(queue_type, data_type) \
+	queue_type* q = calloc(1, sizeof(queue_type)); \
+	q->elements = calloc(1, initial_capacity * sizeof(data_type));
+
+#define RESIZE_QUEUE(data_type) \
+	{ \
+		size_t new_capacity = q->capacity * 2; \
+		data_type* new_elements = calloc(1, new_capacity * sizeof(data_type)); \
+		if (!new_elements) { \
+			fprintf(stderr, "%s: calloc failed\n", __func__); \
+			errno = ENOMEM; \
+			return; \
+		} \
+		for (size_t i = 0; i < q->size; ++i) \
+			new_elements[i] = q->elements[(q->start + i) % q->capacity]; \
+		free(q->elements); \
+		q->elements = new_elements; \
+		q->capacity = new_capacity; \
+		q->start = 0; \
+		q->end = q->size; \
 	}
-	queue->elements[queue->size++] = element;
+
+// void* Queue
+
+Queue* new_queue(size_t initial_capacity) {
+	
+#ifdef QUEUE_MEM_CHECKS
+	SAFE_NEW(Queue, void*);
+#else
+	RISKY_NEW(Queue, void*);
+#endif
+	
+	q->size = 0;
+	q->capacity = initial_capacity;
+	q->start = 0;
+	q->end = 0;
+	return q;
 }
 
-void squeue_push(sQueue* queue, char* element) {
-	if (queue->size == queue->capacity) {
-		queue->capacity *= 2;
-		queue->elements = (char**)realloc(queue->elements, queue->capacity * sizeof(char*));
-	}
-	queue->elements[queue->size] = (char*)malloc((strlen(element) + 1) * sizeof(char));
-	strcpy(queue->elements[queue->size++], element);
+void queue_push(Queue* q, const void* element) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	if (q->size == q->capacity)
+		RESIZE_QUEUE(void*);
+	q->elements[q->end] = (void*)element;
+	q->end = (q->end + 1) % q->capacity;
+	q->size = q->end - q->start;
 }
 
+void* queue_pop(Queue* q) {
 
-void* queue_pop(Queue* queue) {
-	if (queue->size == 0) {
-		printf("Error: Queue is empty.\n");
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK(NULL);
+#endif
+
+	if (q->size == 0) {
+		fprintf(stderr, "queue_pop: Queue is empty\n");
+		errno = EINVAL;
 		return NULL;
 	}
-	void* element = queue->elements[0];
-	for (int i = 0; i < queue->size - 1; i++) {
-		queue->elements[i] = queue->elements[i + 1];
-	}
-	queue->size--;
+	void* element = q->elements[q->start];
+	q->start = (q->start + 1) % q->capacity;
+	q->size = q->end - q->start;
 	return element;
 }
 
-int iqueue_pop(iQueue* queue) {
-	if (queue->size == 0) {
-		printf("Error: Queue is empty.\n");
+void clear_queue(Queue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	q->start = 0;
+	q->end = 0;
+	q->size = 0;
+}
+
+void free_queue(Queue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	free(q->elements);
+	free(q);
+}
+
+void print_queue(const Queue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	printf("[");
+	for (size_t i = 0; i < q->size; i++) {
+		printf("%p", q->elements[(q->start + i) % q->capacity]);
+		if (i < q->size - 1) {
+			printf(", ");
+		}
+	}
+	printf("]\n");
+}
+
+// int Queue
+
+iQueue* new_iqueue(size_t initial_capacity) {
+	
+#ifdef QUEUE_MEM_CHECKS
+	SAFE_NEW(iQueue, int);
+#else
+	RISKY_NEW(iQueue, int);
+#endif
+	
+	q->size = 0;
+	q->capacity = initial_capacity;
+	q->start = 0;
+	q->end = 0;
+	return q;
+}
+
+void iqueue_push(iQueue* q, const int element) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	if (q->size == q->capacity)
+		RESIZE_QUEUE(int);
+	q->elements[q->end] = element;
+	q->end = (q->end + 1) % q->capacity;
+	q->size = q->end - q->start;
+}
+
+int iqueue_pop(iQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK(0);
+#endif
+
+	if (q->size == 0) {
+		fprintf(stderr, "iqueue_pop: iQueue is empty\n");
+		errno = EINVAL;
 		return 0;
 	}
-	int element = queue->elements[0];
-	for (int i = 0; i < queue->size - 1; i++) queue->elements[i] = queue->elements[i + 1];
-	queue->size--;
+	int element = q->elements[q->start];
+	q->start = (q->start + 1) % q->capacity;
+	q->size = q->end - q->start;
 	return element;
 }
 
-double dqueue_pop(dQueue* queue) {
-	if (queue->size == 0) {
-		printf("Error: Queue is empty.\n");
+void clear_iqueue(iQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	q->start = 0;
+	q->end = 0;
+	q->size = 0;
+}
+
+void free_iqueue(iQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	free(q->elements);
+	free(q);
+}
+
+void print_iqueue(const iQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	printf("[");
+	for (size_t i = 0; i < q->size; i++) {
+		printf("%d", q->elements[(q->start + i) % q->capacity]);
+		if (i < q->size - 1) {
+			printf(", ");
+		}
+	}
+	printf("]\n");
+}
+
+// double Queue
+
+dQueue* new_dqueue(size_t initial_capacity) {
+	
+#ifdef QUEUE_MEM_CHECKS
+	SAFE_NEW(dQueue, double);
+#else
+	RISKY_NEW(dQueue, double);
+#endif
+	
+	q->size = 0;
+	q->capacity = initial_capacity;
+	q->start = 0;
+	q->end = 0;
+	return q;
+}
+
+void dqueue_push(dQueue* q, const double element) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	if (q->size == q->capacity)
+		RESIZE_QUEUE(double);
+	q->elements[q->end] = element;
+	q->end = (q->end + 1) % q->capacity;
+	q->size = q->end - q->start;
+}
+
+double dqueue_pop(dQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK(0.0);
+#endif
+
+	if (q->size == 0) {
+		fprintf(stderr, "dqueue_pop: dQueue is empty\n");
+		errno = EINVAL;
 		return 0.0;
 	}
-	double element = queue->elements[0];
-	for (int i = 0; i < queue->size - 1; i++) queue->elements[i] = queue->elements[i + 1];
-	queue->size--;
+	double element = q->elements[q->start];
+	q->start = (q->start + 1) % q->capacity;
+	q->size = q->end - q->start;
 	return element;
 }
 
-char* squeue_pop(sQueue* queue) {
-	if (queue->size == 0) {
-		printf("Error: Queue is empty.\n");
+void clear_dqueue(dQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	q->start = 0;
+	q->end = 0;
+	q->size = 0;
+}
+
+void free_dqueue(dQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	free(q->elements);
+	free(q);
+}
+
+void print_dqueue(const dQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	printf("[");
+	for (size_t i = 0; i < q->size; i++) {
+		printf("%f", q->elements[(q->start + i) % q->capacity]);
+		if (i < q->size - 1) {
+			printf(", ");
+		}
+	}
+	printf("]\n");
+}
+
+// char* Queue
+
+sQueue* new_squeue(size_t initial_capacity) {
+	
+#ifdef QUEUE_MEM_CHECKS
+	SAFE_NEW(sQueue, char*);
+#else
+	RISKY_NEW(sQueue, char*);
+#endif
+	
+	q->size = 0;
+	q->capacity = initial_capacity;
+	q->start = 0;
+	q->end = 0;
+	return q;
+}
+
+void squeue_push(sQueue* q, const char* element) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	if (q->size == q->capacity)
+		RESIZE_QUEUE(char*);
+	q->elements[q->end] = strdup(element);
+	if (!q->elements[q->end]) {
+		fprintf(stderr, "squeue_push: strdup failed\n");
+		return;
+	}
+	q->end = (q->end + 1) % q->capacity;
+	q->size = q->end - q->start;
+}
+
+char* squeue_pop(sQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK(NULL);
+#endif
+
+	if (q->size == 0) {
+		fprintf(stderr, "squeue_pop: sQueue is empty\n");
+		errno = EINVAL;
 		return NULL;
 	}
-	char* element = queue->elements[0];
-	for (int i = 0; i < queue->size - 1; i++) queue->elements[i] = queue->elements[i + 1];
-	queue->size--;
+	char* element = q->elements[q->start];
+	q->start = (q->start + 1) % q->capacity;
+	q->size = q->end - q->start;
 	return element;
 }
 
+void clear_squeue(sQueue* q) {
 
-void clear_queue(Queue* queue) {
-	queue->size = 0;
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	for (size_t i = 0; i < q->size; ++i) {
+		free(q->elements[(q->start + i) % q->capacity]);
+	}
+	q->start = 0;
+	q->end = 0;
+	q->size = 0;
 }
 
-void clear_iqueue(iQueue* queue) {
-	queue->size = 0;
+void free_squeue(sQueue* q) {
+
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
+
+	for (size_t i = 0; i < q->size; ++i) {
+		free(q->elements[(q->start + i) % q->capacity]);
+	}
+	free(q->elements);
+	free(q);
 }
 
-void clear_dqueue(dQueue* queue) {
-	queue->size = 0;
-}
+void print_squeue(const sQueue* q) {
 
-void clear_squeue(sQueue* queue) {
-	queue->size = 0;
-}
+#ifdef QUEUE_NULL_CHECKS
+	NULL_CHECK();
+#endif
 
-
-void free_queue(Queue* queue) {
-	free(queue->elements);
-	free(queue);
-}
-
-void free_iqueue(iQueue* queue) {
-	free(queue->elements);
-	free(queue);
-}
-
-void free_dqueue(dQueue* queue) {
-	free(queue->elements);
-	free(queue);
-}
-
-void free_squeue(sQueue* queue) {
-	for (int i = 0; i < queue->size; i++) free(queue->elements[i]);
-	free(queue->elements);
-	free(queue);
-}
-
-
-void print_queue(Queue* queue) {
 	printf("[");
-	for (int i = 0; i < queue->size - 1; i++)
-		printf("%p, ", queue->elements[i]);
-	if (queue->size > 0)
-		printf("%p", queue->elements[queue->size - 1]);
-	printf("]\n");
-}
-
-void print_iqueue(iQueue* queue) {
-	printf("[");
-	for (int i = 0; i < queue->size - 1; i++)
-		printf("%i, ", queue->elements[i]);
-	if (queue->size > 0)
-		printf("%i", queue->elements[queue->size - 1]);
-	printf("]\n");
-}
-
-void print_dqueue(dQueue* queue) {
-	printf("[");
-	for (int i = 0; i < queue->size - 1; i++)
-		printf("%f, ", queue->elements[i]);
-	if (queue->size > 0)
-		printf("%f", queue->elements[queue->size - 1]);
-	printf("]\n");
-}
-
-void print_squeue(sQueue* queue) {
-	printf("[");
-	for (int i = 0; i < queue->size - 1; i++)
-		printf("%s, ", queue->elements[i]);
-	if (queue->size > 0)
-		printf("%s", queue->elements[queue->size - 1]);
+	for (size_t i = 0; i < q->size; i++) {
+		printf("\"%s\"", q->elements[(q->start + i) % q->capacity]);
+		if (i < q->size - 1) {
+			printf(", ");
+		}
+	}
 	printf("]\n");
 }

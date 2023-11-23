@@ -4,59 +4,77 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+
+#define QUEUE_NULL_CHECKS
+#define QUEUE_MEM_CHECKS
 
 typedef struct {
-	void** elements;
-	int size;
-	int capacity;
+    void** elements;
+    size_t size;
+    size_t capacity;
+    size_t start;
+    size_t end;
 } Queue;
 
 typedef struct {
-	int* elements;
-	int size;
-	int capacity;
+    int* elements;
+    size_t size;
+    size_t capacity;
+    size_t start;
+    size_t end;
 } iQueue;
 
 typedef struct {
-	double* elements;
-	int size;
-	int capacity;
+    double* elements;
+    size_t size;
+    size_t capacity;
+    size_t start;
+    size_t end;
 } dQueue;
 
 typedef struct {
-	char** elements;
-	int size;
-	int capacity;
+    char** elements;
+    size_t size;
+    size_t capacity;
+    size_t start;
+    size_t end;
 } sQueue;
 
-Queue* new_queue(int initial_capacity);
-iQueue* new_iqueue(int initial_capacity);
-dQueue* new_dqueue(int initial_capacity);
-sQueue* new_squeue(int initial_capacity);
+// void* Queue
 
-void queue_push(Queue* queue, void* element);
-void iqueue_push(iQueue* queue, int element);
-void dqueue_push(dQueue* queue, double element);
-void squeue_push(sQueue* queue, char* element);
+Queue* new_queue(size_t initial_capacity);
+void queue_push(Queue* q, const void* element);
+void* queue_pop(Queue* q);
+void clear_queue(Queue* q);
+void free_queue(Queue* q);
+void print_queue(const Queue* q);
 
-void* queue_pop(Queue* queue);
-int iqueue_pop(iQueue* queue);
-double dqueue_pop(dQueue* queue);
-char* squeue_pop(sQueue* queue);
+// int Queue
 
-void clear_queue(Queue* queue);
-void clear_iqueue(iQueue* queue);
-void clear_dqueue(dQueue* queue);
-void clear_squeue(sQueue* queue);
+iQueue* new_iqueue(size_t initial_capacity);
+void iqueue_push(iQueue* q, const int element);
+int iqueue_pop(iQueue* q);
+void clear_iqueue(iQueue* q);
+void free_iqueue(iQueue* q);
+void print_iqueue(const iQueue* q);
 
-void free_queue(Queue* queue);
-void free_iqueue(iQueue* queue);
-void free_dqueue(dQueue* queue);
-void free_squeue(sQueue* queue);
+// double Queue
 
-void print_queue(Queue* queue);
-void print_iqueue(iQueue* queue);
-void print_dqueue(dQueue* queue);
-void print_squeue(sQueue* queue);
+dQueue* new_dqueue(size_t initial_capacity);
+void dqueue_push(dQueue* q, const double element);
+double dqueue_pop(dQueue* q);
+void clear_dqueue(dQueue* q);
+void free_dqueue(dQueue* q);
+void print_dqueue(const dQueue* q);
+
+// char* Queue
+
+sQueue* new_squeue(size_t initial_capacity);
+void squeue_push(sQueue* q, const char* element);
+char* squeue_pop(sQueue* q);
+void clear_squeue(sQueue* q);
+void free_squeue(sQueue* q);
+void print_squeue(const sQueue* q);
 
 #endif
