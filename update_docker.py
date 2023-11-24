@@ -3,6 +3,7 @@ from py_bot.python_utils.utils.all import *
 
 docker_manager = DockerManager(*read_file('.ssh').split('\n')[0:5])
 
+root = '/mnt/user/node-containers/BellaFiora/'
 done_paths = []
 done_commits = []
 updated_dockers = []
@@ -28,16 +29,22 @@ for commit in commits:
 		if len(full_path) <= 1: continue
 		docker = full_path[0]
 		if path in done_paths or not docker in docker_names: continue
-		print(path)
-		continue
-		for folder in full_path[1:-1]:
-			if not docker_manager.exists(folder):
-				docker_manager.mkdir(folder)
+		for i in range(1, len(full_path)-1):
+			folder = '/'.join(full_path[1:i+1])
+			remotepath = f'{root}{docker}/{folder}'
+			localpath = f'{docker}/{folder}'
+			if not localpath in done_paths and not docker_manager.exists(remotepath):
+				print('mkdir', remotepath)
+				docker_manager.mkdir(remotepath)
+				done_paths.append(localpath)
 		done_paths.append(path)
+		remotepath = root+path
 		if action == 'A' or action == 'M':
-			docker_manager.send_file(path, path)
+			print('send', remotepath)
+			docker_manager.send(path, remotepath)
 		elif action == 'D':
-			docker_manager.remove_file(path)
+			print('remove', remotepath)
+			if docker_manager.exists(remotepath): docker_manager.remove(remotepath)
 		else:
 			print(f'updated_dockers: Unknown action ({action})')
 			continue
@@ -45,11 +52,13 @@ for commit in commits:
 	done_commits.append(commit_hash)
 
 # update dockers in which files were added / deleted / modified
-updated_dockers = list(set(updated_dockers))
-for docker in updated_dockers:
-	docker_manager.stop(docker)
-	docker_manager.start(docker)
+# updated_dockers = list(set(updated_dockers))
+# for docker in updated_dockers:
+# 	docker_manager.stop(docker)
+# 	docker_manager.start(docker)
 
 with open('done_commits', 'w+') as f:
 	for commit_hash in done_commits:
 		f.write(commit_hash+'\n')
+
+docker_manager.close()
