@@ -1,5 +1,6 @@
-import os, threading, platform, io, sys, asyncio
+import os, threading, platform, io, sys, asyncio, time
 from .print import cprint
+from .constants import measure_time
 
 def from_windows():
 	return platform.system() == 'Windows'
@@ -11,27 +12,6 @@ def run(func, delay):
 	timer = threading.Timer(delay, func)
 	timer.start()
 	return timer
-
-def read_file(path, mode='r'):
-	r = None
-	if os.path.exists(path):
-		try:
-			with open(path, mode) as f:
-				r = f.read()
-		except:
-			cprint('read_file: failed tp read '+path, 'red')
-	return r
-
-def count_files_in_dir(directory, check_if_file=True):
-	count = 0
-	if check_if_file:
-		for path in os.scandir(directory):
-			if os.path.is_file():
-				count += 1
-	else:
-		for path in os.scandir(directory):
-			count += 1
-	return count
 
 # source: ChatGPT
 # returns what func printed to the console if it did, otherwise its return value
@@ -58,3 +38,21 @@ async def check_loop(check_func, timeout, *args):
 		await asyncio.sleep(1)
 		wait += 1
 	return False
+
+class TimeIt:
+	def __init__(self):
+		self.time = 0
+		self.measured = 0
+
+	def timeit(self, func, *args):
+		st = time.time()
+		r = func(*args)
+		self.time += time.time() - st
+		self.measured += 1
+		return r
+
+	def time_spent_measuring(self):
+		return measure_time * self.measured
+
+	def time_spent_waiting(self):
+		return self.time - self.time_spent_measuring()

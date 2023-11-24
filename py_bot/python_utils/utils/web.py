@@ -1,7 +1,8 @@
-import os, urllib, webbrowser, paramiko
-import requests
-from .os import from_windows
+import re, os, urllib, webbrowser, paramiko, time, requests 
+from bs4 import BeautifulSoup
+from .os import from_windows, TimeIt
 from .print import cprint
+from .list import *
 from dotenv import load_dotenv
 '''
 status codes
@@ -13,6 +14,14 @@ status codes
 	Server error responses (500 – 599)
 
 '''
+
+# allows for indent_width with BeautifulSoup.prettify
+# source : https://stackoverflow.com/a/15513483
+orig_prettify = BeautifulSoup.prettify
+r = re.compile(r'^(\s*)', re.MULTILINE)
+def prettify(self, encoding=None, formatter="minimal", indent_width=4):
+	return r.sub(r'\1' * indent_width, orig_prettify(self, encoding, formatter))
+BeautifulSoup.prettify = prettify
 
 def decode_url(url):
 	return urllib.parse.unquote(url)
@@ -163,98 +172,209 @@ def wget(url:str, output_filename:str=None, output_dir:str=None, show_progress:b
 # 	def __init__(self, )
 
 class DockerManager:
-	def __init__(self, hostname, port, username, password, dotenv_path):
-		self.ssh = paramiko.SSHClient()
-		self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		self.folder_exists = []
+	def __init__(self, hostname, port, username, password, dotenv_path, root_depth=0, use_cache=False):
+		self.ti = TimeIt()
+		self.ssh = self.ti.timeit(paramiko.SSHClient)
+		self.ti.timeit(self.ssh.set_missing_host_key_policy, paramiko.AutoAddPolicy())
+		self.use_cache = use_cache
+		if self.use_cache:
+			# local_cache represents if a local file was already sent
+			self.local_cache = list()
+			# remote_cache represents if a remote file exists
+			self.remote_cache = list()
 
 		# init ssh
 		try:
-			self.ssh.connect(hostname, port, username, password)
+			self.ti.timeit(self.ssh.connect, hostname, port, username, password)
 		except Exception as e:
 			print(f'DockerManager: ssh failed to connect: {e}')
 			return None
 		# init sftp
 		try:
-			# transport = paramiko.Transport((hostname, int(port)))
-			# transport.connect(username=username, password=password)
-			# sftp_channel = transport.open_channel('session')
-			# sftp_channel.send('subsystem request: "sftp"')
-			# self.sftp = paramiko.SFTPClient.from_transport(transport)
-			self.sftp = self.ssh.open_sftp()
+			self.sftp = self.ti.timeit(self.ssh.open_sftp)
 		except Exception as e:
 			print(f'DockerManager: ssh sftp failed to open: {e}')
 			self.ssh.close()
 			return None
 
-		self.get('.env', dotenv_path)
+		self.get(dotenv_path, '.env')
 		load_dotenv(dotenv_path='.env')
+		self.root_depth = root_depth
 
 	def get_container_id(self, container_name):
 		return os.getenv(container_name, None)
 
-	def execute_docker_command(self, command, container_name, additional_args=None):
+	def _execute(self, command, container_name, additional_args=None):
 		container_id = self.get_container_id(container_name)
 		if not container_id: return False, None
 		additional_args = additional_args or []
-		_, stdout, _ = self.ssh.exec_command(f"docker {command} {container_id} {' '.join(additional_args)}")
+		tmp = ' '.join(additional_args)
+		stdout = None
+		try:
+			_, stdout, _ = self.ti.timeit(self.ssh.exec_command, f"docker {command} {container_id} {tmp}")
+		except:
+			return False, none
 		data = stdout.read().decode().strip()
 		return True, data
 		
 	def start(self, container_name):
-		return self.execute_docker_command('start', container_name)
+		return self._execute('start', container_name)
 
 	def stop(self, container_name):
-		return self.execute_docker_command('stop', container_name)
+		return self._execute('stop', container_name)
 
-	def suspend(self, container_name):
-		return self.execute_docker_command('pause', container_name)
+	def pause(self, container_name):
+		return self._execute('pause', container_name)
 
-	def exec_command(self, container_name, command, additional_args=None):
-		return self.execute_docker_command('exec', container_name, [command, *additional_args])
+	def execute(self, container_name, command, additional_args=None):
+		return self._execute('exec', container_name, [command, *additional_args])
 
-	def send(self, localpath, remotepath, safe=True):
+	@profile
+	def _send(self, localpath, remotepath):
+		if not os.path.exists(localpath): return False
+		if not overwrite and self.exists(remotepath): return False
 		if safe:
 			full_path = remotepath.split('/')[1:]
-			for i in range(len(full_path)-1):
+			for i in range(self.root_depth, len(full_path)-1):
 				folder = '/'+'/'.join(full_path[:i+1])
-				if folder in self.folder_exists: continue
-				if not self.exists(folder): self.mkdir(folder)
-				self.folder_exists.append(folder)
-		self.sftp.put(localpath, remotepath)
+				self.mkdir(folder)
+		try:
+			self.ti.timeit(self.sftp.put, localpath, remotepath)
+		except Exception as e:
+			# print(f'DockerManager: send: self.sftp.put: {e}')
+			return False
 
-	def get(self, localpath, remotepath):
-		self.sftp.get(remotepath, localpath)
+	@profile
+	def send(self, localpath, remotepath, safe=True, overwrite=True):
+		if self.use_cache:
+			if localpath in self.local_cache: return False
+			r = self._send(localpath, remotepath, safe, overwrite)
+			self.local_cache.append(localpath)
+			if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+			return r
+		return self._send(localpath, remotepath, safe, overwrite)
+
+	def _get(self, remotepath, localpath, safe, overwrite):
+		if not os.path.exists(localpath): return False
+		if not overwrite and self.exists(remotepath): return False
+		if safe:
+			full_path = remotepath.split('/')[1:]
+			for i in range(self.root_depth, len(full_path)-1):
+				folder = '/'+'/'.join(full_path[:i+1])
+				self.mkdir(folder)
+		try:
+			self.ti.timeit(self.sftp.put, localpath, remotepath)
+		except Exception as e:
+			# print(f'DockerManager: send: self.sftp.put: {e}')
+			return False
+
+	def get(self, remotepath, localpath, safe=True, overwrite=True):
+		if self.use_cache:
+			if localpath in self.local_cache: return False
+			r = self._send(remotepath, localpath, safe, overwrite)
+			self.local_cache.append(localpath)
+			if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+			return r
+		return self._send(remotepath, localpath, safe, overwrite)
 
 	def read(self, remotepath):
-		content = ''
-		with self.sftp.file(remotepath, 'r') as rf:
-			content = rf.read()
+		f = None
+		if self.use_cache:
+			try:
+				f = self.ti.timeit(self.sftp.file, remotepath, 'r')
+			except Exception as e:
+				# print(f'DockerManager: read: self.sftp.file: {e}')
+				self.remote_cache.delete(remotepath)
+				return None
+			if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+		else:
+			try:
+				f = self.ti.timeit(self.sftp.file, remotepath, 'r')
+			except Exception as e:
+				# print(f'DockerManager: read: self.sftp.file: {e}')
+				return None
+		content = f.read()
+		f.close()
 		return content
 
 	def remove(self, remotepath):
-		self.sftp.remove(remotepath)
+		try:
+			self.ti.timeit(self.sftp.remove, remotepath)
+		except Exception as e:
+			# print(f'DockerManager: remove: self.sftp.remove: {e}')
+			return False
+		if self.use_cache: self.remote_cache.delete(remotepath)
+		return True
 
 	def move(self, remotepath_src, remotepath_dest):
-		self.sftp.move(remotepath_src, remotepath_dest)
+		try:
+			self.ti.timeit(self.sftp.posix_rename, remotepath_src, remotepath_dest)
+		except Exception as e:
+			# print(f'DockerManager: move: self.sftp.posix_rename: {e}')
+			return False
+		return True
 
+	def rename(self, remotepath_src, remotepath_dest):
+		return self.move(remotepath_src, remotepath_dest)
+
+	@profile
 	def mkdir(self, remotepath):
-		self.sftp.mkdir(remotepath)
+		if use_cache:
+			if remotepath in self.remote_cache: return True
+			try:
+				self.ti.timeit(self.sftp.mkdir, remotepath)	
+			except Exception as e:
+				# print(f'DockerManager: mkdir: self.sftp.mkdir: {e}')
+				return False
+			self.remote_cache.append(remotepath)
+			return True
+		else:
+			try:
+				self.ti.timeit(self.sftp.mkdir, remotepath)	
+			except Exception as e:
+				# print(f'DockerManager: mkdir: self.sftp.mkdir: {e}')
+				return False
+			return True
 
 	def rmdir(self, remotepath):
-		self.sftp.rmdir(remotepath)
+		try:
+			self.ti.timeit(self.sftp.rmdir, remotepath)
+		except Exception as e:
+			# print(f'DockerManager: rmdir: self.sftp.rmdir: {e}')
+			return False
+		if self.use_cache: self.remote_cache.delete(remotepath)
+		return True
 
 	def exists(self, remotepath):
-		try:
-			self.sftp.stat(remotepath)
+		if self.use_cache:
+			if remotepath in self.remote_cache: return True
+			try:
+				self.ti.timeit(self.sftp.stat, remotepath)
+			except Exception as e:
+				# print(f'DockerManager: exists: self.sftp.stat: {e}')
+				return False
+			self.remote_cache.append(remotepath)
 			return True
-		except:
-			return False
+		else:
+			try:
+				self.ti.timeit(self.sftp.stat, remotepath)
+			except Exception as e:
+				# print(f'DockerManager: exists: self.sftp.stat: {e}')
+				return False
+			return True
 
 	def stat(self, remotepath):
-		return self.sftp.stat(remotepath)
+		r = None
+		try:
+			r = self.ti.timeit(self.sftp.stat, remotepath)
+		except Exception as e:
+			# print(f'DockerManager: stat: self.sftp.stat: {e}')
+			self.remote_cache.delete(remotepath)
+			return None
+		if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+		return r
 
 	def close(self):
-		self.ssh.close()
-		self.sftp.close()
+		self.ti.timeit(self.ssh.close)
+		self.ti.timeit(self.sftp.close)
 		os.remove('.env')
