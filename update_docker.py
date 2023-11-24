@@ -23,30 +23,45 @@ for commit in commits:
 	edits = tmp[2:-1]
 	for edit in edits:
 		tmp = edit.split('\t')
-		action = tmp[0]
+		action = tmp[0][0]
 		path = tmp[1]
 		full_path = path.split('/')
 		if len(full_path) <= 1: continue
 		docker = full_path[0]
-		if path in done_paths or not docker in docker_names: continue
-		for i in range(1, len(full_path)-1):
-			folder = '/'.join(full_path[1:i+1])
-			remotepath = f'{root}{docker}/{folder}'
-			localpath = f'{docker}/{folder}'
-			if not localpath in done_paths and not docker_manager.exists(remotepath):
-				print('mkdir', remotepath)
-				docker_manager.mkdir(remotepath)
-				done_paths.append(localpath)
-		done_paths.append(path)
 		remotepath = root+path
-		if action == 'A' or action == 'M':
-			print('send', remotepath)
+		if action == 'A' or action == 'M' or action == 'C':
+			if path in done_paths or not docker in docker_names: continue
+			print('send', path, remotepath)
 			docker_manager.send(path, remotepath)
+			done_paths.append(path)
 		elif action == 'D':
+			if path in done_paths or not docker in docker_names: continue
 			print('remove', remotepath)
 			if docker_manager.exists(remotepath): docker_manager.remove(remotepath)
+			done_paths.append(path)
+		elif action == 'T':
+			if path in done_paths or not docker in docker_names: continue
+			print('remove', remotepath)
+			if docker_manager.exists(remotepath): docker_manager.remove(remotepath)
+			print('send', path, remotepath)
+			docker_manager.send(path, remotepath)
+			done_paths.append(path)
+		elif action == 'R':
+			dest = tmp[2]
+			full_dest = dest.split('/')
+			if len(full_dest) <= 1: continue
+			docker = full_dest[0]
+			if dest in done_paths or not docker in docker_names: continue
+			remotepath_dest = root+dest
+			if docker_manager.exists(remotepath):
+				print('move', remotepath, remotepath_dest)
+				docker_manager.move(remotepath, remotepath_dest)
+			else:
+				print('send', dest, remotepath_dest)
+				docker_manager.send(dest, remotepath_dest)
+			done_paths.append(dest)
 		else:
-			print(f'updated_dockers: Unknown action ({action})')
+			print(f'ignoring {edit}')
 			continue
 		updated_dockers.append(docker)
 	done_commits.append(commit_hash)
