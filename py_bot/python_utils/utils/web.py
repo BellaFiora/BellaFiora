@@ -175,13 +175,19 @@ class DockerManager:
 			return None
 		# init sftp
 		try:
+			# transport = paramiko.Transport((hostname, int(port)))
+			# transport.connect(username=username, password=password)
+			# sftp_channel = transport.open_channel('session')
+			# sftp_channel.send('subsystem request: "sftp"')
+			# self.sftp = paramiko.SFTPClient.from_transport(transport)
 			self.sftp = self.ssh.open_sftp()
 		except Exception as e:
 			print(f'DockerManager: ssh sftp failed to open: {e}')
 			self.ssh.close()
 			return None
 
-		load_dotenv(dotenv_path=dotenv_path)
+		self.get('.env', dotenv_path)
+		load_dotenv(dotenv_path='.env')
 
 	def get_container_id(self, container_name):
 		return os.getenv(container_name, None)
@@ -206,13 +212,13 @@ class DockerManager:
 	def exec_command(self, container_name, command, additional_args=None):
 		return self.execute_docker_command('exec', container_name, [command, *additional_args])
 
-	def send_file(self, localpath, remotepath):
+	def send(self, localpath, remotepath):
 		self.sftp.put(localpath, remotepath)
 
-	def get_file(self, localpath, remotepath):
+	def get(self, localpath, remotepath):
 		self.sftp.get(remotepath, localpath)
 
-	def read_file(self, remotepath):
+	def read(self, remotepath):
 		content = ''
 		with self.sftp.file(remotepath, 'r') as rf:
 			content = rf.read()
@@ -228,11 +234,16 @@ class DockerManager:
 		self.sftp.rmdir(remotepath)
 
 	def exists(self, remotepath):
-		return self.sftp.stat(remotepath) != None
+		try:
+			self.sftp.stat(remotepath)
+			return True
+		except:
+			return False
 
 	def stat(self, remotepath):
 		return self.sftp.stat(remotepath)
 
-	def close_manager(self):
+	def close(self):
 		self.ssh.close()
 		self.sftp.close()
+		os.remove('.env')
