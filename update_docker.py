@@ -5,13 +5,13 @@ docker_manager = DockerManager(*read_file('.ssh').split('\n')[0:5])
 
 root = '/mnt/user/node-containers/BellaFiora/'
 done_paths = []
-done_commits = []
+commits_done = []
 updated_dockers = []
-if os.path.exists('done_commits'):
+if os.path.exists('commits_done'):
 	content = ''
-	with open('done_commits', 'r') as f:
+	with open('commits_done', 'r') as f:
 		content = f.read()
-	done_commits = content.split('\n')[:-1]
+	commits_done = content.split('\n')[:-1]
 
 docker_names = ['private_api', 'public_api', 'bm_manager', 'js_bot', 'py_bot', 'user_manager', 'webapp']
 logs = os.popen('git log --name-status --oneline --no-decorate --format="///%H"').read()
@@ -19,7 +19,7 @@ commits = logs.split('///')[1:]
 for commit in commits:
 	tmp = commit.split('\n')
 	commit_hash = tmp[0]
-	if commit_hash in done_commits: continue
+	if commit_hash in commits_done: continue
 	edits = tmp[2:-1]
 	for edit in edits:
 		tmp = edit.split('\t')
@@ -64,7 +64,7 @@ for commit in commits:
 			print(f'ignoring {edit}')
 			continue
 		updated_dockers.append(docker)
-	done_commits.append(commit_hash)
+	commits_done.append(commit_hash)
 
 # update dockers in which files were added / deleted / modified
 # updated_dockers = list(set(updated_dockers))
@@ -72,8 +72,8 @@ for commit in commits:
 # 	docker_manager.stop(docker)
 # 	docker_manager.start(docker)
 
-with open('done_commits', 'w+') as f:
-	for commit_hash in done_commits:
+with open('commits_done', 'w+') as f:
+	for commit_hash in commits_done:
 		f.write(commit_hash+'\n')
 
 docker_manager.close()
