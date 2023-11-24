@@ -28,6 +28,7 @@ logs = os.popen('git log --name-status --oneline --no-decorate --format="///%H"'
 ti.time += time.time() - st
 ti.measured += 1
 commits = logs.split('///')[1:]
+# /////////////////////// WIP ///////////////////////
 @profile
 def process_commit(commit):
 	tmp = commit.split('\n')
