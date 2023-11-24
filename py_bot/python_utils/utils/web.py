@@ -166,7 +166,8 @@ class DockerManager:
 	def __init__(self, hostname, port, username, password, dotenv_path):
 		self.ssh = paramiko.SSHClient()
 		self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		
+		self.folder_exists = []
+
 		# init ssh
 		try:
 			self.ssh.connect(hostname, port, username, password)
@@ -212,7 +213,14 @@ class DockerManager:
 	def exec_command(self, container_name, command, additional_args=None):
 		return self.execute_docker_command('exec', container_name, [command, *additional_args])
 
-	def send(self, localpath, remotepath):
+	def send(self, localpath, remotepath, safe=True):
+		if safe:
+			full_path = remotepath.split('/')[1:]
+			for i in range(len(full_path)-1):
+				folder = '/'+'/'.join(full_path[:i+1])
+				if folder in self.folder_exists: continue
+				if not self.exists(folder): self.mkdir(folder)
+				self.folder_exists.append(folder)
 		self.sftp.put(localpath, remotepath)
 
 	def get(self, localpath, remotepath):
@@ -226,6 +234,9 @@ class DockerManager:
 
 	def remove(self, remotepath):
 		self.sftp.remove(remotepath)
+
+	def move(self, remotepath_src, remotepath_dest):
+		self.sftp.move(remotepath_src, remotepath_dest)
 
 	def mkdir(self, remotepath):
 		self.sftp.mkdir(remotepath)
