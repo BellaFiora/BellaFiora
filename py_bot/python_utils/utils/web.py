@@ -173,7 +173,22 @@ def wget(url:str, output_filename:str=None, output_dir:str=None, show_progress:b
 # 	def __init__(self, )
 
 class DockerManager:
-	
+	nb_get_container_id = 0
+	nb_start = 0
+	nb_stop = 0
+	nb_pause = 0
+	nb_execute = 0
+	nb_mkdir = 0
+	nb_rmdir = 0
+	nb_send = 0
+	nb_get = 0
+	nb_read = 0
+	nb_remove = 0
+	nb_move = 0
+	nb_rename = 0
+	nb_stat = 0
+	nb_exists = 0
+
 	# the mapping between a container name and a container id must be set in a .env file on remote at dotenv_path
 	def __init__(self, hostname, port, username, password, dotenv_path, root_depth=0, cache=True, safe=True, overwrite=True):
 		self.ti = TimeIt()
@@ -187,12 +202,13 @@ class DockerManager:
 		self.remote_cache = list()
 
 		self.set_mkdir_options(cache, safe)
-		self.set_rmdir_options(cache, safe)
+		self.set_rmdir_options(cache)
 		self.set_send_options(cache, safe, overwrite)
 		self.set_get_options(safe, overwrite)
-		self.set_remove_options(safe, cache)
-		self.set_stat_options(safe, cache)
-		self.set_exists_options(safe, cache)
+		self.set_remove_options(cache)
+		self.set_move_options(cache)
+		self.set_stat_options(cache)
+		self.set_exists_options(cache)
 
 		# init ssh
 		try:
@@ -220,9 +236,11 @@ class DockerManager:
 	# docker commands utilities
 
 	def get_container_id(self, container_name):
+		self.nb_get_container_id += 1
 		return os.getenv(container_name, None)
 
 	def _execute(self, command, container_name, additional_args=None):
+		self.execute += 1
 		container_id = self.get_container_id(container_name)
 		if not container_id: return False, None
 		additional_args = additional_args or []
@@ -236,12 +254,15 @@ class DockerManager:
 		return True, data
 		
 	def start(self, container_name):
+		self.nb_start += 1
 		return self._execute('start', container_name)
 
 	def stop(self, container_name):
+		self.stop += 1
 		return self._execute('stop', container_name)
 
 	def pause(self, container_name):
+		self.pause += 1
 		return self._execute('pause', container_name)
 
 	def execute(self, container_name, command, additional_args=None):
@@ -278,6 +299,7 @@ class DockerManager:
 				self._mkdir_with_options = self._mkdir_no_cache_no_safe
 
 	def _mkdir(self, remotepath):
+		self.nb_mkdir += 1
 		try:
 			self.ti.timeit(self.sftp.mkdir, remotepath)	
 		except Exception as e:
@@ -317,6 +339,7 @@ class DockerManager:
 			self._rmdir_with_options = self._rmdir_no_cache
 
 	def _rmdir(self, remotepath):
+		self.nb_rmdir += 1
 		try:
 			self.ti.timeit(self.sftp.rmdir, remotepath)
 		except Exception as e:
@@ -361,6 +384,7 @@ class DockerManager:
 					self._send_with_options = self._send_no_cache_no_safe_no_overwrite
 
 	def _send(self, localpath, remotepath):
+		self.nb_send += 1
 		try:
 			self.ti.timeit(self.sftp.put, localpath, remotepath)
 		except Exception as e:
@@ -430,6 +454,7 @@ class DockerManager:
 				self._get_with_options = self._get_no_safe_no_overwrite
 
 	def _get(self, remotepath, localpath):
+		self.nb_get += 1
 		try:
 			self.ti.timeit(self.sftp.get, remotepath, localpath)
 		except Exception as e:
@@ -458,7 +483,11 @@ class DockerManager:
 
 	# read utility
 
+	# no _read bc read is already the most basic operation that can be done
+	# and I'll not create a _read just for read to return _read lol
+
 	def read(self, remotepath, mode='r'):
+		self.nb_read += 1
 		tmp_file_path = python_utils_tmp_folder_path+'/DockerManager_read_tmp_file'
 		self._get(remotepath, tmp_file_path)
 		content = ''
@@ -475,6 +504,7 @@ class DockerManager:
 			self._remove_with_options = self._remove_no_cache
 
 	def _remove(self, remotepath):
+		self.nb_remove += 1
 		try:
 			self.ti.timeit(self.sftp.remove, remotepath)	
 		except Exception as e:
@@ -494,20 +524,46 @@ class DockerManager:
 
 	# move utility
 
-	def move(self, remotepath_src, remotepath_dest):
+	def set_move_options(self, cache):
+		if cache:
+			self._move_with_options = self._move_cache
+		else:
+			self._move_with_options = self._move_no_cache
+
+	def _move(self, remotepath_src, remotepath_dest):
+		self.nb_move += 1
 		try:
 			self.ti.timeit(self.sftp.posix_rename, remotepath_src, remotepath_dest)
 		except Exception as e:
 			# print(f'DockerManager: move: self.sftp.posix_rename: {e}')
 			return False
-		self.remote_cache.delete(remotepath_src)
-		self.remote_cache.append(remotepath_dest)
 		return True
+
+	def _move_no_cache(self, remotepath_src, remotepath_dest):
+		return self._move(remotepath_src, remotepath_dest)
+	
+	def _move_cache(self, remotepath_src, remotepath_dest):
+		r = self._move(remotepath_src, remotepath_dest)
+		if r:
+			self.remote_cache.delete(remotepath_src)
+			if not remotepath_dest in self.remote_cache: self.remote_cache.append(remotepath_dest)
+		return r
+
+	def move(self, remotepath_src, remotepath_dest):
+		return self._move_with_options(remotepath_src, remotepath_dest)
 
 	# rename utility
 
+	# no _rename, same reason as read
+
 	def rename(self, remotepath_src, remotepath_dest):
-		return self.move(remotepath_src, remotepath_dest)
+		self.nb_rename += 1
+		try:
+			self.ti.timeit(self.sftp.posix_rename, remotepath_src, remotepath_dest)
+		except Exception as e:
+			# print(f'DockerManager: move: self.sftp.posix_rename: {e}')
+			return False
+		return True
 
 	# stat utility
 
@@ -518,6 +574,7 @@ class DockerManager:
 			self._stat_with_options = self._stat_no_cache
 
 	def _stat(self, remotepath):
+		self.nb_stat += 1
 		r = None
 		try:
 			r = self.ti.timeit(self.sftp.stat, remotepath)
@@ -547,6 +604,7 @@ class DockerManager:
 			self._exists_with_options = self._exists_no_cache
 
 	def _exists(self, remotepath):
+		self.nb_exists += 1
 		try:
 			self.ti.timeit(self.sftp.stat, remotepath)
 		except Exception as e:
