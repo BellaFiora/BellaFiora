@@ -89,7 +89,8 @@ def process_commit(commit):
 			if not docker in docker_names: continue
 			remotedest = root+dest
 			print(f'renaming {remotepath} {remotedest}')
-			docker_manager.rename(remotepath, remotedest)
+			if not docker_manager.rename(remotepath, remotedest):
+				docker_manager.send(dest, remotedest)
 		else:
 			print(f'ignoring {edit}')
 		updated_dockers.append(docker)
@@ -119,8 +120,7 @@ time_measuring_on_ssh = docker_manager.ti.time_spent_measuring()
 time_total = time.time() - st_total
 time_other = time_total - time_spent_on_ssh - time_measuring_on_ssh
 nb_updated_dockers = len(updated_dockers)
-print(	f"took {time_to_connect}s to connect\n"
-		f"took {time_to_update_dockers}s to update dockers\n"
+print(	f"took {time_to_update_dockers}s to update dockers\n"
 		f"took {time_to_restart_dockers}s to restart dockers\n\n"
 		f"spent {time_spent_on_ssh}s on ssh (+{time_measuring_on_ssh}s on measuring)\n\n"
 		f"spent {time_total}s total (of which {time_other}s not spent on ssh)\n\n"
