@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from .os import from_windows, TimeIt
 from .print import cprint
 from .list import *
+from .constants import tmp_folder_path, python_utils_tmp_folder_path
 from dotenv import load_dotenv
 '''
 status codes
@@ -172,16 +173,22 @@ def wget(url:str, output_filename:str=None, output_dir:str=None, show_progress:b
 # 	def __init__(self, )
 
 class DockerManager:
-	def __init__(self, hostname, port, username, password, dotenv_path, root_depth=0, use_cache=False):
+	
+	# the mapping between a container name and a container id must be set in a .env file on remote at dotenv_path
+	def __init__(self, hostname, port, username, password, dotenv_path, root_depth=0, cache=True, safe=True, overwrite=True):
 		self.ti = TimeIt()
 		self.ssh = self.ti.timeit(paramiko.SSHClient)
 		self.ti.timeit(self.ssh.set_missing_host_key_policy, paramiko.AutoAddPolicy())
-		self.use_cache = use_cache
-		if self.use_cache:
-			# local_cache represents if a local file was already sent
-			self.local_cache = list()
-			# remote_cache represents if a remote file exists
-			self.remote_cache = list()
+		self.root_depth = root_depth
+
+		# local_cache represents if a local file was already sent
+		self.local_cache = set()
+		# remote_cache represents if a remote file exists
+		self.remote_cache = list()
+
+		self.set_mkdir_options(cache, safe)
+		self.set_send_options(cache, safe, overwrite)
+		self.set_get_options(safe, overwrite)
 
 		# init ssh
 		try:
@@ -197,9 +204,16 @@ class DockerManager:
 			self.ssh.close()
 			return None
 
-		self.get(dotenv_path, '.env')
-		load_dotenv(dotenv_path='.env')
-		self.root_depth = root_depth
+		if not os.path.exists(python_utils_tmp_folder_path):
+			os.mkdir(python_utils_tmp_folder_path)
+		tmp_dotenv_path = python_utils_tmp_folder_path+'/DockerManager___init___tmp_file'
+		if not self._get(dotenv_path, tmp_dotenv_path):
+			self.ssh.close()
+			print(f'DockerManager: _get failed to get {dotenv_path} on remote')
+			return None
+		load_dotenv(dotenv_path=tmp_dotenv_path)
+
+	# docker commands utilities
 
 	def get_container_id(self, container_name):
 		return os.getenv(container_name, None)
@@ -229,114 +243,68 @@ class DockerManager:
 	def execute(self, container_name, command, additional_args=None):
 		return self._execute('exec', container_name, [command, *additional_args])
 
-	@profile
-	def _send(self, localpath, remotepath):
-		if not os.path.exists(localpath): return False
-		if not overwrite and self.exists(remotepath): return False
-		if safe:
-			full_path = remotepath.split('/')[1:]
-			for i in range(self.root_depth, len(full_path)-1):
-				folder = '/'+'/'.join(full_path[:i+1])
-				self.mkdir(folder)
-		try:
-			self.ti.timeit(self.sftp.put, localpath, remotepath)
-		except Exception as e:
-			# print(f'DockerManager: send: self.sftp.put: {e}')
-			return False
+	# make intermediate directories
 
-	@profile
-	def send(self, localpath, remotepath, safe=True, overwrite=True):
-		if self.use_cache:
-			if localpath in self.local_cache: return False
-			r = self._send(localpath, remotepath, safe, overwrite)
-			self.local_cache.append(localpath)
-			if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
-			return r
-		return self._send(localpath, remotepath, safe, overwrite)
+	def _make_dirs_no_cache(self, path):
+		full_path = path.split('/')[1:]
+		for i in range(self.root_depth, len(full_path)-1):
+			folder = '/'+'/'.join(full_path[:i+1])
+			self._mkdir(folder)
+	
+	def _make_dirs_cache(self, path, cache):
+		full_path = path.split('/')[1:]
+		for i in range(self.root_depth, len(full_path)-1):
+			folder = '/'+'/'.join(full_path[:i+1])
+			if folder in cache: continue
+			self._mkdir(folder)
+			cache.append(folder)
 
-	# /////////////////////// WIP ///////////////////////
-	def _get(self, remotepath, localpath, safe, overwrite):
-		if not os.path.exists(localpath): return False
-		if not overwrite and self.exists(remotepath): return False
-		if safe:
-			full_path = remotepath.split('/')[1:]
-			for i in range(self.root_depth, len(full_path)-1):
-				folder = '/'+'/'.join(full_path[:i+1])
-				self.mkdir(folder)
-		try:
-			self.ti.timeit(self.sftp.put, localpath, remotepath)
-		except Exception as e:
-			# print(f'DockerManager: send: self.sftp.put: {e}')
-			return False
+	# mkdir utility
 
-	# /////////////////////// WIP ///////////////////////
-	def get(self, remotepath, localpath, safe=True, overwrite=True):
-		if self.use_cache:
-			if localpath in self.local_cache: return False
-			r = self._send(remotepath, localpath, safe, overwrite)
-			self.local_cache.append(localpath)
-			if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
-			return r
-		return self._send(remotepath, localpath, safe, overwrite)
-
-	def read(self, remotepath):
-		f = None
-		if self.use_cache:
-			try:
-				f = self.ti.timeit(self.sftp.file, remotepath, 'r')
-			except Exception as e:
-				# print(f'DockerManager: read: self.sftp.file: {e}')
-				self.remote_cache.delete(remotepath)
-				return None
-			if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+	def set_mkdir_options(self, cache, safe):
+		if cache:
+			if safe:
+				self._mkdir_with_options = self._mkdir_cache_safe
+			else:
+				self._mkdir_with_options = self._mkdir_cache_no_safe
 		else:
-			try:
-				f = self.ti.timeit(self.sftp.file, remotepath, 'r')
-			except Exception as e:
-				# print(f'DockerManager: read: self.sftp.file: {e}')
-				return None
-		content = f.read()
-		f.close()
-		return content
+			if safe:
+				self._mkdir_with_options = self._mkdir_no_cache_safe
+			else:
+				self._mkdir_with_options = self._mkdir_no_cache_no_safe
 
-	def remove(self, remotepath):
+	def _mkdir(self, remotepath):
 		try:
-			self.ti.timeit(self.sftp.remove, remotepath)
+			self.ti.timeit(self.sftp.mkdir, remotepath)	
 		except Exception as e:
-			# print(f'DockerManager: remove: self.sftp.remove: {e}')
-			return False
-		if self.use_cache: self.remote_cache.delete(remotepath)
-		return True
-
-	def move(self, remotepath_src, remotepath_dest):
-		try:
-			self.ti.timeit(self.sftp.posix_rename, remotepath_src, remotepath_dest)
-		except Exception as e:
-			# print(f'DockerManager: move: self.sftp.posix_rename: {e}')
+			# print(f'DockerManager: mkdir: self.sftp.mkdir: {e}')
 			return False
 		return True
 
-	def rename(self, remotepath_src, remotepath_dest):
-		return self.move(remotepath_src, remotepath_dest)
+	def _mkdir_cache_safe(self, remotepath):
+		self._make_dirs_cache(remotepath, self.remote_cache)
+		r = self._mkdir(remotepath)
+		if r and not remotepath in self.remote_cache:
+			remote_cache.append(remotepath)
+		return r
+	
+	def _mkdir_cache_no_safe(self, remotepath):
+		r = self._mkdir(remotepath)
+		if r and not remotepath in self.remote_cache:
+			remote_cache.append(remotepath)
+		return r
+	
+	def _mkdir_no_cache_safe(self, remotepath):
+		self._make_dirs_no_cache(remotepath, self.remote_cache)
+		return self._mkdir(remotepath)
+	
+	def _mkdir_no_cache_no_safe(self, remotepath):
+		return self._mkdir(remotepath)
 
-	@profile
 	def mkdir(self, remotepath):
-		if use_cache:
-			if remotepath in self.remote_cache: return True
-			try:
-				self.ti.timeit(self.sftp.mkdir, remotepath)	
-			except Exception as e:
-				# print(f'DockerManager: mkdir: self.sftp.mkdir: {e}')
-				return False
-			self.remote_cache.append(remotepath)
-			return True
-		else:
-			try:
-				self.ti.timeit(self.sftp.mkdir, remotepath)	
-			except Exception as e:
-				# print(f'DockerManager: mkdir: self.sftp.mkdir: {e}')
-				return False
-			return True
+		return self._mkdir_with_options(remotepath) 
+
+	# rmdir utility
 
 	def rmdir(self, remotepath):
 		try:
@@ -346,6 +314,166 @@ class DockerManager:
 			return False
 		if self.use_cache: self.remote_cache.delete(remotepath)
 		return True
+
+	# send utility
+
+	def set_send_options(self, cache, safe, overwrite):
+		if cache:
+			if safe:
+				if overwrite:
+					self._send_with_options = self._send_cache_safe_overwrite
+				else:
+					self._send_with_options = self._send_cache_safe_no_overwrite
+			else:
+				if overwrite:
+					self._send_with_options = self._send_cache_no_safe_overwrite
+				else:
+					self._send_with_options = self._send_cache_no_safe_no_overwrite
+		else:
+			if safe:
+				if overwrite:
+					self._send_with_options = self._send_no_cache_safe_overwrite
+				else:
+					self._send_with_options = self._send_no_cache_safe_no_overwrite
+			else:
+				if overwrite:
+					self._send_with_options = self._send_no_cache_no_safe_overwrite
+				else:
+					self._send_with_options = self._send_no_cache_no_safe_no_overwrite
+
+	def _send(self, localpath, remotepath):
+		try:
+			self.ti.timeit(self.sftp.put, localpath, remotepath)
+		except Exception as e:
+			print(f'DockerManager: _send: self.sftp.put: {e}')
+			return False
+		return True
+
+	def _send_no_cache_no_safe_no_overwrite(self, localpath, remotepath):
+		if self.exists(remotepath): return False
+		return self._send(localpath, remotepath)
+	
+	def _send_no_cache_no_safe_overwrite(self, localpath, remotepath):
+		return self._send(localpath, remotepath)
+	
+	def _send_no_cache_safe_no_overwrite(self, localpath, remotepath):
+		if self.exists(remotepath): return False
+		self._make_dirs_no_cache(remotepath)
+		return self._send(localpath, remotepath)
+	
+	def _send_no_cache_safe_overwrite(self, localpath, remotepath):
+		self._make_dirs_no_cache(remotepath)
+		return self._send(localpath, remotepath)
+	
+	def _send_cache_no_safe_no_overwrite(self, localpath, remotepath):
+		local_file_info = os.stat(localpath)
+		if localpath in self.local_cache and local_file_info.st_mtime == self.local_cache[localpath]: return False
+		self.local_cache[localpath] = local_file_info.st_mtime
+		if self.exists(remotepath): return False
+		return self._send(localpath, remotepath)
+	
+	def _send_cache_no_safe_overwrite(self, localpath, remotepath):
+		local_file_info = os.stat(localpath)
+		if localpath in self.local_cache and local_file_info.st_mtime == self.local_cache[localpath]: return False
+		self.local_cache[localpath] = local_file_info.st_mtime
+		return self._send(localpath, remotepath)
+	
+	def _send_cache_safe_no_overwrite(self, localpath, remotepath):
+		local_file_info = os.stat(localpath)
+		if localpath in self.local_cache and local_file_info.st_mtime == self.local_cache[localpath]: return False
+		self.local_cache[localpath] = local_file_info.st_mtime
+		if self.exists(remotepath): return False
+		self._make_dirs_cache(remotepath, self.remote_cache)
+		return self._send(localpath, remotepath)
+	
+	def _send_cache_safe_overwrite(self, localpath, remotepath):
+		local_file_info = os.stat(localpath)
+		if localpath in self.local_cache and local_file_info.st_mtime == self.local_cache[localpath]: return False
+		self.local_cache[localpath] = local_file_info.st_mtime
+		self._make_dirs_cache(remotepath, self.remote_cache)
+		return self._send(localpath, remotepath)
+
+	def send(self, localpath, remotepath):
+		return self._send_with_options(localpath, remotepath)
+
+	# get utility
+
+	def set_get_options(self, safe, overwrite):
+		if safe:
+			if overwrite:
+				self._get_with_options = self._get_safe_overwrite
+			else:
+				self._get_with_options = self._get_safe_no_overwrite
+		else:
+			if overwrite:
+				self._get_with_options = self._get_no_safe_overwrite
+			else:
+				self._get_with_options = self._get_no_safe_no_overwrite
+
+	def _get(self, remotepath, localpath):
+		try:
+			self.ti.timeit(self.sftp.get, remotepath, localpath)
+		except Exception as e:
+			print(f'DockerManager: _get: self.sftp.get: {e}')
+			return False
+		return True
+
+	def _get_no_safe_no_overwrite(self, remotepath, localpath):
+		if os.path.exists(localpath): return False
+		return self._get(remotepath, localpath)
+	
+	def _get_no_safe_overwrite(self, remotepath, localpath):
+		return self._get(remotepath, localpath)
+	
+	def _get_safe_no_overwrite(self, remotepath, localpath):
+		if os.path.exists(localpath): return False
+		self._make_dirs_no_cache(localpath)
+		return self._get(remotepath, localpath)
+	
+	def _get_safe_overwrite(self, remotepath, localpath):
+		self._make_dirs_no_cache(localpath)
+		return self._get(remotepath, localpath)
+
+	def get(self, localpath, remotepath):
+		return self._get_with_options(localpath, remotepath)
+
+	# read utility
+
+	def read(self, remotepath, mode='r'):
+		tmp_file_path = python_utils_tmp_folder_path+'/DockerManager_read_tmp_file'
+		self._get(remotepath, tmp_file_path)
+		content = ''
+		with open(tmp_file_path, mode) as f:
+			content = f.read()
+		return content
+
+	# remove utility
+
+	def remove(self, remotepath):
+		try:
+			self.ti.timeit(self.sftp.remove, remotepath)	
+		except Exception as e:
+			# print(f'DockerManager: remove: self.sftp.remove: {e}')
+			return False
+		self.remote_cache.delete(remotepath)
+		return True
+
+	# move utility
+
+	def move(self, remotepath_src, remotepath_dest):
+		try:
+			self.ti.timeit(self.sftp.posix_rename, remotepath_src, remotepath_dest)
+		except Exception as e:
+			# print(f'DockerManager: move: self.sftp.posix_rename: {e}')
+			return False
+		self.remote_cache.delete(remotepath_src)
+		self.remote_cache.append(remotepath_dest)
+		return True
+
+	# rename utility
+
+	def rename(self, remotepath_src, remotepath_dest):
+		return self.move(remotepath_src, remotepath_dest)
 
 	def exists(self, remotepath):
 		if self.use_cache:
