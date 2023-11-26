@@ -13,9 +13,10 @@ if os.path.exists('commits_done'):
 		content = f.read()
 	commits_done = content.split('\n')[:-1]
 
-docker_names = ['private_api', 'public_api', 'bm_manager', 'js_bot', 'py_bot', 'user_manager', 'webapp']
+docker_names = ['private_api', 'public_api', 'bm_manager', 'js_bot', 'py_bot', 'user_manager', 'webapp', 'common']
 logs = os.popen('git log --name-status --oneline --no-decorate --format="///%H"').read()
 commits = logs.split('///')[1:]
+
 '''
 cmd>git log --name-status --oneline --no-decorate --format="///%H"
 ///ce042254a2ce20233646c8f657d713d011e3e77c
@@ -72,10 +73,13 @@ def process_commit(commit):
 		if not docker in docker_names: continue
 		remotepath = root+path
 		if action == 'A' or action == 'M' or action == 'C':
+			print(f'sending {path} {remotepath}')
 			docker_manager.send(path, remotepath)
 		elif action == 'D':
+			print(f'removing {remotepath}')
 			docker_manager.remove(remotepath)
 		elif action == 'T':
+			print(f'moving {path} {remotepath}')
 			docker_manager.move(path, remotepath)
 		elif action == 'R':
 			dest = tmp[2]
@@ -83,7 +87,9 @@ def process_commit(commit):
 			if len(full_dest) <= 1: continue
 			docker = full_dest[0]
 			if not docker in docker_names: continue
-			docker_manager.rename(remotepath, root+dest)
+			remotedest = root+dest
+			print(f'renaming {remotepath} {remotedest}')
+			docker_manager.rename(remotepath, remotedest)
 		else:
 			print(f'ignoring {edit}')
 		updated_dockers.append(docker)
@@ -95,8 +101,8 @@ for commit in commits:
 time_to_update_dockers = time.time() - st
 
 st = time.time()
-# update dockers in which files were added / deleted / modified
-# updated_dockers = list(set(updated_dockers))
+# update dockers in which files were added / modified / created / deleted / renamed
+updated_dockers = list(set(updated_dockers))
 # for docker in updated_dockers:
 # 	docker_manager.stop(docker)
 # 	docker_manager.start(docker)
