@@ -187,8 +187,12 @@ class DockerManager:
 		self.remote_cache = list()
 
 		self.set_mkdir_options(cache, safe)
+		self.set_rmdir_options(cache, safe)
 		self.set_send_options(cache, safe, overwrite)
 		self.set_get_options(safe, overwrite)
+		self.set_remove_options(safe, cache)
+		self.set_stat_options(safe, cache)
+		self.set_exists_options(safe, cache)
 
 		# init ssh
 		try:
@@ -306,14 +310,29 @@ class DockerManager:
 
 	# rmdir utility
 
-	def rmdir(self, remotepath):
+	def set_rmdir_options(self, cache):
+		if cache:
+			self._rmdir_with_options = self._rmdir_cache
+		else:
+			self._rmdir_with_options = self._rmdir_no_cache
+
+	def _rmdir(self, remotepath):
 		try:
 			self.ti.timeit(self.sftp.rmdir, remotepath)
 		except Exception as e:
 			# print(f'DockerManager: rmdir: self.sftp.rmdir: {e}')
 			return False
-		if self.use_cache: self.remote_cache.delete(remotepath)
 		return True
+
+	def _rmdir_cache(self, remotepath):
+		self.remote_cache.delete(remotepath)
+		return self._rmdir(remotepath)
+	
+	def _rmdir_no_cache(self, remotepath):
+		return self._rmdir(remotepath)
+	
+	def rmdir(self, remotepath):
+		return self._rmdir_with_options(remotepath)
 
 	# send utility
 
@@ -449,14 +468,29 @@ class DockerManager:
 
 	# remove utility
 
-	def remove(self, remotepath):
+	def set_remove_options(self, cache):
+		if cache:
+			self._remove_with_options = self._remove_cache
+		else:
+			self._remove_with_options = self._remove_no_cache
+
+	def _remove(self, remotepath):
 		try:
 			self.ti.timeit(self.sftp.remove, remotepath)	
 		except Exception as e:
 			# print(f'DockerManager: remove: self.sftp.remove: {e}')
 			return False
-		self.remote_cache.delete(remotepath)
 		return True
+
+	def _remove_cache(self, remotepath):
+		self.remote_cache.delete(remotepath)
+		return self._remove(remotepath)
+	
+	def _remove_no_cache(self, remotepath):
+		return self._remove(remotepath)
+	
+	def remove(self, remotepath):
+		return self._remove_with_options(remotepath)
 
 	# move utility
 
@@ -475,36 +509,64 @@ class DockerManager:
 	def rename(self, remotepath_src, remotepath_dest):
 		return self.move(remotepath_src, remotepath_dest)
 
-	def exists(self, remotepath):
-		if self.use_cache:
-			if remotepath in self.remote_cache: return True
-			try:
-				self.ti.timeit(self.sftp.stat, remotepath)
-			except Exception as e:
-				# print(f'DockerManager: exists: self.sftp.stat: {e}')
-				return False
-			self.remote_cache.append(remotepath)
-			return True
-		else:
-			try:
-				self.ti.timeit(self.sftp.stat, remotepath)
-			except Exception as e:
-				# print(f'DockerManager: exists: self.sftp.stat: {e}')
-				return False
-			return True
+	# stat utility
 
-	def stat(self, remotepath):
+	def set_stat_options(self, cache):
+		if cache:
+			self._stat_with_options = self._stat_cache
+		else:
+			self._stat_with_options = self._stat_no_cache
+
+	def _stat(self, remotepath):
 		r = None
 		try:
 			r = self.ti.timeit(self.sftp.stat, remotepath)
 		except Exception as e:
 			# print(f'DockerManager: stat: self.sftp.stat: {e}')
-			self.remote_cache.delete(remotepath)
 			return None
-		if not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
 		return r
 
+	def _stat_no_cache(self, remotepath):
+		return self._stat(remotepath)
+	
+	def _stat_cache(self, remotepath):
+		r = self._stat(remotepath)
+		if not r: self.remote_cache.delete(remotepath)
+		elif not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+		return r
+
+	def stat(self, remotepath):
+		return self._stat_with_options(remotepath)
+
+	# exists utility
+
+	def set_exists_options(self, cache):
+		if cache:
+			self._exists_with_options = self._exists_cache
+		else:
+			self._exists_with_options = self._exists_no_cache
+
+	def _exists(self, remotepath):
+		try:
+			self.ti.timeit(self.sftp.stat, remotepath)
+		except Exception as e:
+			# print(f'DockerManager: exists: self.sftp.stat: {e}')
+			return False
+		return True
+
+	def _exists_no_cache(self, remotepath):
+		return self._exists(remotepath)
+	
+	def _exists_cache(self, remotepath):
+		r = self._exists(remotepath)
+		if r and not remotepath in self.remote_cache: self.remote_cache.append(remotepath)
+		return r
+
+	def exists(self, remotepath):
+		return self._exists_with_options(remotepath)
+
+	# close the DockerManager
+
 	def close(self):
-		self.ti.timeit(self.ssh.close)
 		self.ti.timeit(self.sftp.close)
-		os.remove('.env')
+		self.ti.timeit(self.ssh.close)
