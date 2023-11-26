@@ -197,7 +197,7 @@ class DockerManager:
 		self.root_depth = root_depth
 
 		# local_cache represents if a local file was already sent
-		self.local_cache = set()
+		self.local_cache = {}
 		# remote_cache represents if a remote file exists
 		self.remote_cache = list()
 
@@ -437,9 +437,12 @@ class DockerManager:
 		return self._send(localpath, remotepath)
 
 	def send(self, localpath, remotepath):
+		if not os.path.exists(localpath): return False
 		return self._send_with_options(localpath, remotepath)
 
 	# get utility
+
+	# function names???
 
 	def set_get_options(self, safe, overwrite):
 		if safe:
@@ -478,8 +481,8 @@ class DockerManager:
 		self._make_dirs_no_cache(localpath)
 		return self._get(remotepath, localpath)
 
-	def get(self, localpath, remotepath):
-		return self._get_with_options(localpath, remotepath)
+	def get(self, remotepath, localpath):
+		return self._get_with_options(remotepath, localpath)
 
 	# read utility
 
