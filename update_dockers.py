@@ -6,9 +6,10 @@ if len(sys.argv) == 1:
 	print('give prod or dev as argument')
 	exit(1)
 
-if sys.argv[1] == 'prod':
+branch = sys.argv[1]
+if branch == 'prod':
 	root = '/mnt/user/node-containers/BellaFiora/' 
-elif sys.argv[1] == 'dev':
+elif branch == 'dev':
 	root = '/mnt/user/node-containers/BellaFiora_Dev/'
 else:
 	print('give prod or dev as argument')
@@ -16,11 +17,12 @@ else:
 args = read_file('.ssh').split('\n')[0:4]
 docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=5)
 
+commits_done_file = 'commits_done_'+branch
 commits_done = []
 updated_dockers = []
-if os.path.exists('commits_done'):
+if os.path.exists(commits_done_file):
 	content = ''
-	with open('commits_done', 'r') as f:
+	with open(commits_done_file, 'r') as f:
 		content = f.read()
 	commits_done = content.split('\n')[:-1]
 
@@ -128,7 +130,7 @@ time_to_restart_dockers = time.time() - st
 
 docker_manager.close()
 
-with open('commits_done', 'w+') as f:
+with open(commits_done_file, 'w+') as f:
 	for commit_hash in commits_done:
 		f.write(commit_hash+'\n')
 
