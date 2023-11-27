@@ -120,6 +120,7 @@ time_to_update_dockers = time.time() - st
 st = time.time()
 # update dockers in which files were added / modified / created / deleted / renamed
 updated_dockers = list(set(updated_dockers))
+updated_dockers.delete('common')
 # for docker in updated_dockers:
 # 	docker_manager.stop(docker)
 # 	docker_manager.start(docker)
@@ -147,14 +148,14 @@ print(	f"took {time_to_update_dockers}s to update dockers\n"
 		f"renamed {docker_manager.nb_rename} files"
 		)
 mydb_logs = {
-	"update dockers": time_to_update_dockers,
-	"restart dockers": time_to_restart_dockers,
-	"ssh time": time_spent_on_ssh,
-	"nb dockers updated": nb_updated_dockers,
-	"nb files sent": docker_manager.nb_send,
-	"nb files removed": docker_manager.nb_remove,
-	"nb files moved": docker_manager.nb_move,
-	"nb files renamed": docker_manager.nb_rename
+	"update_dockers": math.floor(time_to_update_dockers*1000),
+	"restart_dockers": math.floor(time_to_restart_dockers*1000),
+	"ssh_time": math.floor(time_spent_on_ssh*1000),
+	"nb_dockers_updated": nb_updated_dockers,
+	"nb_files_sent": docker_manager.nb_send,
+	"nb_files_removed": docker_manager.nb_remove,
+	"nb_files_moved": docker_manager.nb_move,
+	"nb_files_renamed": docker_manager.nb_rename
 }
 credentials = read_file('.sql').split('\n')[0:4]
 host, user, password, database = credentials[0], credentials[1], credentials[2], credentials[3]
