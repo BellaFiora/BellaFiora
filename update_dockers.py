@@ -2,7 +2,7 @@ import os, sys, time
 from py_bot.python_utils.utils.all import *
 
 st_total = time.time()
-docker_manager = DockerManager(*read_file('.ssh').split('\n')[0:5], root_depth=5)
+docker_manager = DockerManager(*read_file('.ssh').split('\n')[0:5], root_depth=5, overwrite=False, safe=False)
 
 root = '/mnt/user/node-containers/BellaFiora/'
 commits_done = []
@@ -74,13 +74,16 @@ def process_commit(commit):
 		remotepath = root+path
 		if action == 'A' or action == 'M' or action == 'C':
 			print(f'sending {path} {remotepath}')
-			docker_manager.send(path, remotepath)
+			if docker_manager.send(path, remotepath):
+				updated_dockers.append(docker)
 		elif action == 'D':
 			print(f'removing {remotepath}')
-			docker_manager.remove(remotepath)
+			if docker_manager.remove(remotepath):
+				updated_dockers.append(docker)
 		elif action == 'T':
 			print(f'moving {path} {remotepath}')
-			docker_manager.move(path, remotepath)
+			if docker_manager.move(path, remotepath):
+				updated_dockers.append(docker)
 		elif action == 'R':
 			dest = tmp[2]
 			full_dest = dest.split('/')
@@ -90,10 +93,12 @@ def process_commit(commit):
 			remotedest = root+dest
 			print(f'renaming {remotepath} {remotedest}')
 			if not docker_manager.rename(remotepath, remotedest):
-				docker_manager.send(dest, remotedest)
+				if docker_manager.send(dest, remotedest):
+					updated_dockers.append(docker)
+			else:
+				updated_dockers.append(docker)
 		else:
 			print(f'ignoring {edit}')
-		updated_dockers.append(docker)
 	commits_done.append(commit_hash)
 
 st = time.time()
