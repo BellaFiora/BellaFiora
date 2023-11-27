@@ -9,7 +9,7 @@ if len(sys.argv) == 1:
 if sys.argv[1] == 'prod':
 	root = '/mnt/user/node-containers/BellaFiora/' 
 elif sys.argv[1] == 'dev':
-	root = '/mnt/user/node-containers/BellaFiora-Dev/'
+	root = '/mnt/user/node-containers/BellaFiora_Dev/'
 else:
 	print('give prod or dev as argument')
 	exit(1)
