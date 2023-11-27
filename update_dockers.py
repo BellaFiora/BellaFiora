@@ -1,4 +1,4 @@
-import os, sys, time
+import os, sys, time, mysql.connector, math
 from py_bot.python_utils.utils.all import *
 
 st_total = time.time()
@@ -146,3 +146,25 @@ print(	f"took {time_to_update_dockers}s to update dockers\n"
 		f"moved {docker_manager.nb_move} files\n"
 		f"renamed {docker_manager.nb_rename} files"
 		)
+mydb_logs = {
+	"update dockers": time_to_update_dockers,
+	"restart dockers": time_to_restart_dockers,
+	"ssh time": time_spent_on_ssh,
+	"nb dockers updated": nb_updated_dockers,
+	"nb files sent": docker_manager.nb_send,
+	"nb files removed": docker_manager.nb_remove,
+	"nb files moved": docker_manager.nb_move,
+	"nb files renamed": docker_manager.nb_rename
+}
+credentials = read_file('.sql').split('\n')[0:4]
+host, user, password, database = credentials[0], credentials[1], credentials[2], credentials[3]
+connection = mysql.connector.connect(host=host, user=user, password=password, database=database)
+cursor = connection.cursor()
+query = f'INSERT INTO app_metrics (`app`, `start`, `time`, `exit`, `log`) VALUES (%s, %s, %s, %s, %s)'
+ 
+st_total_formatted = datetime.utcfromtimestamp(st_total).strftime('%Y-%m-%d %H:%M:%S')
+
+cursor.execute(query, ("update_dockers", st_total_formatted, math.floor(time_total*1000), 0, str(mydb_logs)))
+connection.commit()
+cursor.close()
+connection.close()
