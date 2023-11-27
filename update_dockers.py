@@ -14,7 +14,7 @@ else:
 	print('give prod or dev as argument')
 	exit(1)
 args = read_file('.ssh').split('\n')[0:4]
-docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=5, overwrite=False, safe=False)
+docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=5)
 
 commits_done = []
 updated_dockers = []
