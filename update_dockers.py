@@ -2,9 +2,20 @@ import os, sys, time
 from py_bot.python_utils.utils.all import *
 
 st_total = time.time()
-docker_manager = DockerManager(*read_file('.ssh').split('\n')[0:5], root_depth=5, overwrite=False, safe=False)
+if len(sys.argv) == 1:
+	print('give prod or dev as argument')
+	exit(1)
 
-root = '/mnt/user/node-containers/BellaFiora/'
+if sys.argv[1] == 'prod':
+	root = '/mnt/user/node-containers/BellaFiora/' 
+elif sys.argv[1] == 'dev':
+	root = '/mnt/user/node-containers/BellaFiora-Dev/'
+else:
+	print('give prod or dev as argument')
+	exit(1)
+args = read_file('.ssh').split('\n')[0:4]
+docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=5, overwrite=False, safe=False)
+
 commits_done = []
 updated_dockers = []
 if os.path.exists('commits_done'):
