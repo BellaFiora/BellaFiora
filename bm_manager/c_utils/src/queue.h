@@ -6,7 +6,7 @@
 #include <string.h>
 #include <errno.h>
 
-#define QUEUE_NULL_CHECKS
+// #define QUEUE_NULL_CHECKS
 #define QUEUE_MEM_CHECKS
 
 typedef struct {

@@ -1,7 +1,7 @@
 #include "os.h"
 
 DirectoryCounts directory_count(const char *dirname) {
-	struct DirectoryCounts r = {0, 0};
+	DirectoryCounts r = { .nb_files = 0, .nb_directories = 0 };
 	struct dirent *entry;
 	DIR *directory = opendir(dirname);
 	if (!directory) {
@@ -10,10 +10,10 @@ DirectoryCounts directory_count(const char *dirname) {
 	}
 	while ((entry = readdir(directory))) {
 		if (entry->d_type == DT_REG)
-			r.fileCount++;
+			r.nb_files++;
 		else if (entry->d_type == DT_DIR) {
 			if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-				r.directoryCount++;
+				r.nb_directories++;
 		}
 	}
 	closedir(directory);
@@ -21,10 +21,20 @@ DirectoryCounts directory_count(const char *dirname) {
 }
 
 FILES* open_files(const char* dirname) {
+	// check nb files to open
+	struct rlimit rlim;
+	if (getrlimit(RLIMIT_NOFILE, &rlim)) {
+		fprintf(stderr, "open_files: getrlimit failed\n");
+		return NULL;
+	}
+	DirectoryCounts counts = directory_count(dirname);
+	if (counts.nb_files > rlim.rlim_cur) {
+		fprintf(stderr, "open_files: %zu files to open in %s (limit is %zu)\n", counts.nb_files, dirname, rlim.rlim_cur);
+		return NULL;
+	}
 	// init FILES struct
 	FILES* r = calloc(1, sizeof(FILES));
-	if (!r)
-	{
+	if (!r) {
 		fprintf(stderr, "open_files: calloc failed\n");
 		return NULL;
 	}
@@ -124,10 +134,8 @@ FILES* open_files(const char* dirname) {
 	closedir(directory);
 	tmp1 = realloc(r->files, r->nb_files * sizeof(FILE*));
 	tmp2 = realloc(r->filenames, r->nb_files * sizeof(char*));
-	if (tmp1)
-		r->files = tmp1;
-	if (tmp2)
-		r->filenames = tmp2;
+	if (tmp1) r->files = tmp1;
+	if (tmp2) r->filenames = tmp2;
 	return r;
 }
 
@@ -141,4 +149,38 @@ void close_files(FILES* files) {
 	free(files->files);
 	free(files->filenames);
 	free(files);
+}
+
+FFILE* mmap_file(const char* path) {
+	// Open the file
+	int fd = open(path, O_RDONLY);
+	if (fd == -1) {
+		fprintf(stderr, "mmap_file: open failed\n");
+		return NULL;
+	}
+	struct stat fstats;
+	if (fstat(fd, &fstats) == -1) {
+		fprintf(stderr, "mmap_file: fstat failed\n");
+		close(fd);
+		return NULL;
+	}
+	char* content = mmap(NULL, fstats.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	close(fd);
+	if (content == MAP_FAILED) {
+		fprintf(stderr, "mmap_file: mmap failed\n");
+		return NULL;
+	}
+	FFILE* r = calloc(1, sizeof(FFILE));
+	if (!r) {
+		fprintf(stderr, "mmap_file: calloc failed\n");
+		return NULL;
+	}
+	r->content = content;
+	r->size = fstats.st_size;
+	return r;
+}
+
+void munmap_file(FFILE* file) {
+	if (munmap(file->content, file->size) == -1) fprintf(stderr, "munmap_file: munmap failed\n");
+	free(file);
 }

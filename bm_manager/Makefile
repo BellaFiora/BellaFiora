@@ -1,22 +1,16 @@
 # user defined
 CC=gcc
 CFLAGS=-Wall -Wextra
-LDLIBS=-lcurl -lpthread -ljansson
-C_DIR=src
+LDLIBS=-lcurl -lpthread
+SRC_DIRS=src c_utils/src jansson-2.14/src
 O_DIR=obj
-LIB_C_FILES=$(wildcard c_utils/src/*.c)
 EXE=bin/bm_manager
 
 # automatic
-SRC_FILES=$(wildcard $(C_DIR)/*.c)
-SRC_FILES_FILENAMES=$(basename $(notdir $(filter %.c,$(SRC_FILES))))
-C_FILES=$(SRC_FILES_FILENAMES:%=$(C_DIR)/%.c)
-C_FILES+=$(LIB_C_FILES)
-O_FILES=$(SRC_FILES_FILENAMES:%=$(O_DIR)/%.o)
-LIB_FILES_FILENAMES=$(basename $(notdir $(filter %.c,$(LIB_C_FILES))))
-O_FILES+=$(LIB_FILES_FILENAMES:%=$(O_DIR)/libs/%.o)
+C_FILES=$(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+O_FILES=$(C_FILES:%.c=$(O_DIR)/%.o)
 $(shell mkdir -p bin)
-$(shell mkdir -p obj/libs)
+$(shell mkdir -p obj)
 
 # rules for main and test binaries
 bin: obj/main.o $(O_FILES)
@@ -25,16 +19,15 @@ test: obj/test.o $(O_FILES)
 	$(CC) $(CFLAGS) -o $(EXE) $^ $(LDLIBS)
 
 # rules for main and test src files
-obj/main.o: main.c
-	$(CC) $(CFLAGS) -c $< -o $@
-obj/test.o: test.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(O_DIR)/main.o: main.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+$(O_DIR)/test.o: test.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-# rules for src and lib src files
-obj/%.o: src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-obj/libs/%.o: $(sort $(dir $(LIB_C_FILES)))%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+# rules for src files
+$(O_DIR)/%.o: %.c
+	@mkdir -p $(shell dirname $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -rf obj bin

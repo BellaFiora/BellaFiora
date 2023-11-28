@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include <pthread.h>
-#include <jansson.h>
+#include "../jansson-2.14/src/jansson.h"
 
 #include "../c_utils/src/all.h"
 
