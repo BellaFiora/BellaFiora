@@ -260,17 +260,17 @@ class DockerManager:
 
 	def stop(self, container_name):
 		r = self._execute('stop', container_name)
-		if r: self.stop += 1
+		if r: self.nb_stop += 1
 		return r
 
 	def pause(self, container_name):
 		r = self._execute('pause', container_name)
-		if r: self.pause += 1
+		if r: self.nb_pause += 1
 		return r
 
 	def execute(self, container_name, command, additional_args=None):
 		r = self._execute('exec', container_name, [command, *additional_args])
-		if r: self.execute += 1
+		if r: self.nb_execute += 1
 		return r
 
 	# make intermediate directories
