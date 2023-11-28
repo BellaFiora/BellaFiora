@@ -8,14 +8,14 @@ if len(sys.argv) == 1:
 
 branch = sys.argv[1]
 if branch == 'prod':
-	root = '/mnt/user/node-containers/BellaFiora/' 
+	root = '/mnt/user/node-containers/BellaFiora/'
 elif branch == 'dev':
 	root = '/mnt/user/node-containers/BellaFiora_Dev/'
 else:
 	print('give prod or dev as argument')
 	exit(1)
 args = read_file('.ssh').split('\n')[0:4]
-docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=5)
+docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=4)
 
 commits_done_file = 'commits_done_'+branch
 commits_done = []
@@ -123,9 +123,9 @@ st = time.time()
 # update dockers in which files were added / modified / created / deleted / renamed
 updated_dockers = list(set(updated_dockers))
 updated_dockers.delete('common')
-# for docker in updated_dockers:
-# 	docker_manager.stop(docker)
-# 	docker_manager.start(docker)
+for docker in updated_dockers:
+	docker_manager.stop(docker)
+	docker_manager.start(docker)
 time_to_restart_dockers = time.time() - st
 
 docker_manager.close()
@@ -159,8 +159,11 @@ mydb_logs = {
 	"nb_files_moved": docker_manager.nb_move,
 	"nb_files_renamed": docker_manager.nb_rename
 }
-credentials = read_file('.sql').split('\n')[0:4]
-host, user, password, database = credentials[0], credentials[1], credentials[2], credentials[3]
+
+host = os.getenv('db_externalhost', None)
+user = os.getenv('db_username', None)
+password = os.getenv('db_password', None)
+database = os.getenv('db_database', None)
 connection = mysql.connector.connect(host=host, user=user, password=password, database=database)
 cursor = connection.cursor()
 query = f'INSERT INTO app_metrics (`app`, `start`, `time`, `exit`, `log`) VALUES (%s, %s, %s, %s, %s)'

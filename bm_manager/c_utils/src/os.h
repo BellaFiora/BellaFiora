@@ -8,6 +8,11 @@
 #include <errno.h>
 
 typedef struct {
+	int nb_files;
+	int nb_directories;
+} DirectoryCounts;
+
+typedef struct {
 	const char* dirname;
 	FILE** files;
 	char** filenames;

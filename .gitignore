@@ -2,6 +2,8 @@
 *.sql
 *.ssh
 *.osu
+*.o
+*.d
 .token
 .apikeys
 *.pyc

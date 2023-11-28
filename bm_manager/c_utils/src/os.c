@@ -1,5 +1,25 @@
 #include "os.h"
 
+DirectoryCounts directory_count(const char *dirname) {
+	struct DirectoryCounts r = {0, 0};
+	struct dirent *entry;
+	DIR *directory = opendir(dirname);
+	if (!directory) {
+		fprintf(stderr, "directory_count: opendir failed to open the %s directory\n", dirname);
+		return r;
+	}
+	while ((entry = readdir(directory))) {
+		if (entry->d_type == DT_REG)
+			r.fileCount++;
+		else if (entry->d_type == DT_DIR) {
+			if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+				r.directoryCount++;
+		}
+	}
+	closedir(directory);
+	return r;
+}
+
 FILES* open_files(const char* dirname) {
 	// init FILES struct
 	FILES* r = calloc(1, sizeof(FILES));
@@ -21,7 +41,7 @@ FILES* open_files(const char* dirname) {
 	// open directory
 	DIR* directory = opendir(dirname);
 	if (!directory) {
-		fprintf(stderr, "open_files: opendir failed to open the %s\n", dirname);
+		fprintf(stderr, "open_files: opendir failed to open the %s directory\n", dirname);
 		free(r->files);
 		free(r->filenames);
 		free(r);

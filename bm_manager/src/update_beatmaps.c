@@ -49,8 +49,9 @@ void* download_beatmaps(void* arg) {
 	return NULL;
 }
 
-void* _update_beatmaps(void* arg) {
-	struct ThreadData* data = (struct ThreadData*)arg;
+void* scan_beatmapsets(void* arg) {
+	sQueue* q = arg;
+	struct dirent* entry = NULL;
 	FILE* bmset_file = NULL;
 	char* bmset_filename = NULL;
 	char* content = NULL;
@@ -59,8 +60,40 @@ void* _update_beatmaps(void* arg) {
 	const char* bmid = NULL;
 	size_t index = 0;
 	json_t* bm = NULL;
-	for (size_t i = data->start; i < data->end; i++) {
+
+	printf("opening directory...\n");
+	// open beatmapsets directory
+	DIR* directory = opendir("beatmapsets");
+	if (!directory) {
+		fprintf(stderr, "scan_beatmapsets: opendir failed to open the beatmapsets directory\n");
+		return 1;
+	}
+	
+		// read filenames in directory
+		
+		
+	}
+	while (1) {
 		// get json file
+		errno = 0;
+		if (!(entry = readdir(directory))) {
+			if (errno) {
+				fprintf(stderr, "scan_beatmapsets: readdir failed\n");
+				for (size_t i = 0; i < r->nb_files; i++) {
+					fclose(r->files[i]);
+					free(r->filenames[i]);
+				}
+				free(r->files);
+				free(r->filenames);
+				free(r);
+				closedir(directory);
+				return NULL;
+			}
+			break;
+		}
+		if (entry->d_type != DT_REG)
+			// not a regular file
+			continue;
 		bmset_file = data->bmsets->files[i];
 		bmset_filename = data->bmsets->filenames[i];
 		// read json file
@@ -69,7 +102,7 @@ void* _update_beatmaps(void* arg) {
 		fseek(bmset_file, 0, SEEK_SET);
 		content = realloc(content, content_size + 1);
 		if (!content) {
-			fprintf(stderr, "_update_beatmaps: %s failed, realloc failed\n", bmset_filename);
+			fprintf(stderr, "scan_beatmapsets: %s failed, realloc failed\n", entry->d_name);
 			fclose(bmset_file);
 			continue;
 		}
@@ -79,23 +112,23 @@ void* _update_beatmaps(void* arg) {
 		// parse content
 		json_t* bmset = json_loads(content, 0, NULL);
 		if (!bmset) {
-			fprintf(stderr, "_update_beatmaps: %s failed, bad json\n", bmset_filename);
+			fprintf(stderr, "scan_beatmapsets: %s failed, bad json\n", entry->d_name);
 			continue;
 		}
 		if (json_is_null(bmset)) {
-			fprintf(stderr, "_update_beatmaps: %s failed, null json\n", bmset_filename);
+			fprintf(stderr, "scan_beatmapsets: %s failed, null json\n", entry->d_name);
 			json_decref(bmset);
 			continue;
 		}
 		// seek for new beatmap ids
 		json_array_foreach(bmset, index, bm) {
 			if (!(tmp = json_object_get(bm, "beatmap_id"))) {
-				fprintf(stderr, "_update_beatmaps: no beatmap_id in %zuth beatmap of %s\n", index, bmset_filename);
+				fprintf(stderr, "scan_beatmapsets: no beatmap_id in %zuth beatmap of %s\n", index, entry->d_name);
 				continue;
 			}
 			bmid = json_string_value(tmp);
 			if (!bmid) {
-				fprintf(stderr, "_update_beatmaps: null beatmap_id in %zuth beatmap of %s\n", index, bmset_filename);
+				fprintf(stderr, "scan_beatmapsets: null beatmap_id in %zuth beatmap of %s\n", index, entry->d_name);
 				continue;
 			}
 			sprintf(bm_filename, "beatmaps/%s.osu", bmid);
@@ -125,7 +158,7 @@ void* _update_beatmaps(void* arg) {
 			pthread_mutex_destroy(&lock); \
 		if (dl_thread) \
 			pthread_cancel(dl_thread); \
-		close_files(bmsets); \
+		closedir(bmsets); \
 		if (ranges) \
 			free(ranges); \
 		if (threads) { \
@@ -152,7 +185,7 @@ int update_beatmaps(void) {
 	// init a iQueue
 	sQueue* q = new_squeue(1024);
 	if (!q) {
-		fprintf(stderr, "update_beatmaps: new_iqueue failed\n");
+		fprintf(stderr, "update_beatmaps: new_squeue failed\n");
 		pthread_mutex_destroy(&lock);
 		return 1;
 	}
@@ -164,58 +197,23 @@ int update_beatmaps(void) {
 		// free_squeue(q);
 		return 1;
 	}
-	// open all beatmapsets files
-	printf("opening files...\n");
-	FILES* bmsets = open_files("beatmapsets");
-	if (!bmsets) {
-		fprintf(stderr, "update_beatmaps: open_files failed\n");
-		pthread_mutex_destroy(&lock);
-		// free_squeue(q);
-		pthread_cancel(dl_thread);
-		return 1;
-	}
 	// init workers
-	size_t nb_workers = min(bmsets->nb_files, 50);
-	pthread_t* threads = calloc(nb_workers, sizeof(pthread_t));
-	if (!threads) {
-		fprintf(stderr, "update_beatmaps: open_files failed\n");
-		pthread_mutex_destroy(&lock);
-		// free_squeue(q);
-		pthread_cancel(dl_thread);
-		close_files(bmsets);
-		return 1;
-	}
-	Range* ranges = divide(bmsets->nb_files, nb_workers);
-	struct ThreadData** thread_datas = calloc(nb_workers, sizeof(struct ThreadData*));
-	if (!threads) {
+	pthread_t thread = 0;
+	thread_data = calloc(1, sizeof(struct ThreadData));
+	if (!thread_data) {
 		fprintf(stderr, "update_beatmaps: calloc failed\n");
 		update_beatmaps_cleanup;
 		return 1;
 	}
-	for (size_t i = 0; i < nb_workers; i++) {
-		thread_datas[i] = calloc(1, sizeof(struct ThreadData));
-		if (!thread_datas[i]) {
-			fprintf(stderr, "update_beatmaps: calloc failed\n");
-			update_beatmaps_cleanup;
-			return 1;
-		}
-		thread_datas[i]->start = ranges[i].start;
-		thread_datas[i]->end = ranges[i].end;
-		thread_datas[i]->bmsets = bmsets;
-		thread_datas[i]->q = q;
-		thread_datas[i]->lock = lock;
-	}
 	// start workers
 	printf("updating beatmaps...\n");
 	int st = time(NULL);
-	for (size_t i = 0; i < nb_workers; i++) {
-		if (pthread_create(&threads[i], NULL, _update_beatmaps, thread_datas[i])) {
-			fprintf(stderr, "update_beatmaps: pthread_create failed\n");
-			update_beatmaps_cleanup;
-			return 1;
-		}
+	if (pthread_create(&threads[i], NULL, scan_beatmapsets, q)) {
+		fprintf(stderr, "update_beatmaps: pthread_create failed\n");
+		update_beatmaps_cleanup;
+		return 1;
 	}
-	// wait for the _update_beatmaps threads to find all new beatmap ids
+	// wait for the scan_beatmapsets threads to find all new beatmap ids
 	for (size_t i = 0; i < nb_workers; i++)
 		pthread_join(threads[i], NULL);
 	printf("took %ds to find new beatmaps\n", (int)(time(NULL) - st));

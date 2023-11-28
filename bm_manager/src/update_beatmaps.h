@@ -14,7 +14,7 @@
 struct ThreadData {
 	size_t start;
 	size_t end;
-	FILES* bmsets;
+	DIR* bmsets;
 	sQueue* q;
 	pthread_mutex_t lock;
 };
