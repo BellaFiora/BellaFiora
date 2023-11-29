@@ -37,4 +37,6 @@ typedef struct {
 FFILE* mmap_file(const char* path);
 void munmap_file(FFILE* file);
 
+extern char** dotenv;
+
 #endif

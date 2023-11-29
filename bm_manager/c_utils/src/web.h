@@ -9,6 +9,8 @@
 
 #include <curl/curl.h>
 
+#include <sql.h>
+
 struct MemoryStruct {
 	char *data;
 	size_t size;
