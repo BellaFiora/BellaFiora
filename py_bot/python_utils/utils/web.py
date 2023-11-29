@@ -238,7 +238,6 @@ class DockerManager:
 			print(f'DockerManager: _get failed to get {dotenv_path} on remote')
 			return None
 		load_dotenv(dotenv_path=tmp_dotenv_path)
-		return self
 
 	# docker commands utilities
 
