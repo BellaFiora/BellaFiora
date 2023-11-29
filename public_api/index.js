@@ -23,8 +23,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-app.get('/v1/private/*', requestHandler);
-app.get('/v1/public/*', requestHandler);
+app.get('/private/*', requestHandler);
+app.get('/public/*', requestHandler);
 
 const server = http.createServer(app);
 server.listen(port, () => {
