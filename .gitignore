@@ -1,4 +1,5 @@
 *.env
+*.exe
 *.sql
 *.ssh
 *.osu
