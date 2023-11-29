@@ -214,12 +214,16 @@ class DockerManager:
 		try:
 			self.ti.timeit(self.ssh.connect, hostname, port, username, password)
 		except Exception as e:
+			self.ssh = None
+			self.sftp = None
 			print(f'DockerManager: ssh failed to connect: {e}')
 			return None
 		# init sftp
 		try:
 			self.sftp = self.ti.timeit(self.ssh.open_sftp)
 		except Exception as e:
+			self.ssh = None
+			self.sftp = None
 			print(f'DockerManager: ssh sftp failed to open: {e}')
 			self.ssh.close()
 			return None
@@ -229,6 +233,8 @@ class DockerManager:
 		tmp_dotenv_path = python_utils_tmp_folder_path+'/DockerManager___init___tmp_file'
 		if not self._get(dotenv_path, tmp_dotenv_path):
 			self.ssh.close()
+			self.ssh = None
+			self.sftp = None
 			print(f'DockerManager: _get failed to get {dotenv_path} on remote')
 			return None
 		load_dotenv(dotenv_path=tmp_dotenv_path)

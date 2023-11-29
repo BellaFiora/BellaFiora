@@ -16,10 +16,10 @@ else:
 	exit(1)
 args = read_file('.ssh').split('\n')[0:4]
 docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=4)
-if docker_manager == None:
+if docker_manager == None or docker_manager.sftp == None or docker_manager.sftp == None:
 	exit(1)
 docker_manager._send('dummy.txt', 'dummy.txt')
-if docker_manager.sftp == None or docker_manager.ssh == None:
+if docker_manager.sftp == None or docker_manager.sftp == None:
 	exit(1)
 
 commits_done_file = 'commits_done_'+branch
