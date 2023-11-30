@@ -141,14 +141,15 @@ with open(commits_done_file, 'w+') as f:
 
 time_spent_on_ssh = docker_manager.ti.time_spent_waiting()
 time_measuring_on_ssh = docker_manager.ti.time_spent_measuring()
-time_total = time.time() - st_total
-time_other = time_total - time_spent_on_ssh - time_measuring_on_ssh
 nb_updated_dockers = len(updated_dockers)
+updated_dockers_list = ' '.join(updated_dockers)
+time_total = time.time() - st_total
+time_other = time_total - time_spent_on_ssh - time_measuring_on_ssh - time_to_restart_dockers
 print(	f"took {time_to_update_dockers}s to update dockers\n"
 		f"took {time_to_restart_dockers}s to restart dockers\n\n"
 		f"spent {time_spent_on_ssh}s on ssh (+{time_measuring_on_ssh}s on measuring)\n\n"
-		f"spent {time_total}s total (of which {time_other}s not spent on ssh)\n\n"
-		f"updated {nb_updated_dockers} dockers ({updated_dockers})\n"
+		f"spent {time_total}s total (of which {time_other}s not spent on ssh or restarting dockers)\n\n"
+		f"updated {nb_updated_dockers} dockers ({updated_dockers_list})\n"
 		f"sent {docker_manager.nb_send} files\n"
 		f"removed {docker_manager.nb_remove} files\n"
 		f"moved {docker_manager.nb_move} files\n"
