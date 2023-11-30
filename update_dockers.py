@@ -124,14 +124,17 @@ for commit in commits:
 	process_commit(commit)
 time_to_update_dockers = time.time() - st
 
-st = time.time()
-# update dockers in which files were added / modified / created / deleted / renamed
 updated_dockers = list(set(updated_dockers))
 updated_dockers.delete('common')
+tsw_st = docker_manager.ti.time_spent_waiting()
+st = time.time()
+# update dockers in which files were added / modified / created / deleted / renamed
 for docker in updated_dockers:
 	docker_manager.stop(docker)
 	docker_manager.start(docker)
 time_to_restart_dockers = time.time() - st
+# remove ssh time from time_to_restart_dockers when updating dockers for time_other
+time_to_restart_dockers -= tsw_st - docker_manager.ti.time_spent_waiting()
 
 docker_manager.close()
 
