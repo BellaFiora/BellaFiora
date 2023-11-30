@@ -12,6 +12,7 @@ void* callback(void* data) {
 	// char host[NI_MAXHOST] = { 0 };
 	// char service[NI_MAXSERV] = { 0 };
 	char* hello = "HTTP/1.1 200 OK\nContent-Length: 50\nContent-Type: text/html\nConnection: Closed\n\n<html><body><h1>salut au revoir</h1></body></html>";
+	
 	ssize_t bytes_to_send = strlen(hello);
 
 	while (1) {
