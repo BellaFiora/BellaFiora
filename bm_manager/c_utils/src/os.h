@@ -1,16 +1,8 @@
 #ifndef OS_UTILS_H
 #define OS_UTILS_H
 
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/resource.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <dirent.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <dirent.h>
 
 typedef struct {
 	size_t nb_files;

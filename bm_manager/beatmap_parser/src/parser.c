@@ -1,5 +1,7 @@
 #include "parser.h"
 
+#include <string.h>
+
 char unwanted[BUF_SIZE]; // used by remove_chars
 size_t unwanted_size;
 char line[BUF_SIZE]; // buffer for the current line

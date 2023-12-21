@@ -99,11 +99,11 @@ void print_events(const List* events) {
 		printf("Invalid Event list.\n");
 		return;
 	}
-	int size = events->size;
-	printf("Events (%d):\n\n", size);
-	for (int i = 0; i < size; i++) {
+	size_t size = events->size;
+	printf("Events (%zu):\n\n", size);
+	for (size_t i = 0; i < size; i++) {
 		Event* event = (Event*)events->elements[i];
-		printf("(%i)\n", i);
+		printf("(%zu)\n", i);
 		print_event(event);
 		printf("\n");
 	}
@@ -126,11 +126,11 @@ void print_timingPoints(const List* timingPoints) {
 		printf("Invalid TimingPoint list.\n");
 		return;
 	}
-	int size = timingPoints->size;
-	printf("TimingPoints (%d):\n\n", size);
-	for (int i = 0; i < size; i++) {
+	size_t size = timingPoints->size;
+	printf("TimingPoints (%zu):\n\n", size);
+	for (size_t i = 0; i < size; i++) {
 		TimingPoint* timingPoint = (TimingPoint*)timingPoints->elements[i];
-		printf("(%i)\n", i);
+		printf("(%zu)\n", i);
 		print_timingPoint(timingPoint);
 		printf("\n");
 	}
@@ -150,11 +150,11 @@ void print_beatmapColours(const List* beatmapColours) {
 		printf("Invalid BeatmapColour list.\n");
 		return;
 	}
-	int size = beatmapColours->size;
-	printf("BeatmapColours (%d):\n\n", size);
-	for (int i = 0; i < size; i++) {
+	size_t size = beatmapColours->size;
+	printf("BeatmapColours (%zu):\n\n", size);
+	for (size_t i = 0; i < size; i++) {
 		BeatmapColour* beatmapColour = (BeatmapColour*)beatmapColours->elements[i];
-		printf("(%i)\n", i);
+		printf("(%zu)\n", i);
 		print_beatmapColour(beatmapColour);
 		printf("\n");
 	}
@@ -180,7 +180,7 @@ void print_slider(const Slider* slider) {
 	printf("Slider:\n");
 	printf("\tCurveType: %c\n", slider->curveType);
 	printf("\tCurvePoints: [");
-	for (int i = 0; i < slider->curvePoints->size; i++) {
+	for (size_t i = 0; i < slider->curvePoints->size; i++) {
 		CurvePoint* curvePoint = (CurvePoint*)slider->curvePoints->elements[i];
 		printf("(%d, %d)", curvePoint->x, curvePoint->y);
 		if (i < slider->curvePoints->size - 1) {
@@ -196,7 +196,7 @@ void print_slider(const Slider* slider) {
 	else
 		print_ilist(slider->edgeSounds);
 	printf("\tEdgeSets: [");
-	for (int i = 0; i < slider->edgeSets->size; i++) {
+	for (size_t i = 0; i < slider->edgeSets->size; i++) {
 		EdgeSet* edgeSet = (EdgeSet*)slider->edgeSets->elements[i];
 		printf("(%s, %s)", edgeSet->normalSet, edgeSet->additionSet);
 		if (i < slider->edgeSets->size - 1) {
@@ -251,11 +251,11 @@ void print_hitObjects(const List* hitObjects) {
 		printf("Invalid HitObject list.\n");
 		return;
 	}
-	int size = hitObjects->size;
-	printf("HitObjects (%d):\n\n", size);
-	for (int i = 0; i < size; i++) {
+	size_t size = hitObjects->size;
+	printf("HitObjects (%zu):\n\n", size);
+	for (size_t i = 0; i < size; i++) {
 		HitObject* hitObject = (HitObject*)hitObjects->elements[i];
-		printf("(%i)\n", i);
+		printf("(%zu)\n", i);
 		print_hitObject(hitObject);
 		printf("\n");
 	}

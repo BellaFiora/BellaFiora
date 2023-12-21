@@ -102,7 +102,7 @@ void jsonify_events(const List* events, FILE* fp) {
 	fprintf(fp, "\t\"Events\":\n");
 	fprintf(fp, "\t[\n");
 	Event* event = NULL;
-	for (int i = 0; i < events->size - 1; i++) {
+	for (size_t i = 0; i < events->size - 1; i++) {
 		event = events->elements[i];
 		jsonify_event
 		fprintf(fp, "\t\t},\n");
@@ -130,7 +130,7 @@ void jsonify_timingPoints(const List* timingPoints, FILE* fp) {
 	fprintf(fp, "\t\"TimingPoints\":\n");
 	fprintf(fp, "\t[\n");
 	TimingPoint* timingPoint = NULL;
-	for (int i = 0; i < timingPoints->size - 1; i++) {
+	for (size_t i = 0; i < timingPoints->size - 1; i++) {
 		timingPoint = timingPoints->elements[i];
 		jsonify_timingPoint
 		fprintf(fp, "\t\t},\n");
@@ -160,7 +160,7 @@ void jsonify_beatmapColours(const List* beatmapColours, FILE* fp) {
 	fprintf(fp, "\t\"BeatmapColours\":\n");
 	fprintf(fp, "\t[\n");
 	BeatmapColour* beatmapColour = NULL;
-	for (int i = 0; i < beatmapColours->size - 1; i++) {
+	for (size_t i = 0; i < beatmapColours->size - 1; i++) {
 		beatmapColour = beatmapColours->elements[i];
 		jsonify_beatmapColour
 		fprintf(fp, "\t\t},\n");
@@ -180,7 +180,7 @@ void jsonify_slider(const Slider* slider, FILE* fp) {
 	if (slider->curvePoints) {
 		fprintf(fp, "[");
 		if (slider->curvePoints->size > 0) {
-			for (int i = 0; i < slider->curvePoints->size - 1; i++) {
+			for (size_t i = 0; i < slider->curvePoints->size - 1; i++) {
 				CurvePoint* curvePoint = (CurvePoint*)slider->curvePoints->elements[i];
 				fprintf(fp, "[%d, %d], ", curvePoint->x, curvePoint->y);
 			}
@@ -204,7 +204,7 @@ void jsonify_slider(const Slider* slider, FILE* fp) {
 	if (slider->edgeSets) {
 		fprintf(fp, "[");
 		if (slider->edgeSets->size > 0) {
-			for (int i = 0; i < slider->edgeSets->size - 1; i++) {
+			for (size_t i = 0; i < slider->edgeSets->size - 1; i++) {
 				EdgeSet* edgeSet = (EdgeSet*)slider->edgeSets->elements[i];
 				fprintf(fp, "[%s, %s], ", edgeSet->normalSet, edgeSet->additionSet);
 			}
@@ -256,7 +256,7 @@ void jsonify_hitObjects(const List* hitObjects, FILE* fp) {
 	fprintf(fp, "\t\"HitObjects\":\n");
 	fprintf(fp, "\t[\n");
 	HitObject* hitObject = NULL;
-	for (int i = 0; i < hitObjects->size - 1; i++) {
+	for (size_t i = 0; i < hitObjects->size - 1; i++) {
 		hitObject = hitObjects->elements[i];
 		jsonify_hitObject
 		fprintf(fp, "\t\t},\n");

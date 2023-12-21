@@ -6,8 +6,8 @@
 #include <errno.h>
 
 typedef struct {
-	size_t start;
-	size_t end;
+    size_t start;
+    size_t end;
 } Range;
 
 // return b if a == b

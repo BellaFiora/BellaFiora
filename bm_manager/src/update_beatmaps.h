@@ -9,7 +9,7 @@
 #include <pthread.h>
 #include "../jansson-2.14/src/jansson.h"
 
-#include "../c_utils/src/all.h"
+#include "../c_utils/all.h"
 
 struct ThreadData {
 	size_t start;

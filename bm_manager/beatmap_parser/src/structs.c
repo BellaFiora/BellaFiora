@@ -1,5 +1,7 @@
 #include "structs.h"
 
+#include <string.h>
+
 General* new_general() {
 	General* r = malloc(sizeof(General));
 	r->audioFilename = malloc(1*sizeof(char));
@@ -297,7 +299,7 @@ void free_beatmap(Beatmap* beatmap){
 	free_editor(beatmap->editor);
 	free_metadata(beatmap->metadata);
 	free_difficulty(beatmap->difficulty);
-	int i = 0;
+	size_t i = 0;
 	while (i < beatmap->events->size) free_event(beatmap->events->elements[i++]);
 	free(beatmap->events);
 	i = 0;

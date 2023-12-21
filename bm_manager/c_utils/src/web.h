@@ -1,19 +1,13 @@
 #ifndef WEB_UTILS_H
 #define WEB_UTILS_H
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <errno.h>
-
-#include <curl/curl.h>
 
 //#include <sql.h>
 
 struct MemoryStruct {
-	char *data;
-	size_t size;
+    char *data;
+    size_t size;
 };
 
 extern struct MemoryStruct curl_response;
