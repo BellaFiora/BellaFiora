@@ -57,33 +57,33 @@ void* callback(void* data) {
 }
 
 int main(void) {
-	Server* server1 = new_server("25586", "25586", callback);
+	Server* server1 = new_server("HTTP Server", "25586", callback);
 	if (!server1) {
-		fprintf(stderr, "main: failed to create server1\n");
+		fprintf(stderr, "main: failed to create %s\n", server1->name);
 		return 1;
 	}
-	Server* server2 = new_server("25587", "25587", callback);
+	Server* server2 = new_server("Websocket Server", "25587", callback);
 	if (!server2) {
-		fprintf(stderr, "main: failed to create server2\n");
+		fprintf(stderr, "main: failed to create %s\n", server2->name);
 		return 1;
 	}
 
 	if (start_server(server1)) {
-		fprintf(stderr, "main: failed to start server1\n");
+		fprintf(stderr, "main: failed to start %s\n", server1->name);
 		return 1;
 	}
 	if (start_server(server2)) {
-		fprintf(stderr, "main: failed to start server2\n");
+		fprintf(stderr, "main: failed to start %s\n", server2->name);
 		return 1;
 	}
 
 	if (wait_server(server1)) {
-		fprintf(stderr, "main: failed to wait server1\n");
+		fprintf(stderr, "main: failed to wait %s\n", server1->name);
 		return 1;
 	}
 	fprintf(stdout, "main: %s terminted\n", server1->name);
 	if (wait_server(server2)) {
-		fprintf(stderr, "main: failed to wait server2\n");
+		fprintf(stderr, "main: failed to wait %s\n", server2->name);
 		return 1;
 	}
 	fprintf(stdout, "main: %s terminted\n", server2->name);

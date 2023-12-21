@@ -18,7 +18,7 @@
 
 #include "hashtable.h"
 #include "jansson_private.h" /* for container_of() */
-#include <jansson_config.h>  /* for JSON_INLINE */
+#include "jansson_config.h"  /* for JSON_INLINE */
 
 #ifndef INITIAL_HASHTABLE_ORDER
 #define INITIAL_HASHTABLE_ORDER 3

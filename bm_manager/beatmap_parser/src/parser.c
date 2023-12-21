@@ -7,7 +7,7 @@ char buf[BUF_SIZE]; // buffer for parse functions
 char tmp[BUF_SIZE]; // temporary buffer for utils functions
 
 char* remove_chars(char* string) {
-	if (string == NULL || unwanted == NULL) return NULL;
+	if (string == NULL || unwanted_size == 0) return NULL;
 	size_t length = strlen(string);
 	size_t i = 0;
 	size_t j = 0;
@@ -33,7 +33,7 @@ char* remove_chars(char* string) {
 }
 
 char* nremove_chars(char* string, size_t length) {
-	if (string == NULL || unwanted == NULL) return NULL;
+	if (string == NULL || unwanted_size == 0) return NULL;
 	size_t i = 0;
 	size_t j = 0;
 	while (i < length) {

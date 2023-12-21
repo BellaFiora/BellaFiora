@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifdef HAVE_STDINT_H
+#ifndef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 

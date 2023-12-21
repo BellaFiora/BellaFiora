@@ -9,7 +9,7 @@
 
 #include <curl/curl.h>
 
-#include <sql.h>
+//#include <sql.h>
 
 struct MemoryStruct {
 	char *data;

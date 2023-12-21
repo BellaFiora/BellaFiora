@@ -1,7 +1,7 @@
 # user defined
 CC=gcc
 CFLAGS=-Wall -Wextra
-LDLIBS=-lcurl -lpthread -lodbc
+LDLIBS=-lcurl -lpthread #-lodbc
 SRC_DIRS=src c_utils/src jansson-2.14/src beatmap_parser/src
 O_DIR=obj
 EXE=bin/bm_manager
