@@ -15,3 +15,4 @@ beatmapsests
 beatmaps
 commits_done
 update.ps1
+*.lprof
