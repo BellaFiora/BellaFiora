@@ -53,9 +53,11 @@ void* callback(void* data) {
 
         int client_socket = accept(server->socket, &client_addr, &client_addr_len);
         if (client_socket == -1) {
-            // Error or nothing to read, accept timeout
+            // Error or timeout
             if (errno != EAGAIN && errno != EWOULDBLOCK)
                 creport(stderr, "%s", strerror(errno));
+            //else
+            //    creport(stdout, "timeout");
             continue;
         }
 
@@ -82,7 +84,17 @@ void* callback(void* data) {
         //  printf("%s: received %ld bytes from %s:%s\n", server->name, (long) bytes_received, host, service);
 
         // Print the received data
-        creport(stdout, "received %zu bytes:\n%.*s", bytes_received, (int)bytes_received, buf);
+        //creport(stdout, "received %zu bytes:\n%.*s", bytes_received, (int)bytes_received, buf);
+
+        // Process the request
+
+        size_t i = 0;
+        while (buf[i] != ' ') i++;
+        i += 2;
+        size_t j = 0;
+        while (buf[i+j] != ' ') j++;
+        DBGI(j);
+        printf("%.*s\n", (unsigned int)j, buf+i);
 
         // send back the received data
         if (sendto(client_socket, hello, bytes_to_send, 0, &client_addr, client_addr_len) != bytes_to_send)

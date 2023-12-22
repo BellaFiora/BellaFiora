@@ -19,6 +19,9 @@ struct ThreadData {
 	pthread_mutex_t lock;
 };
 
+// protos_flag
+void* download_beatmaps(void* arg);
+void* scan_beatmapsets(void* arg);
 int update_beatmaps(void);
 
 #endif
