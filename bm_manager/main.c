@@ -113,6 +113,10 @@ void* sigint_handler(void* data) {
 }
 
 int main(void) {
+    int i = 5;
+    DBGI(i);
+    return 0;
+
     setup_sigint_handlers();
     char server1_name[] = "HTTP Server";
     Server* server1 = new_server(server1_name, "25586", callback, sigint_handler);

@@ -7,237 +7,123 @@
 #include <stdarg.h>
 #include <math.h>
 
-#ifdef DBG_VAR_NAME /* ---------- WITH VARIABLE NAME IN DBG_PREFIX  ----------*/
+// ---------- DBG ----------
 
 /* DBGI */
 
-void DBGI_int(const char* name, int n) {
-    printf(DBG_PREFIX"%i\n", name, n);
-}
+#define __DBGI(format) dbgprintf(format"\n", n);
+#define _DBGI(type, format) dbgdef(void, CAT(DBGI_, type), type n) { __DBGI(format) }
 
-void DBGI_long(const char* name, long n) {
-    printf(DBG_PREFIX"%ld\n", name, n);
-}
-
-void DBGI_long_long(const char* name, long long n) {
-    printf(DBG_PREFIX"%lld\n", name, n);
-}
-
-void DBGI_unsigned_char(const char* name, unsigned char n) {
-    printf(DBG_PREFIX"%u\n", name, n);
-}
-
-void DBGI_char(const char* name, char n) {
-    printf(DBG_PREFIX"%i\n", name, n);
-}
-
-void DBGI_size_t(const char* name, size_t n) {
-    printf(DBG_PREFIX"%zu\n", name, n);
-}
+_DBGI(int, "%i")
+_DBGI(size_t, "%zu")
+_DBGI(float, "%f")
+_DBGI(double, "%f")
+_DBGI(char, "%i")
+_DBGI(long, "%ld")
+dbgdef(void, DBGI_long_long, long long n) { __DBGI("%lld") }
+dbgdef(void, DBGI_unsigned_char, unsigned char n) { __DBGI("%u") }
 
 /* DBGBIN */
 
 static char bits[sizeof(size_t) * 8] = { 0 };
 
-void DBGBIN_char(const char* name, char n) {
-    int nb_bits = sizeof(char) * 8;
-    printf(DBG_PREFIX"", name);
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
+#define __DBGBIN(type) \
+    int nb_bits = sizeof(type) * 8; \
+    dbgprintf(""); \
+    for (int i = 0; i < nb_bits; i++){ \
+        bits[i] = n % 2 + '0'; \
+        n /= 2; \
+    } \
+    for (int i = nb_bits - 1; i >= 0; i--) \
+        putchar(bits[i]); \
     putchar('\n');
-}
 
-void DBGBIN_unsigned_char(const char* name, unsigned char n) {
-    int nb_bits = sizeof(unsigned char) * 8;
-    printf(DBG_PREFIX"", name);
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
+#define _DBGBIN(type) dbgdef(void, CAT(DBGBIN_, type), type n) { __DBGBIN(type) }
 
-void DBGBIN_int(const char* name, int n) {
-    int nb_bits = sizeof(int) * 8;
-    printf(DBG_PREFIX"", name);
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
-
-void DBGBIN_size_t(const char* name, size_t n) {
-    int nb_bits = sizeof(size_t) * 8;
-    printf(DBG_PREFIX"", name);
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
+_DBGBIN(int)
+_DBGBIN(size_t)
+_DBGBIN(char)
+_DBGBIN(long)
+dbgdef(void, DBGBIN_long_long, long long n) { __DBGBIN(long long) }
+dbgdef(void, DBGBIN_unsigned_char, unsigned char n) { __DBGBIN(unsigned char) }
 
 /* DBGA */
 
-void DBGA_int(const char* name, const int* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n", name);
-        return;
-    }
-    printf(DBG_PREFIX"[ ", name);
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%d, ", array[i]);
-    printf("%d ]\n", array[len - 1]);
-}
+#define __DBGA(format) \
+    if (len == 0){ \
+        dbgprintf("[]\n"); \
+        return; \
+    } \
+    dbgprintf("[ "); \
+    for (size_t i = 0; i < len - 1; i++) \
+        printf(format", ", array[i]); \
+    printf(format" ]\n", array[len - 1]);
 
-void DBGA_size_t(const char* name, const size_t* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n", name);
-        return;
-    }
-    printf(DBG_PREFIX"[ ", name);
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%zu, ", array[i]);
-    printf("%zu ]\n", array[len - 1]);
-}
+#define _DBGA(type, format) dbgdef(void, CAT(DBGA_, type), const type* array, size_t len) { __DBGA(format) }
 
-void DBGA_float(const char* name, const float* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n", name);
-        return;
-    }
-    printf(DBG_PREFIX"[ ", name);
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%f, ", array[i]);
-    printf("%f ]\n", array[len - 1]);
-}
-
-void DBGA_double(const char* name, const double* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n", name);
-        return;
-    }
-    printf(DBG_PREFIX"[ ", name);
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%f, ", array[i]);
-    printf("%f ]\n", array[len - 1]);
-}
-
-void DBGA_char(const char* name, const char* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n", name);
-        return;
-    }
-    printf(DBG_PREFIX"[ ", name);
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%c, ", array[i]);
-    printf("%c ]\n", array[len - 1]);
-}
-
-void DBGA_str(const char* name, const char** array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n", name);
-        return;
-    }
-    printf(DBG_PREFIX"[ ", name);
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%s, ", array[i]);
-    printf("%s ]\n", array[len - 1]);
-}
+_DBGA(int, "%i")
+_DBGA(size_t, "%zu")
+_DBGA(float, "%f")
+_DBGA(double, "%f")
+_DBGA(char, "%c")
+dbgdef(void, DBGA_str, const char** array, size_t len) { __DBGA("%s") }
 
 /* DBGC */
 
-void DBGC_char(const char* name, const char c) {
-    printf(DBG_PREFIX"%c\n", name, c);
-}
-
-void DBGC_char_ptr(const char* name, const char* c) {
-    printf(DBG_PREFIX"%c\n", name, *c);
-}
+dbgdef(void, DBGC_char, const char c) { dbgprintf("%c\n", c); }
+dbgdef(void, DBGC_char_ptr, const char*c) { dbgprintf("%c\n", *c); }
 
 /* DBGS */
 
-void DBGS_str(const char* name, const char* str) {
-    int diff = strcmp(name, str);
-    if (!diff)
-        printf("%s\n", str);
-    else
-        printf(DBG_PREFIX"%s\n", name, str);
-}
+dbgdef(void, DBGS_str, const char* str) { dbgprintf("%s\n", str); }
 
 /* DBGMAT */
+
+#define DBGMAT_entry_width_check \
+    if (entry < 0) { \
+        width++; \
+        n = -n; \
+    }
+
+#define DBGMAT_entry_width_body \
+    while (n) { \
+        width++; \
+        n /= 10; \
+    } \
+    return width + (entry == 0);
 
 int DBGMAT_entry_width_int(const int entry) {
     int width = 0;
     int n = entry;
-    if (entry < 0) {
-        width++;
-        n = -n;
-    }
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
+    DBGMAT_entry_width_check
+    DBGMAT_entry_width_body
 }
 
 int DBGMAT_entry_width_size_t(const size_t entry) {
     int width = 0;
     size_t n = entry;
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
+    DBGMAT_entry_width_body
 }
 
 int DBGMAT_entry_width_float(const float entry) {
     int width = 0;
     float n = entry;
-    if (entry < 0) {
-        width++;
-        n = -n;
-    }
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
+    DBGMAT_entry_width_check
+    DBGMAT_entry_width_body
 }
 
 int DBGMAT_entry_width_double(const double entry) {
     int width = 0;
     double n = entry;
-    if (entry < 0) {
-        width++;
-        n = -n;
-    }
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
+    DBGMAT_entry_width_check
+    DBGMAT_entry_width_body
 }
 
-int DBGMAT_entry_width_char(__attribute__((unused)) const char entry) {
-    return 1;
-}
+int DBGMAT_entry_width_char(__attribute__((unused)) const char entry) { return 1; }
 
-int DBGMAT_entry_width_str(const char* entry) {
-    return strlen(entry);
-}
+int DBGMAT_entry_width_str(const char* entry) { return strlen(entry); }
 
-#define _DBGMAT_entries_width(type) \
+#define __DBGMAT_entries_width(type) \
     for (size_t j = 0; j < n; j++) { \
         int col_max_width = 0; \
         for (size_t i = 0; i < m; i++) { \
@@ -247,512 +133,77 @@ int DBGMAT_entry_width_str(const char* entry) {
         max_width[j] = col_max_width; \
     }
 
-void DBGMAT_entries_width_int(size_t n, size_t m, const int** mat, int max_width[m]) {
-    _DBGMAT_entries_width(int)
-}
+#define _DBGMAT_entries_width(type) void CAT(DBGMAT_entries_width_, type)(size_t n, size_t m, const type** mat, int max_width[m]) { __DBGMAT_entries_width(type) }
+#define _DBGAMAT_entries_width(type) void CAT(DBGAMAT_entries_width_, type)(size_t n, size_t m, const type mat[n][m], int max_width[m]) { __DBGMAT_entries_width(type) }
 
-void DBGMAT_entries_width_size_t(size_t n, size_t m, const size_t** mat, int max_width[m]) {
-    _DBGMAT_entries_width(size_t)
-}
+_DBGMAT_entries_width(int)
+_DBGMAT_entries_width(size_t)
+_DBGMAT_entries_width(float)
+_DBGMAT_entries_width(double)
+_DBGMAT_entries_width(char)
+void DBGMAT_entries_width_str(size_t n, size_t m, const char*** mat, int max_width[m]) { __DBGMAT_entries_width(str) }
 
-void DBGMAT_entries_width_float(size_t n, size_t m, const float** mat, int max_width[m]) {
-    _DBGMAT_entries_width(float)
-}
+_DBGAMAT_entries_width(int)
+_DBGAMAT_entries_width(size_t)
+_DBGAMAT_entries_width(float)
+_DBGAMAT_entries_width(double)
+_DBGAMAT_entries_width(char)
+void DBGAMAT_entries_width_str(size_t n, size_t m, const char* mat[n][m], int max_width[m]) { __DBGMAT_entries_width(str) }
 
-void DBGMAT_entries_width_double(size_t n, size_t m, const double** mat, int max_width[m]) {
-    _DBGMAT_entries_width(double)
-}
+#define __DBGMAT_init \
+    if (n == 0 && m == 0) { \
+        dbgprintf("[]\n"); \
+        return; \
+    } \
+    int max_width[m];
 
-void DBGMAT_entries_width_char(size_t n, size_t m, const char** mat, int max_width[m]) {
-    _DBGMAT_entries_width(char)
-}
-
-void DBGMAT_entries_width_str(size_t n, size_t m, const char*** mat, int max_width[m]) {
-    _DBGMAT_entries_width(str)
-}
-
-void DBGAMAT_entries_width_int(size_t n, size_t m, const int mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(int)
-}
-
-void DBGAMAT_entries_width_size_t(size_t n, size_t m, const size_t mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(size_t)
-}
-
-void DBGAMAT_entries_width_float(size_t n, size_t m, const float mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(float)
-}
-
-void DBGAMAT_entries_width_double(size_t n, size_t m, const double mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(double)
-}
-
-void DBGAMAT_entries_width_char(size_t n, size_t m, const char mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(char)
-}
-
-void DBGAMAT_entries_width_str(size_t n, size_t m, const char* mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(str)
-}
+#define __DBGMAT_body(format) \
+    dbgprintf("\n"); \
+    for (size_t i = 0; i < n; i++) { \
+        for (size_t j = 0; j < m; j++) { \
+            for (size_t i = 0; i < DBGMAT_corners; i++) printf("|"); \
+            printf("%*.s"format"%*.s", DBGMAT_spaces, " ", max_width[j], mat[i][j], DBGMAT_spaces, " "); \
+        } \
+        for (size_t i = 0; i < DBGMAT_corners; i++) printf("|"); \
+        printf("\n"); \
+    }
 
 #define _DBGMAT(type, format) \
-    if (n == 0 && m == 0) { \
-        printf(DBG_PREFIX"[]\n", name); \
-        return; \
-    } \
-    int max_width[m]; \
+dbgdef(void, CAT(DBGMAT_, type), size_t n, size_t m, const type** mat) { \
+    __DBGMAT_init \
     CAT(DBGMAT_entries_width_, type)(n, m, mat, max_width); \
-    printf(DBG_PREFIX"\n", name); \
-    for (size_t i = 0; i < n; i++) { \
-        for (size_t j = 0; j < m; j++) { \
-            for (size_t i = 0; i < DBGMAT_corners; i++) \
-                printf("|"); \
-            printf("%*.s"format"%*.s", DBGMAT_spaces, " ", max_width[j], mat[i][j], DBGMAT_spaces, " "); \
-        } \
-        for (size_t i = 0; i < DBGMAT_corners; i++) \
-            printf("|"); \
-        printf("\n"); \
-    }
+    __DBGMAT_body(format) \
+}
 
 #define _DBGAMAT(type, format) \
-    if (n == 0 && m == 0) { \
-        printf(DBG_PREFIX"[]\n", name); \
-        return; \
-    } \
-    int max_width[m]; \
+dbgdef(void, CAT(DBGAMAT_, type), size_t n, size_t m, const type mat[n][m]) { \
+    __DBGMAT_init \
     CAT(DBGAMAT_entries_width_, type)(n, m, mat, max_width); \
-    printf(DBG_PREFIX"\n", name); \
-    for (size_t i = 0; i < n; i++) { \
-        for (size_t j = 0; j < m; j++) { \
-            for (size_t i = 0; i < DBGMAT_corners; i++) \
-                printf("|"); \
-            printf("%*.s"format"%*.s", DBGMAT_spaces, " ", max_width[j], mat[i][j], DBGMAT_spaces, " "); \
-        } \
-        for (size_t i = 0; i < DBGMAT_corners; i++) \
-            printf("|"); \
-        printf("\n"); \
-    }
-
-void DBGMAT_int(const char* name, size_t n, size_t m, const int** mat) {
-    _DBGMAT(int, "%*i")
+    __DBGMAT_body(format) \
 }
 
-void DBGMAT_size_t(const char* name, size_t n, size_t m, const size_t** mat) {
-    _DBGMAT(size_t, "%*zu")
+_DBGMAT(int, "%*i")
+_DBGMAT(size_t, "%*zu")
+_DBGMAT(float, "%*f")
+_DBGMAT(double, "%*f")
+_DBGMAT(char, "%*c")
+dbgdef(void, DBGMAT_str, size_t n, size_t m, const char*** mat) {
+    __DBGMAT_init
+    DBGMAT_entries_width_str(n, m, mat, max_width);
+    __DBGMAT_body("%*s")
 }
 
-void DBGMAT_float(const char* name, size_t n, size_t m, const float** mat) {
-    _DBGMAT(float, "%*f")
+_DBGAMAT(int, "%*i")
+_DBGAMAT(size_t, "%*zu")
+_DBGAMAT(float, "%*f")
+_DBGAMAT(double, "%*f")
+_DBGAMAT(char, "%*c")
+dbgdef(void, DBGAMAT_str, size_t n, size_t m, const char* mat[n][m]) {
+    __DBGMAT_init
+    DBGAMAT_entries_width_str(n, m, mat, max_width);
+    __DBGMAT_body("%*s")
 }
 
-void DBGMAT_double(const char* name, size_t n, size_t m, const double** mat) {
-    _DBGMAT(double, "%*f")
-}
+// ---------- MISCELLANEOUS ----------
 
-void DBGMAT_char(const char* name, size_t n, size_t m, const char** mat) {
-    _DBGMAT(char, "%*c")
-}
 
-void DBGMAT_str(const char* name, size_t n, size_t m, const char*** mat) {
-    _DBGMAT(str, "%*s")
-}
-
-void DBGAMAT_int(const char* name, size_t n, size_t m, const int mat[n][m]) {
-    _DBGAMAT(int, "%*i")
-}
-
-void DBGAMAT_size_t(const char* name, size_t n, size_t m, const size_t mat[n][m]) {
-    _DBGAMAT(size_t, "%*zu")
-}
-
-void DBGAMAT_float(const char* name, size_t n, size_t m, const float mat[n][m]) {
-    _DBGAMAT(float, "%*f")
-}
-
-void DBGAMAT_double(const char* name, size_t n, size_t m, const double mat[n][m]) {
-    _DBGAMAT(double, "%*f")
-}
-
-void DBGAMAT_char(const char* name, size_t n, size_t m, const char mat[n][m]) {
-    _DBGAMAT(char, "%*c")
-}
-
-void DBGAMAT_str(const char* name, size_t n, size_t m, const char* mat[n][m]) {
-    _DBGAMAT(str, "%*s")
-}
-
-#else /* ---------- WITHOUT VARIABLE NAME IN DBG_PREFIX  ----------*/
-
-/* DBGI */
-
-void DBGI_int(int n) {
-    printf(DBG_PREFIX"%i\n", n);
-}
-
-void DBGI_long(long n) {
-    printf(DBG_PREFIX"%ld\n", n);
-}
-
-void DBGI_long_long(long long n) {
-    printf(DBG_PREFIX"%lld\n", n);
-}
-
-void DBGI_unsigned_char(unsigned char n) {
-    printf(DBG_PREFIX"%u\n", n);
-}
-
-void DBGI_char(char n) {
-    printf(DBG_PREFIX"%i\n", n);
-}
-
-void DBGI_size_t(size_t n) {
-    printf(DBG_PREFIX"%zu\n", n);
-}
-
-/* DBGBIN */
-
-static char bits[sizeof(size_t) * 8] = { 0 };
-
-void DBGBIN_char(char n) {
-    int nb_bits = sizeof(char) * 8;
-    printf(DBG_PREFIX"");
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
-
-void DBGBIN_unsigned_char(unsigned char n) {
-    int nb_bits = sizeof(unsigned char) * 8;
-    printf(DBG_PREFIX"");
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
-
-void DBGBIN_int(int n) {
-    int nb_bits = sizeof(int) * 8;
-    printf(DBG_PREFIX"");
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
-
-void DBGBIN_size_t(size_t n) {
-    int nb_bits = sizeof(size_t) * 8;
-    printf(DBG_PREFIX"");
-    for (int i = 0; i < nb_bits; i++){
-        bits[i] = n % 2 + '0';
-        n /= 2;
-    }
-    for (int i = nb_bits - 1; i >= 0; i--)
-        putchar(bits[i]);
-    putchar('\n');
-}
-
-/* DBGA */
-
-void DBGA_int(const int* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n");
-        return;
-    }
-    printf(DBG_PREFIX"[ ");
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%d, ", array[i]);
-    printf("%d ]\n", array[len - 1]);
-}
-
-void DBGA_size_t(const size_t* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n");
-        return;
-    }
-    printf(DBG_PREFIX"[ ");
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%zu, ", array[i]);
-    printf("%zu ]\n", array[len - 1]);
-}
-
-void DBGA_float(const float* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n");
-        return;
-    }
-    printf(DBG_PREFIX"[ ");
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%f, ", array[i]);
-    printf("%f ]\n", array[len - 1]);
-}
-
-void DBGA_double(const double* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n");
-        return;
-    }
-    printf(DBG_PREFIX"[ ");
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%f, ", array[i]);
-    printf("%f ]\n", array[len - 1]);
-}
-
-void DBGA_char(const char* array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n");
-        return;
-    }
-    printf(DBG_PREFIX"[ ");
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%c, ", array[i]);
-    printf("%c ]\n", array[len - 1]);
-}
-
-void DBGA_str(const char** array, size_t len) {
-    if (len == 0){
-        printf(DBG_PREFIX"[]\n");
-        return;
-    }
-    printf(DBG_PREFIX"[ ");
-    for (size_t i = 0; i < len - 1; i = i + 1)
-        printf("%s, ", array[i]);
-    printf("%s ]\n", array[len - 1]);
-}
-
-/* DBGC */
-
-void DBGC_char(const char c) {
-    printf(DBG_PREFIX"%c\n", c);
-}
-
-void DBGC_char_ptr(const char* c) {
-    printf(DBG_PREFIX"%c\n", *c);
-}
-
-/* DBGS */
-
-void DBGS_str(const char* str) {
-    int diff = strcmp(name, str);
-    if (!diff)
-        printf("%s\n", str);
-    else
-        printf(DBG_PREFIX"%s\n", str);
-}
-
-/* DBGMAT */
-
-int DBGMAT_entry_width_int(const int entry) {
-    int width = 0;
-    int n = entry;
-    if (entry < 0) {
-        width++;
-        n = -n;
-    }
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
-}
-
-int DBGMAT_entry_width_size_t(const size_t entry) {
-    int width = 0;
-    size_t n = entry;
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
-}
-
-int DBGMAT_entry_width_float(const float entry) {
-    int width = 0;
-    float n = entry;
-    if (entry < 0) {
-        width++;
-        n = -n;
-    }
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
-}
-
-int DBGMAT_entry_width_double(const double entry) {
-    int width = 0;
-    double n = entry;
-    if (entry < 0) {
-        width++;
-        n = -n;
-    }
-    while (n) {
-        width++;
-        n /= 10;
-    }
-    return width + (entry == 0);
-}
-
-int DBGMAT_entry_width_char(__attribute__((unused)) const char entry) {
-    return 1;
-}
-
-int DBGMAT_entry_width_str(const char* entry) {
-    return strlen(entry);
-}
-
-#define _DBGMAT_entries_width(type) \
-    for (size_t j = 0; j < n; j++) { \
-        int col_max_width = 0; \
-        for (size_t i = 0; i < m; i++) { \
-            int width = CAT(DBGMAT_entry_width_, type)(mat[i][j]); \
-            if (width > col_max_width) col_max_width = width; \
-        } \
-        max_width[j] = col_max_width; \
-    }
-
-void DBGMAT_entries_width_int(size_t n, size_t m, const int** mat, int max_width[m]) {
-    _DBGMAT_entries_width(int)
-}
-
-void DBGMAT_entries_width_size_t(size_t n, size_t m, const size_t** mat, int max_width[m]) {
-    _DBGMAT_entries_width(size_t)
-}
-
-void DBGMAT_entries_width_float(size_t n, size_t m, const float** mat, int max_width[m]) {
-    _DBGMAT_entries_width(float)
-}
-
-void DBGMAT_entries_width_double(size_t n, size_t m, const double** mat, int max_width[m]) {
-    _DBGMAT_entries_width(double)
-}
-
-void DBGMAT_entries_width_char(size_t n, size_t m, const char** mat, int max_width[m]) {
-    _DBGMAT_entries_width(char)
-}
-
-void DBGMAT_entries_width_str(size_t n, size_t m, const char*** mat, int max_width[m]) {
-    _DBGMAT_entries_width(str)
-}
-
-void DBGAMAT_entries_width_int(size_t n, size_t m, const int mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(int)
-}
-
-void DBGAMAT_entries_width_size_t(size_t n, size_t m, const size_t mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(size_t)
-}
-
-void DBGAMAT_entries_width_float(size_t n, size_t m, const float mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(float)
-}
-
-void DBGAMAT_entries_width_double(size_t n, size_t m, const double mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(double)
-}
-
-void DBGAMAT_entries_width_char(size_t n, size_t m, const char mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(char)
-}
-
-void DBGAMAT_entries_width_str(size_t n, size_t m, const char* mat[n][m], int max_width[m]) {
-    _DBGMAT_entries_width(str)
-}
-
-#define _DBGMAT(type, format) \
-    if (n == 0 && m == 0) { \
-        printf(DBG_PREFIX"[]\n"); \
-        return; \
-    } \
-    int max_width[m]; \
-    CAT(DBGMAT_entries_width_, type)(n, m, mat, max_width); \
-    printf(DBG_PREFIX"\n"); \
-    for (size_t i = 0; i < n; i++) { \
-        for (size_t j = 0; j < m; j++) { \
-            for (size_t i = 0; i < DBGMAT_corners; i++) \
-                printf("|"); \
-            printf("%*.s"format"%*.s", DBGMAT_spaces, " ", max_width[j], mat[i][j], DBGMAT_spaces, " "); \
-        } \
-        for (size_t i = 0; i < DBGMAT_corners; i++) \
-            printf("|"); \
-        printf("\n"); \
-    }
-
-#define _DBGAMAT(type, format) \
-    if (n == 0 && m == 0) { \
-        printf(DBG_PREFIX"[]\n"); \
-        return; \
-    } \
-    int max_width[m]; \
-    CAT(DBGAMAT_entries_width_, type)(n, m, mat, max_width); \
-    printf(DBG_PREFIX"\n"); \
-    for (size_t i = 0; i < n; i++) { \
-        for (size_t j = 0; j < m; j++) { \
-            for (size_t i = 0; i < DBGMAT_corners; i++) \
-                printf("|"); \
-            printf("%*.s"format"%*.s", DBGMAT_spaces, " ", max_width[j], mat[i][j], DBGMAT_spaces, " "); \
-        } \
-        for (size_t i = 0; i < DBGMAT_corners; i++) \
-            printf("|"); \
-        printf("\n"); \
-    }
-
-void DBGMAT_int(size_t n, size_t m, const int** mat) {
-    _DBGMAT(int, "%*i")
-}
-
-void DBGMAT_size_t(size_t n, size_t m, const size_t** mat) {
-    _DBGMAT(size_t, "%*zu")
-}
-
-void DBGMAT_float(size_t n, size_t m, const float** mat) {
-    _DBGMAT(float, "%*f")
-}
-
-void DBGMAT_double(size_t n, size_t m, const double** mat) {
-    _DBGMAT(double, "%*f")
-}
-
-void DBGMAT_char(size_t n, size_t m, const char** mat) {
-    _DBGMAT(char, "%*c")
-}
-
-void DBGMAT_str(size_t n, size_t m, const char*** mat) {
-    _DBGMAT(str, "%*s")
-}
-
-void DBGAMAT_int(size_t n, size_t m, const int mat[n][m]) {
-    _DBGAMAT(int, "%*i")
-}
-
-void DBGAMAT_size_t(size_t n, size_t m, const size_t mat[n][m]) {
-    _DBGAMAT(size_t, "%*zu")
-}
-
-void DBGAMAT_float(size_t n, size_t m, const float mat[n][m]) {
-    _DBGAMAT(float, "%*f")
-}
-
-void DBGAMAT_double(size_t n, size_t m, const double mat[n][m]) {
-    _DBGAMAT(double, "%*f")
-}
-
-void DBGAMAT_char(size_t n, size_t m, const char mat[n][m]) {
-    _DBGAMAT(char, "%*c")
-}
-
-void DBGAMAT_str(size_t n, size_t m, const char* mat[n][m]) {
-    _DBGAMAT(str, "%*s")
-}
-
-#endif
