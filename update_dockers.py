@@ -16,6 +16,11 @@ else:
 	exit(1)
 args = read_file('.ssh').split('\n')[0:4]
 docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=4)
+if docker_manager == None or docker_manager.sftp == None or docker_manager.sftp == None:
+	exit(1)
+docker_manager._send('dummy.txt', 'dummy.txt')
+if docker_manager.sftp == None or docker_manager.sftp == None:
+	exit(1)
 
 commits_done_file = 'commits_done_'+branch
 commits_done = []
@@ -119,14 +124,17 @@ for commit in commits:
 	process_commit(commit)
 time_to_update_dockers = time.time() - st
 
-st = time.time()
-# update dockers in which files were added / modified / created / deleted / renamed
 updated_dockers = list(set(updated_dockers))
 updated_dockers.delete('common')
+tsw_st = docker_manager.ti.time_spent_waiting()
+st = time.time()
+# update dockers in which files were added / modified / created / deleted / renamed
 for docker in updated_dockers:
 	docker_manager.stop(docker)
 	docker_manager.start(docker)
 time_to_restart_dockers = time.time() - st
+# remove ssh time from time_to_restart_dockers when updating dockers for time_other
+time_to_restart_dockers -= tsw_st - docker_manager.ti.time_spent_waiting()
 
 docker_manager.close()
 
@@ -136,14 +144,15 @@ with open(commits_done_file, 'w+') as f:
 
 time_spent_on_ssh = docker_manager.ti.time_spent_waiting()
 time_measuring_on_ssh = docker_manager.ti.time_spent_measuring()
-time_total = time.time() - st_total
-time_other = time_total - time_spent_on_ssh - time_measuring_on_ssh
 nb_updated_dockers = len(updated_dockers)
+updated_dockers_list = ' '.join(updated_dockers)
+time_total = time.time() - st_total
+time_other = time_total - time_spent_on_ssh - time_measuring_on_ssh - time_to_restart_dockers
 print(	f"took {time_to_update_dockers}s to update dockers\n"
 		f"took {time_to_restart_dockers}s to restart dockers\n\n"
 		f"spent {time_spent_on_ssh}s on ssh (+{time_measuring_on_ssh}s on measuring)\n\n"
-		f"spent {time_total}s total (of which {time_other}s not spent on ssh)\n\n"
-		f"updated {nb_updated_dockers} dockers\n"
+		f"spent {time_total}s total (of which {time_other}s not spent on ssh or restarting dockers)\n\n"
+		f"updated {nb_updated_dockers} dockers ({updated_dockers_list})\n"
 		f"sent {docker_manager.nb_send} files\n"
 		f"removed {docker_manager.nb_remove} files\n"
 		f"moved {docker_manager.nb_move} files\n"
