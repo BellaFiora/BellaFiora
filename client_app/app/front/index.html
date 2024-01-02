@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BellaFiora</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="../../src/css/tw.css"> -->
+    <link rel="stylesheet" href="../../src/css/base.css">
+</head>
+<body>
+    <div class="windows-nav">Bella Fiora - App</div>
+    <div class="nav-top">
+        <div class="search-tools">
+            <div class="search-bar">Search..</div>
+            <div class="search-btn"><ion-icon name="search-outline"></ion-icon></div>
+        </div>
+        <div class="users-tools">
+            <div class="nav-btn-action"><ion-icon name="person-outline"></ion-icon></div>
+            <div class="nav-btn-action"><ion-icon name="notifications-outline"></ion-icon></div>
+            <div class="nav-btn-action"><ion-icon name="settings-outline"></ion-icon></div>
+        </div>
+        <div class="open-boxedit reply">
+            <div class="soft_infos">
+                <span id="software_version">v</span>
+                <p>&nbsp;|&nbsp;</p>
+                <span id="application_id"></span>
+            </div>
+        </div>
+    </div>
+    <div class="global-contents"> 
+        <div class="main-content" id="HomePage">
+            <div class="home-collumn">
+                <div class="user-welcome">
+                    <div class="avatar" ><img src="" id="userAvatar"/></div>
+                    <div class="user_informations">
+                        <span id="welcomePseudo">Welcome, Pupariaa !</span>
+                        <span id="welcomeRank"></span>
+                        <span id="welcomePP"></span>
+                    </div>
+                </div>
+    
+                <div class="user-stats">
+                    <div class="stat-container">
+                        <span  class="stat-label">Classed Score</span>
+                        <span class="stat-info" id="userStat_classedScore"></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-info" id="userStat_Accuracy" ></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span  class="stat-label">Plays</span>
+                        <span class="stat-info" id="userStat_classedPlays"></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span  class="stat-label">Total Score</span>
+                        <span class="stat-info" id="userStat_TotalScore"></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span  class="stat-label">Clicks</span>
+                        <span class="stat-info" id="userStat_nbClick"></span>
+                    </div>
+
+
+
+                    <div class="stat-container">
+                        <span id="userStat_classedScore" class="stat-label">Combo Max</span>
+                        <span class="stat-info" id="userStat_maxCombo"></span>
+                    </div>
+
+                    <div class="rank-highligh" id="rank_highligh">Graph.. Yen a pas encore mdr</div>
+
+                    <div class="rank-notations">
+                        <div class="rank-note">
+                            <label>SSH</label>
+                            <span id="userStat_nb_ssh"></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>SS</label>
+                            <span id="userStat_nb_ss"></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>SH</label>
+                            <span id="userStat_nb_sh"></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>S</label>
+                            <span id="userStat_nb_s"></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>A</label>
+                            <span id="userStat_nb_a"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home_user_profile">
+                <div class="title-categories">Your Best Scores</div>
+                <div id="best_scores" class="scores_list">
+                    <h2 style="color:black">Loading..</h2>
+                </div>
+            </div>
+        </div>
+        <div class="main-content" id="BotIgPage">
+            <div class="user-welcome">
+                <span>..</span>
+            </div>
+        </div>
+        <div class="main-content active" id="GamePlayPage">
+            <div class="player-music" id="musicPlayer">
+                <div class="player-music-backdrop"></div>
+                <div class="player-content">
+                    <div class="gameplay-player">
+                        
+                    </div>
+                    <div class="music-informations">
+                        <span id="music_info_title">Title  - Author</span>
+                        <span id="music_info_diff">Difficulty</span>
+                        <span id="music_info_author">Mapped By</span>
+                    </div>
+                    <div class="beatmap-informations">
+                        <div id="bm_status"></div>
+                    </div>
+                </div>
+                <div class="music-progressbar">
+                </div>
+            </div>
+            <div class="home-collumn ai-l player" style="width: 30%;">
+                <div class="bm_statistics_handler" id="bm_stats_handler_hp">
+                    <span>HP Drain</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_hp"></div>
+                    </div>
+                   
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_cs">
+                    <span>Cercle Size</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_cs"></div>
+
+                    </div>
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_od">
+                    <span>Overall Difficulty</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_od"></div>
+                    </div>
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_ar">
+                    <span>Approach Rate</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_ar"></div>
+                    </div>
+
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_sr">
+                    <span>Star Rating</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_sr"></div>
+                    </div>
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_kc">
+                    <span>Key Count</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_kc"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="home_user_profile" style="width: 60%;height: 200px;">
+                <div class="title-categories">Your Scores</div>
+                <div id="specificsMap" class="scores_list">
+                    <!-- <div class="score-container">
+                        <div class="score-pp">0 PP</div>
+                        <div class="score-infos">
+                            <div class="score-container-top">Max Combo: ${s.maxCombo} Score: ${s.replayScore} Miss: ${s.cMiss} 300: ${s.c300} 100: ${s.c100} 50: ${s.c50}</div>
+                            <div class="score-container-bottom">${ctwtg(s.timestampWindows)} | Accuracy: ${osuUtils.acc(s.mode, s.c300, s.c100, s.c50, s.cMiss, s.cKatu, s.cGeki)} | Stars: 0 ★</div>
+                        </div>
+                        <div class="score-mods">${s.mods ? s.mods : null}</div>
+                        <div class="score-rank">X</div>
+                    </div> -->
+                </div>
+            </div>
+
+            
+        
+        </div>
+            
+            <!-- <div id="playing_keys">
+                <div id="key1">
+                    <span style="width: 1px;"></span>
+                </div>
+                <div id="key2"></div>
+
+            </div> -->
+            <!-- <div id="graph_ms"></div>
+            <div id="graph_percent"></div> -->
+            <!-- <div class="playing-highligh" id="currentMap_highligh"> -->
+        </div>
+        <div class="main-content" id="RefHelperPage">
+            <div class="ref-helper-main">
+                <div class="refHelper-tab">
+                    <div class="ref-tab">
+                        <span>Tab Name</span>
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                </div>
+                <div class="slots-body">
+                    <div class="slot">
+                        <span class="num-slot">1</span>
+                        <span class="player-name">Pupariaa</span>
+                        <span class="action-slot">
+                            <ion-icon name="color-wand-outline"></ion-icon>
+                        </span>
+                    </div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+                <div class="room-edits">
+                    <div class="map-handler">
+                        <div class="btn-change-map">Change</div>
+                    </div>
+                    <div class="room-editor">
+
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">DT</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">HD</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">FL</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">EZ</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">SD</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">RL</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">NF</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="room-chat">
+                        <div class="chat">
+                            <div class="chat-message">
+                                <span>Pseudo</span>
+                                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aliquid alias labore, maxime consequuntur </p>
+                            </div>
+                        </div>
+                        <div class="prompt-chat">
+                            <input type="text" placeholder="Type a message">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- <div class="main-content" id="StatsPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+        <!-- <div class="main-content" id="HistoryPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+        <!-- <div class="main-content" id="PromptGenPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+       
+        <!-- <div class="main-content" id="DocPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+         <div class="main-content" id="Overlays">
+            <div class="home-collumn ai-l">
+                <div class="overlay-item active">PP Counter</div>
+                <div class="overlay-item">Beatmap</div>
+                <div class="overlay-item">Statistics</div>
+                <div class="overlay-item">Player</div>
+                <div class="overlay-item">Unstable Rate</div>
+                <div class="overlay-item">Stream Overlays</div>
+                <div class="overlay-item">Chat Streams</div>
+            </div>
+            <div class="overlay-edit">
+                <span class="overlay-cat-title">Preview</span>
+                <div class="overlay-preview">
+                    <div class="__pp_counter">
+                        <div class="__overlay __pp_counter">
+                            <span>145 PP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="overlay-settings-up">
+                    <select id="overlays_ppcounter-styleselect" name="Style Select">
+                        <option value="option1">Bella Fiora Theme</option>
+                        <option value="option2">Option 2</option>
+                        <option value="option3">Option 3</option>
+                        <option value="option4">Option 4</option>
+                    </select>
+                    <div class="set-up-element palet-color">
+                        <span>Text Color</span>
+                        <input type="color" id="overlays_ppcounter-text-color"value="#ffffff" />
+                    </div>
+                    <div class="set-up-element palet-color">
+                        <span>BG Color</span>
+                        <input type="color" id="overlays_ppcounter-text-color" value="#a84a89"/>
+                    </div>
+                    <div class="set-up-element">
+                        <span>Width (px)</span>
+                        <input type="number" placeholder="1000">
+                        
+                    </div>
+                    <div class="set-up-element">
+                        <span>Height (px)</span>
+                        <input type="number" placeholder="1000">
+
+                    </div>
+                    <div class="overlay-apply-btns">
+                        <div class="overlay-btn">Save</div>
+                        <div class="overlay-btn">Reset</div>
+                        <div class="overlay-btn">Open Server</div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+        <!-- <script>
+            const colorSelector = document.getElementById('color-selector');
+
+            colorSelector.addEventListener('input', (event) => {
+                const selectedColor = event.target.value;
+                console.log(`Selected Color: ${selectedColor}`);
+            });
+        </script> -->
+       
+         <!-- <div class="main-content" id="DocPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+    </div>
+        
+
+    </div>
+
+    <div class="nav-bottom">
+        <div class="nav-menu">
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="HomePage">
+                <ion-icon name="radio-button-off-outline"></ion-icon>
+                <span>Home</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="BotIgPage">
+                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                <span>Bot IG</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu active" onclick="setActiveButton(this)" data-id="GamePlayPage">
+                <ion-icon name="game-controller-outline"></ion-icon>
+                <span>Gameplay</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="StatsPage">
+                <ion-icon name="pulse-outline"></ion-icon>
+                <span>Stats</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="HistoryPage">
+                <ion-icon name="receipt-outline"></ion-icon>
+                <span>History</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="PromptGenPage">
+                <ion-icon name="terminal-outline"></ion-icon>
+                <span>Prompt Gen.</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" id="refHelperHandler" data-id="RefHelperPage">
+                <ion-icon name="browsers-outline"></ion-icon>
+                <span>Ref helper</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" id="overlays" data-id="OverlaysPage">
+                <ion-icon name="copy-outline"></ion-icon>
+                <span>Overlays</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu " onclick="setActiveButton(this)" data-id="DocPage">
+                <ion-icon name="book-outline"></ion-icon>
+                <span>Doc</span>
+                <div class="indicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="body__handler_pop_up" ></div> -->
+
+</body>
+<script src="../../src/graphs.js" defer></script>
+<script src="../renderers/main-renderer.js" defer></script>
+</html>
