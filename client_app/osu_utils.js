@@ -1,6 +1,8 @@
 "use strict";
 
 class OsuUtils {
+
+	
 	/**
 	 * Calculate accuracy based on hits and mode.
 	 *
@@ -159,6 +161,82 @@ class OsuUtils {
 			return 'D';
 		}
 	}
+
+
+
+	/**
+	 * Converts a timestamp in Microsoft FileTime format to a human-readable date string.
+	 * @param {number} ms - Timestamp in Microsoft FileTime format.
+	 * @returns {string} - Formatted date string.
+	 */
+	tsms(ms) {
+		try {
+			const epochDiff = 11644473600000;
+			const timestampUnix = (ms / 10000) - epochDiff;
+			const date = new Date(timestampUnix);
+			const adjustedYear = date.getUTCFullYear() - 1600;
+			date.setUTCFullYear(adjustedYear);
+			return date.toLocaleString();
+		} catch (error) {
+			console.error("Error in tsms function:", error);
+			return "Invalid Date";
+		}
+	}
+
+	/**
+	 * Converts a numeric representation of mods to a space-separated string of mod names.
+	 * @param {number} int - Numeric representation of mods.
+	 * @returns {string} - Space-separated string of mod names.
+	 */
+	ModsIntToString(int) {
+		try {
+			const modNames = [];
+			const Mods = {
+				NF: 1, EZ: 2, HD: 8, HR: 16, SD: 32, DT: 64, RX: 128, HT: 256,
+				NC: 512, FL: 1024, SO: 4096, PF: 16384, K4: 32768, K5: 65536,
+				K6: 131072, K7: 262144, K8: 524288, FI: 1048576, RD: 2097152,
+				TG: 8388608, K9: 16777216, K1: 67108864, K3: 134217728,
+				K2: 268435456,
+			};
+		
+			for (let mod in Mods) {
+				if (int & Mods[mod]) {
+					modNames.push(mod);
+				}
+			}
+			return modNames.join(" ");
+		} catch (error) {
+			console.error("Error in ModsIntToString function:", error);
+			return "Error converting mods";
+		}
+	}
+
+	/**
+	 * Converts a mode string to its corresponding numeric representation.
+	 * @param {string} modeString - Mode string ('osu', 'taiko', 'ctb', 'mania').
+	 * @returns {number} - Numeric representation of the mode.
+	 */
+	ModeStringToInt(modeString) {
+		try {
+			switch (modeString.toLowerCase()) {
+				case 'osu':
+				case 'osu!':
+					return 0;
+				case 'taiko':
+					return 1;
+				case 'ctb':
+					return 2;
+				case 'mania':
+					return 3;
+				default:
+					return -1;
+			}
+		} catch (error) {
+			console.error("Error in ModeStringToInt function:", error);
+			return -1;
+		}
+	}
+
 }
 module.exports = OsuUtils;
 
