@@ -8,7 +8,7 @@ def _update_beatmapsets(start:int, end:int, apikey:str, nb_beatmapsets_downloade
 		if os.path.exists(f'cache/beatmapsets/{beatmapset_id}'): continue
 		r = requests.get(f'https://osu.ppy.sh/api/get_beatmaps?k={apikey}&s={beatmapset_id}')
 		if r.status_code != 200 or r.content == b'[]': continue
-		with open(f'cache/beatmapsets/{beatmapset_id}', 'wb+') as f:
+		with open(f'cache/beatmapsets/{beatmapset_id}.json', 'wb+') as f:
 			f.write(r.content)
 		lock.acquire()
 		nb_beatmapsets_downloaded.value += 1
