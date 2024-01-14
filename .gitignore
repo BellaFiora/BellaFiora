@@ -9,8 +9,7 @@
 .apikeys
 *.pyc
 *.stackdump
-py/cache
-js/cache
+cache
 beatmapsests
 beatmaps
 commits_done
