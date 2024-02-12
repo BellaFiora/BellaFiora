@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erreur</title>
+  <style>
+      :root {
+        --color1 : #a84a89;
+        --color2 : linear-gradient(263deg, rgba(240,151,236,1) 18%, rgba(197,94,252,1) 63%);
+        --color6 : linear-gradient(263deg, rgb(197, 94, 252) 18%, rgba(158, 23, 151, 0.788) 63%);
+        --color7 : linear-gradient(263deg, rgb(197, 101, 248) 18%, rgba(158, 23, 151, 0.788) 63%);
+        --background4: rgba(203, 128, 243, 0.555);
+        --background5: rgba(255, 0, 0, 0.151);
+        --color8: rgb(197, 94, 252);
+        --color3 : #da8bf6;
+        --color4 : #ffffff;
+        --color5 : #82DDF0;
+        /* --color1 : #F7B267;
+        --color2 : #F79D65;
+        --color3 : #F4845F;
+        --color4: #F27059;
+        --color5: #F25C54; */
+        }
+        @font-face {
+            font-family: 'Typo_Round_Light'; 
+            src: url('../../src/fonts/Typo_Round_Regular_Demo.otf') format('opentype'); 
+            font-weight: normal; 
+            font-style: normal;
+        }
+
+        body {
+        background:linear-gradient(263deg, var(--background5) 18%, rgb(236, 236, 236) 63%);
+        display: flex;
+        flex-direction: column;
+        font-family: 'Typo_Round_Light', sans-serif;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        }
+        .error-container {
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        /* background-color: #fff; */
+        /* border: 2px solid #ccc; */
+        /* border-radius: 8px; */
+        /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+        padding: 20px;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        }
+
+        h1 {
+        color: #e74c3c;
+        width: 60%;
+        margin-top: -19px;
+        margin-left: 154px;
+        }
+
+        p {
+        color: #333;
+        margin-right: -134px;
+        }
+
+        button {
+        background-color: #3498db;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        /* border-radius: 5px; */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 40%;
+        margin-right: -136px;
+        }
+
+        button:hover {
+        background-color: #2980b9;
+        }
+        .bf_img {
+            position: absolute;
+            bottom: -5px;
+            left: -100px;
+        }
+        .bf_img img {
+            height: 250px;
+            z-index: -999;
+            
+        }
+  </style>
+</head>
+<body>
+    <div class="bf_img">
+        <img src="../src/bf_err.png" alt="">
+    </div>
+  <div class="error-container">
+    <h1>Something went wrong..</h1>
+    <p id="err"></p>
+    <button onclick="restart()">Restart</button>
+  </div>
+
+  <script>
+  
+  </script>
+<script src="../renderers/error_renderer.js" defer></script>
+
+</body>
+</html>
