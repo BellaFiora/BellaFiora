@@ -1,5 +1,7 @@
 #include "prints.h"
 
+#include "../../c_utils/src/debug.h"
+
 void print_general(const General* general) {
 	printf("General:\n\n");
 	printf("Audio Filename: %s\n", general->audioFilename);

@@ -22,8 +22,8 @@ FILES* open_files(const char* dirname);
 void close_files(FILES* files);
 
 typedef struct {
-    char* content;
-    size_t size;
+	char* content;
+	size_t size;
 } FFILE;
 
 FFILE* mmap_file(const char* path);

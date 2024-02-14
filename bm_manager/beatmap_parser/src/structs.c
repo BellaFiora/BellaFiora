@@ -1,5 +1,6 @@
 #include "structs.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 General* new_general() {

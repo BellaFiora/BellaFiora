@@ -32,7 +32,7 @@ void jsonify_editor(const Editor* editor, FILE* fp) {
 	if (editor->bookmarks == NULL)
 		fprintf(fp, "null,\n");
 	else {
-		fprintf_ilist(fp, editor->bookmarks);
+		fprintf_ilist(editor->bookmarks, fp);
 		fprintf(fp, ",\n");
 	}
 	fprintf(fp, "\t\t\"DistanceSpacing\": %0.2f,\n", editor->distanceSpacing);
@@ -56,7 +56,7 @@ void jsonify_metadata(const Metadata* metadata, FILE* fp) {
 	if (metadata->tags == NULL)
 		fprintf(fp, "null,\n");
 	else {
-		fprintf_slist(fp, metadata->tags, 2);
+		fprintf_slist(metadata->tags, fp, 2);
 		fprintf(fp, ",\n");
 	}
 	fprintf(fp, "\t\t\"BeatmapID\": %d,\n", metadata->beatmapID);
@@ -195,7 +195,7 @@ void jsonify_slider(const Slider* slider, FILE* fp) {
 	fprintf(fp, "\t\t\t\t\"Length\": %.2f,\n", slider->length);
 	fprintf(fp, "\t\t\t\t\"EdgeSounds\": ");
 	if (slider->edgeSounds) {
-		fprintf_ilist(fp, slider->edgeSounds);
+		fprintf_ilist(slider->edgeSounds, fp);
 		fprintf(fp, ",\n");
 	}
 	else

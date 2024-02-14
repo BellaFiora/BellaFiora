@@ -12,22 +12,23 @@ extern size_t nb_servers;
 #include <netdb.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "debug.h"
 
 typedef struct {
-  char *name;
-  void *(*callback)(void *);
-  void *(*sigint_handler)(void *);
-  int running;
-  int socket;
-  int port;
-  pthread_t th;
+	char *name;
+	void *(*callback)(void *);
+	void *(*sigint_handler)(void *);
+	int running;
+	int socket;
+	int port;
+	pthread_t th;
 } Server;
 
 // protos_flag
 Server *new_server(char *name, char *port, void *(*callback)(void *),
-                   void *(*sigint_handler)(void *));
+									 void *(*sigint_handler)(void *));
 int start_server(Server *server);
 int wait_server(Server *server);
 void free_server(Server *server);

@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 char unwanted[BUF_SIZE]; // used by remove_chars

@@ -8,11 +8,11 @@
 // void* Queue
 
 typedef struct {
-    void** elements;
-    size_t size;
-    size_t capacity;
-    size_t start;
-    size_t end;
+	void** elements;
+	size_t size;
+	size_t capacity;
+	size_t start;
+	size_t end;
 } Queue;
 
 Queue* new_queue(size_t initial_capacity);
@@ -25,11 +25,11 @@ void print_queue(const Queue* q);
 // int Queue
 
 typedef struct {
-    int* elements;
-    size_t size;
-    size_t capacity;
-    size_t start;
-    size_t end;
+	int* elements;
+	size_t size;
+	size_t capacity;
+	size_t start;
+	size_t end;
 } iQueue;
 
 iQueue* new_iqueue(size_t initial_capacity);
@@ -42,11 +42,11 @@ void print_iqueue(const iQueue* q);
 // double Queue
 
 typedef struct {
-    double* elements;
-    size_t size;
-    size_t capacity;
-    size_t start;
-    size_t end;
+	double* elements;
+	size_t size;
+	size_t capacity;
+	size_t start;
+	size_t end;
 } dQueue;
 
 dQueue* new_dqueue(size_t initial_capacity);
@@ -59,11 +59,11 @@ void print_dqueue(const dQueue* q);
 // char* Queue
 
 typedef struct {
-    char** elements;
-    size_t size;
-    size_t capacity;
-    size_t start;
-    size_t end;
+	char** elements;
+	size_t size;
+	size_t capacity;
+	size_t start;
+	size_t end;
 } sQueue;
 
 sQueue* new_squeue(size_t initial_capacity);

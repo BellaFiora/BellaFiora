@@ -1,5 +1,6 @@
 #ifndef BEATMAP_PARSER_PRINTS_H
 #define BEATMAP_PARSER_PRINTS_H
+
 #include "structs.h"
 
 void print_general(const General* general);
