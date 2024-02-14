@@ -1,104 +1,149 @@
+
+// *** Node Modules *** // 
 const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer} = require('electron');
 const {spawn} = require('child_process');
 const axios = require('axios');
-require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
-const dns = require('dns');
+const conf = require('credentials')
 const url = require('url');
 const http = require('http');
+// const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
+// const dns = require('dns');
+// const { type } = require('os');
+
+
+
+// *** App Libs *** // 
 const osuFiles = require('./app/lib/osuFiles')
 const AppError = require('./app/lib/error')
 const gini = require('./app/lib/ini')
-const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
-const conf = require('credentials')
-const OsuDBReader = require('./app/lib/db_parser');
-const osuutils = require('./app/lib/osu_utils');
 const remoteSrv = require('./app/lib/remoteSrv')
-const { Howl, Howler } = require('howler');
-const { type } = require('os');
+// const OsuDBReader = require('./app/lib/db_parser');
+// const osuutils = require('./app/lib/osu_utils');
 
-const voiceData = [];
-let audioCache = {};
-let wsData = null
-let mainWindow = null
-let isFirstTime = true
-let continueExecute = true
-let gosumemoryProcess = null
+
+
+
+
+
+
+
+// First Configs 
+require('dotenv').config();
+let mainWindow = null ; //Main view Window Application
+let continueExecute = true ;
 let isOsuLanuched;
-let s;
 let gmIsReady;
-let player_data
+let player_data;
+// let isFirstTime = true;
 
 app.whenReady().then(async () => {
-    const Conf = new conf()
-    Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""))
+    const Conf = new conf();
+    Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
     fs.readFile(path.resolve(Conf.getConf('AppPath'),'./package.json'), 'utf8', (err, output) => {
-        const packageFile = JSON.parse(output)
-        Conf.setConf('client_version', packageFile.version)
-    })
+        const packageFile = JSON.parse(output);
+        Conf.setConf('client_version', packageFile.version);
+    });
     ipcMain.on('getMainWindow', () => mainWindow.webContents.send('mainWindow', mainWindow));
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
-    await LaunchGUI()
-    await ServerConnection().then(resp=>{if(resp.err){Log(resp.err, true, true);continueExecute = false}})
-    await gLaunch()
-    await wsConnect()
-    await osuConnect()
-    await osuHandler()
-    await loadVoices();
-    await mainApp()
-    await sendCache()  
-})
-async function osuConnect(){
-    Log('Connect your Osu!Account')
-    const Conf = new conf()
-    if(!continueExecute) return
-    return new Promise(async (a, b) => {
-        if(Conf.getConf('osu_token')){
+    await LaunchGUI();
+    await ServerConnection().then(resp=>{if(resp.err){Log(resp.err, true, true);continueExecute = false}});
+    await gLaunch();
+    await wsConnect();
+    await osuConnect();
+    await osuHandler();
+    await mainApp();
+    await sendCache();
+});
+async function osuConnect() {
+    // Log message for connecting Osu!Account
+    Log('Connect your Osu!Account');
+
+    // Create a new configuration object
+    const Conf = new conf();
+
+    // Check if execution should continue
+    if (!continueExecute) return;
+
+    // Return a Promise
+    return new Promise(async (resolve, reject) => {
+        // Check if Osu token exists in configuration
+        if (Conf.getConf('osu_token')) {
+            // Make a GET request to Osu! API to fetch user data
             axios.get('https://osu.ppy.sh/api/v2/me', {
-                headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}`},
-            }).then(async response => { 
-                console.log(response.data.id)
-                if(response.data.id) a(true); 
-                await SyncData(); 
-            }).catch(error => {console.error('Error fetching data:', error.message);});
+                headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}` },
+            }).then(async response => {
+                console.log(response.data.id);
+
+                // Resolve if user ID exists in the response
+                if (response.data.id) resolve(true);
+
+                // Call SyncData function
+                await SyncData();
+            }).catch(error => {
+                console.error('Error fetching data:', error.message);
+                reject(error);
+            });
         } else {
-            console.log('auth service')
-            await AuthService()
-            await SyncData()
-            a(true)
-        }
-    })
-    async function AuthService(){
-        return new Promise(async (e, n) => {
+            // If Osu token doesn't exist, perform authentication and sync data
+            console.log('auth service');
+            await AuthService();
+            await SyncData();
+            resolve(true);
+        };
+    });
+
+    // Authentication function for Osu
+    async function AuthService() {
+        return new Promise(async (resolve, reject) => {
+            // Open external URL for Osu! OAuth authorization
             shell.openExternal('https://osu.ppy.sh/oauth/authorize?client_id=30165&redirect_uri=https://techalchemy.fr/oAuth2/Bellafiora/index.php&response_type=code&scope=public identify');
+
+            // Create a server for handling the authorization callback
             const server = http.createServer((req, res) => {
                 const parsedUrl = url.parse(req.url, true);
-                const queryParameters = parsedUrl.query
-                axios.get('https://osu.ppy.sh/api/v2/me', { headers: { 'Authorization': `Bearer ${queryParameters.token}`}})
-                .then(response => {
-                    console.log(queryParameters.token)
-                    console.log(response.data.id)
-                    if(response.data.id){
-                        Conf.setConf('osu_id', response.data.id)
-                        Conf.setConf('osu_token', queryParameters.token)
+                const queryParameters = parsedUrl.query;
+
+                // Make a GET request to Osu! API with the received token
+                axios.get('https://osu.ppy.sh/api/v2/me', { headers: { 'Authorization': `Bearer ${queryParameters.token}` } })
+                    .then(response => {
+                        console.log(queryParameters.token);
+                        console.log(response.data.id);
+
+                        // Resolve if user ID exists in the response
+                        if (response.data.id) {
+                            // Save Osu ID and token in configuration
+                            Conf.setConf('osu_id', response.data.id);
+                            Conf.setConf('osu_token', queryParameters.token);
+
+                            // Close the authorization window
+                            const closeWindowScript = '<script>window.close();</script>';
+                            res.end(closeWindowScript);
+                            setTimeout(() => { server.close(); }, 500);
+
+                            resolve(true);
+                        }
+                    }).catch(error => {
+                        // Close the authorization window in case of error
                         const closeWindowScript = '<script>window.close();</script>';
                         res.end(closeWindowScript);
-                        setTimeout(() => {server.close()}, 500);
-                        e(true)
-                    } 
-                }).catch(error => {
-                    const closeWindowScript = '<script>window.close();</script>';
-                    res.end(closeWindowScript);
-                    server.close()
-                });
+                        console.log(error);
+                        server.close();
+                    });
             });
-            server.listen(3000, '127.0.0.1',)
-        })
-    }
+
+            // Start the server on localhost:3000
+            server.listen(3000, '127.0.0.1');
+        });
+    };
+
+    // Function to synchronize data
     async function SyncData() {
         return new Promise(async (resolve, reject) => {
             try {
+                // Make a GET request to a server for data synchronization
                 axios.get('http://176.145.161.240:25586/client/private/syncdata', {
                     params: {
                         setter: 'set',
@@ -107,24 +152,21 @@ async function osuConnect(){
                         user_id: Conf.getConf('osu_id')
                     }
                 }).then(response => {
-
                     if (response.status === 200) {
-                        player_data = response.data
-                        console.log(typeof(player_data))
+                        player_data = response.data;
+                        console.log(typeof (player_data));
                         resolve(true);
-
                     } else {
                         reject(new Error(`HTTP request failed with status: ${response.status}`));
-                    }
-                })
-    
+                    };
+                });
             } catch (error) {
                 console.error('Error making HTTP request:', error);
                 reject(error);
-            }
+            };
         });
-    }
-}
+    };
+};
 async function mainApp(){
     if(!continueExecute) return
     return new Promise((e, n) => {
@@ -134,16 +176,21 @@ async function mainApp(){
                 protocol: 'file:',
                 slashes: true,
             })
-        )
-        e(true)
-    })
-    
-}
-async function LaunchGUI(){
-    if(!continueExecute) return
-    const Conf = new conf()
-    return new Promise((e, n) => {
+        );
+        e(true);
+    });
+};
+async function LaunchGUI() {
+    // Check if execution should continue
+    if (!continueExecute) return
+
+    // Create a new configuration object
+    const Conf = new conf();
+
+    // Return a Promise
+    return new Promise((resolve, reject) => {
         try {
+            // Create a new BrowserWindow for the GUI
             mainWindow = new BrowserWindow({
                 height: 648,
                 width: 1133,
@@ -155,7 +202,6 @@ async function LaunchGUI(){
                     contextIsolation: false,
                     paintWhenInitiallyHidden: true
                 },
-                
                 titleBarStyle: "hidden",
                 titleBarOverlay: {
                     color: "#ffffff00",
@@ -164,60 +210,95 @@ async function LaunchGUI(){
                 },
                 show: false
             });
+
+            // Load the loading.html file
             mainWindow.loadFile("./app/front/loading.html");
+
+            // Event listener for when the window is closed
             mainWindow.on("closed", () => {
-                e(null)
+                resolve(null);
             });
+
+            // Event listener for when the window is ready to show
             mainWindow.once("ready-to-show", () => {
+                // Uncomment the line below to open DevTools
                 // mainWindow.webContents.openDevTools();
+
+                // Show the main window
                 mainWindow.show();
-                let a = {
+
+                // Send client information to the window
+                let clientInfo = {
                     client_version: Conf.getConf('client_version'),
                     client_ip: Conf.getConf('client_ip'),
                     client_id: Conf.getConf('client_id')
-                }
-                mainWindow.webContents.send('client_informations', a)
-                Conf.setConf('app', mainWindow)
-                e(mainWindow)
+                };
+
+                mainWindow.webContents.send('client_informations', clientInfo);
+
+                // Save the mainWindow reference in configuration
+                Conf.setConf('app', mainWindow);
+
+                resolve(mainWindow);
             });
-            e(mainWindow)
-        } catch (e){n(e)}
-    })
-}
-async function ServerConnection(){
-    if(!continueExecute) return
-    const Conf = new conf()
-    const RemoteSrv = new remoteSrv()
-    const t = await axios.get("https://api64.ipify.org?format=json");
-    Conf.setConf('client_ip', t.data.ip)
-    return new Promise(async (e, n) => {
-        if(Conf.getConf('client_id')){
-            Log('Server Synchronisation..')
-            RemoteSrv.Login(mainWindow).then(r=>{e({stat: r.stat, err: r.err})})
+
+            // Resolve with the mainWindow reference
+            resolve(mainWindow);
+        } catch (error) {
+            // Reject if there's an error
+            continueExecute = false
+            reject(error);
+        };
+    });
+};
+async function ServerConnection() {
+    // Check if execution should continue
+    if (!continueExecute) return
+
+    // Create new configuration and remote server objects
+    const Conf = new conf();
+    const RemoteSrv = new remoteSrv();
+
+    // Fetch the client's IP address using an external API
+    let ipResponse
+    try {
+        ipResponse = await axios.get("https://api64.ipify.org?format=json");
+    } catch(e){
+        AppError(mainWindow, 'Please Enable Internet Connection');
+        continueExecute = false;
+        return
+    };
+
+    // Set the client's IP address in the configuration
+    Conf.setConf('client_ip', ipResponse.data.ip);
+
+    // Return a Promise
+    return new Promise(async (resolve, reject) => {
+        // Check if client ID exists in the configuration
+        if (Conf.getConf('client_id')) {
+            // Log message for server synchronization
+            Log('Server Synchronization..');
+
+            // Perform login to the remote server
+            RemoteSrv.Login(mainWindow).then(result => {
+                resolve({ stat: result.stat, err: result.err });
+            });
         } else {
-            Log('Server Register')
-            RemoteSrv.Reg(mainWindow).then(r=>{e({stat: r.stat, err: r.err}) })
-        }
-    })
-}
-async function Log(e, show = true, err = false, toServ= true) {
-    const RemoteSrv = new remoteSrv()
-    if (show) {
-        if(err){
-            try { await mainWindow.webContents.send("loading_err", e)} 
-            catch(e){ console.log(e)}
-        } else {
-            try {await mainWindow.webContents.send("progress_loading", e)}
-            catch(e){console.log(e) }
-        }
-    }
-    console.log(e)
-    if(toServ) RemoteSrv.Log(e);
-}
+            // Log message for server registration
+            Log('Server Register');
+
+            // Perform registration to the remote server
+            RemoteSrv.Reg(mainWindow).then(result => {
+                resolve({ stat: result.stat, err: result.err });
+            });
+        };
+    });
+};
 async function gLaunch(){
     if(!continueExecute) return
-    Log('Starting Gosumemory')
+    Log('Starting Gosumemory');
     return new Promise(async (o, r) => {
+        let s;
         try {
             const Conf = new conf();
             fs.access(path.join(Conf.getConf('AppPath'), "gosumemory.exe"), fs.constants.F_OK, e => {
@@ -232,14 +313,13 @@ async function gLaunch(){
                                 if (e.includes("Initialized successfully") || e.includes("Initialization complete")) {
                                     gmIsReady = true;  
                                     clearTimeout(s);
-                                    const gIni = new gini()
-                                    gosumemoryProcess = externalProcess
-                                    gIni.set('Main', 'update',1)
-                                    n(externalProcess)
-                                }
+                                    const gIni = new gini();
+                                    gosumemoryProcess = externalProcess;
+                                    gIni.set('Main', 'update',1);
+                                    n(externalProcess);
+                                };
                             })
-
-                        }
+                        };
                     });
                     const t = new Promise(n => {
                         s = setTimeout(() => {
@@ -247,93 +327,119 @@ async function gLaunch(){
                                 if (isOsuLanuched) {
                                     Log("If this is the first time, start Osu!", true, true);
                                     setTimeout(async () => {
-                                        o(false)
-                                        isOsuLanuched = false
+                                        o(false);
+                                        isOsuLanuched = false;
                                     }, 3000);
-                                } else { Log("Error When Launching Gosumemory", true, true); o(false)}
-                            } else {o(true)}
-                        }, 10e3)
+                                } else { Log("Error When Launching Gosumemory", true, true); o(false)};
+                            } else {o(true)};
+                        }, 10e3);
                     });
                     Promise.race([n, t]).then(e => {o(e)}).
                     catch(e => {
                         Log("Error When Launching Gosumemory", true, true);
-                        isOsuLanuched = false
-                        o(e)
-                    })
-                }
+                        isOsuLanuched = false;
+                        o(e);
+                    });
+                };
+            });
+        } catch(e){Log(`Error When Launching Gosumemory: ${e.message}`, true, true); o(e)};
+    });
+};
+async function osuHandler() {
+    // Check if execution should continue
+    if (!continueExecute) return
 
-            })
-        } catch(e){Log(`Error When Launching Gosumemory: ${e.message}`, true, true); o(e)}
-    })
-}
-async function wsConnect(){
-    if(!continueExecute) return
-    const Conf = new conf()
-    Log('Connection to the Websocket')
-    mainWindow.webContents.send('ws_connect', true);
-    return new Promise((resolve) => {
-        ipcMain.on('ws_connect_result', (event, arg) => {
-            if(arg){
-                Log(arg, true, true)
-                continueExecute = false
-                // resolve(arg);
-            } 
-            else {resolve(true) }
-        });
-        ipcMain.on('ws_osu_path', (event, arg) => { Conf.setConf('osu_path', arg)})
-      });
-
-}
-async function osuHandler(){
-    if(!continueExecute) return
-    return new Promise(async (o, r) => {
-        const OsuFiles = new osuFiles()
+    // Return a Promise
+    return new Promise(async (resolve, reject) => {
+        // Create new osuFiles and configuration objects
+        const OsuFiles = new osuFiles();
         const Conf = new conf();
-        if(fs.existsSync(path.join(Conf.getConf('AppPath'), '/beatmaps.json'))){
-            Log('Update your Scores', true, false)
-            OsuFiles.updateScores(mainWindow).then(()=> {o(true)})
+
+        // Check if beatmaps.json file exists in the specified path
+        if (fs.existsSync(path.join(Conf.getConf('AppPath'), '/beatmaps.json'))) {
+            // Log message for updating scores
+            Log('Update your Scores', true, false);
+
+            // Update scores using the osuFiles object
+            OsuFiles.updateScores(mainWindow).then(() => {
+                resolve(true);
+            });
         } else {
-            Log('Scan your beatmaps', true, false)
-            OsuFiles.osuDbParse(mainWindow).then(()=> {
-                Log('Scan your scores', true, false)  
-                OsuFiles.scoreDbParse(mainWindow).then(()=> {
-                    OsuFiles.updateScores(mainWindow).then(()=> {o(true)})
-                })
-            })
-        }
-    })
-}
-async function loadVoices() {
-    if(!continueExecute) return
-    Log('Load Voices Assets', true, false);
-    return new Promise((resolve, reject) => {
-        const languages = ['FR'];
-        const types = ['ur', 'aim', 'tolate', 'toquickly'];
-        const Conf = new conf();
-        try{
-            languages.forEach(language => {
-                types.forEach(type => {
-                    for (let i = 1; i <= 7; i++) {
-                        const fileName = `0${i}.wav`;
-                        const filePath = path.join(Conf.getConf('AppPath'), 'app', 'src', 'assets', 'voices', language, type, fileName);
-                        if (!audioCache[filePath]) {
-                                const data = fs.readFileSync(filePath);
-                                audioCache[filePath] = data;
-                                voiceData.push({ language, type, buffer: new Uint8Array(data)});      
-                        }
-                    }
+            // Log message for scanning beatmaps
+            Log('Scan your beatmaps', true, false);
+
+            // Parse osu database and scan beatmaps using osuFiles object
+            OsuFiles.osuDbParse(mainWindow).then(() => {
+                // Log message for scanning scores
+                Log('Scan your scores', true, false);
+
+                // Parse score database and update scores using osuFiles object
+                OsuFiles.scoreDbParse(mainWindow).then(() => {
+                    OsuFiles.updateScores(mainWindow).then(() => {
+                        resolve(true);
+                    });
                 });
             });
-        } catch(e){AppError(mainWindow, 'Audios Assets Not Found')}
-        if (voiceData.length > 0) {resolve(voiceData);}
+        };
     });
-}
+};
+async function wsConnect() {
+    // Check if execution should continue
+    if (!continueExecute) return
+
+    // Create a new configuration object
+    const Conf = new conf();
+
+    // Log message for connecting to the Websocket
+    Log('Connection to the Websocket');
+
+    // Send a message to the main window to initiate Websocket connection
+    mainWindow.webContents.send('ws_connect', true);
+
+    // Return a Promise
+    return new Promise((resolve) => {
+        // Event listener for the result of Websocket connection
+        ipcMain.on('ws_connect_result', (event, arg) => {
+            if (arg) {
+                // Log the result if available
+                Log(arg, true, true);
+
+                // Set continueExecute to false
+                continueExecute = false;
+                // resolve(arg);
+            } else {
+                // Resolve with true if no specific result is received
+                resolve(true);
+            }
+        });
+
+        // Event listener for receiving the Osu path from the main window
+        ipcMain.on('ws_osu_path', (event, arg) => {
+            // Set Osu path in the configuration
+            Conf.setConf('osu_path', arg);
+        });
+    });
+};
+async function Log(e, show = true, err = false, toServ= true) {
+    const RemoteSrv = new remoteSrv()
+    if (show) {
+        if(err){
+            try { await mainWindow.webContents.send("loading_err", e)} 
+            catch(e){ console.log(e);};
+        } else {
+            try {await mainWindow.webContents.send("progress_loading", e)}
+            catch(e){console.log(e);};
+        };
+    };
+    console.log(e);
+    if(toServ) RemoteSrv.Log(e);
+};
 async function sendCache(){
     if(!continueExecute) return
     return new Promise((e, n) => { setTimeout(async () => {
         mainWindow.webContents.send('audio-cache', voiceData);  
         mainWindow.webContents.send('player-data', player_data);
-        console.log('send')
-        e(true)
-    }, 1000);})
-}
+        console.log('send');
+        e(true);
+    }, 1000);});
+};
