@@ -57,7 +57,7 @@ class remoteSrv {
                 idApp: Conf.getConf("client_id"),
                 ipAddress: Conf.getConf('client_ip'),
                 version: Conf.getConf('client_version'),
-                user_id: Conf.getConf('user_id'),
+                user_id: Conf.getConf('osu_id'),
                 osu_token: Conf.getConf('osu_token'),
                 register_timestamp: Conf.getConf('ts_register'),
                 platform: Conf.getConf('platform'),
