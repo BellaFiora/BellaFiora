@@ -1,4 +1,6 @@
 node_modules/
 score.json
 beatmaps.json
-presence.conf 
+presence.conf
+node_modules/
+node_modules/*
