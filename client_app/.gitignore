@@ -1,6 +1,6 @@
 node_modules/
-score.json
+scores.json
 beatmaps.json
 presence.conf
-node_modules/
-node_modules/*
+
+ 
