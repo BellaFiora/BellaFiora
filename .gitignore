@@ -17,3 +17,4 @@ update.ps1
 *.lprof
 bm_manager/bin
 test*
+*.bkp

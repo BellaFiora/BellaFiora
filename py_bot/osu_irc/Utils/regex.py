@@ -11,7 +11,7 @@ ReQuit:"re.Pattern" = re.compile(r"^:(.+?)!cho\@ppy\.sh QUIT :(.+)")
 ReUserList:"re.Pattern" = re.compile(r"^:cho\.ppy\.sh 353.*")
 ReMOTD:"re.Pattern" = re.compile(r"^:cho\.ppy\.sh 332.*")
 ReMode:"re.Pattern" = re.compile(r"^:.+?!cho\@cho.ppy\.sh MODE .+")
-RePrivMessage:"re.Pattern" = re.compile(r"^:.+?!cho\@ppy\.sh PRIVMSG .+? :(.*)")
+RePrivMessage:"re.Pattern" = re.compile(r"^:.+?!cho\@ppy\.sh PRIVMSG .+? :.*")
 
 # extended IRC Events
 ReUserListData:"re.Pattern" = re.compile(r".*353 .* = (#?\S+?) :(.*)$")
