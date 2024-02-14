@@ -11,7 +11,6 @@ const osuFiles = require('./app/lib/osuFiles')
 const AppError = require('./app/lib/error')
 const gini = require('./app/lib/ini')
 const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
-const request = require('request-promise-native')
 const conf = require('credentials')
 const OsuDBReader = require('./app/lib/db_parser');
 const osuutils = require('./app/lib/osu_utils');
