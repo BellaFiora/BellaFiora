@@ -1,7 +1,7 @@
 #ifndef BEATMAP_PARSER_STRUCTS_H
 #define BEATMAP_PARSER_STRUCTS_H
 
-#include "../../c_utils/all.h"
+#include "../../c_utils/src/list.h"
 
 typedef struct {
 	char* audioFilename;

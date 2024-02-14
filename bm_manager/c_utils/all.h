@@ -8,5 +8,6 @@
 #include "src/os.h"
 #include "src/web.h"
 #include "src/server.h"
+#include "src/format.h"
 
 #endif

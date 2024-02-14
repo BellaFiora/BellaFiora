@@ -1,4 +1,11 @@
 
+var upToDate = false;
+var playerId = null;
+var currentMode;
+var locale;
+var playersInfos;
+var playerInfos;
+
 function convertTime(seconds) {
 	const days = Math.floor(seconds / (24 * 60 * 60));
 	const hours = Math.floor((seconds % (24 * 60 * 60)) / 3600);
@@ -20,11 +27,11 @@ function convertTime(seconds) {
 }
 
 var dom = {
-	_userId: null,
+	_playerId: null,
 	_locale: null,
 	_playerInfos: null,
-	get userId() { return this._userId; },
-	set userId(userId) { this._userId = userId; },
+	get playerId() { return this._playerId; },
+	set playerId(playerId) { this._playerId = playerId; },
 
 	get locale() { return this._locale; },
 	set locale(locale) { this._locale = locale; },
@@ -106,14 +113,14 @@ function addProfileStat(parent, keyTextContent, valueTextContent) {
 
 class LS {
 	constructor () {
-		this.userid = text.substring(startIndex, endIndex !== -1 ? endIndex : text.length);
+		this.playerId = text.substring(startIndex, endIndex !== -1 ? endIndex : text.length);
 
 	}
 	getUserStat() {
-		stats = localStorage.getItem(this.userid);
+		stats = localStorage.getItem(this.playerId);
 	}
 	setUserStat(statsArray) {
-		localStorage.setItem(this.userid, statsArray);
+		localStorage.setItem(this.playerId, statsArray);
 	}
 }
 
@@ -121,7 +128,7 @@ async function addTotalPlaycount(playerInfos) {
 	return new Promise(async (resolve, reject) => {
 		const DOM = new dom();
 		try {
-			fetch(`https://osu.ppy.sh/users/${userId}/extra-pages/historical`)
+			fetch(`https://osu.ppy.sh/users/${playerId}/extra-pages/historical`)
 			.then(response => response.json())
 			.then(data => {
 				let totalPlaycountValue = 0;
@@ -139,18 +146,22 @@ async function addTotalPlaycount(playerInfos) {
 	});
 }
 
-function getUserId() {
+function getplayerId() {
 	let text = window.location.href;
 	startIndex = 'https://osu.ppy.sh/users/'.length;
 	endIndex = text.indexOf('/', startIndex);
-	return text.substring(startIndex, endIndex !== -1 ? endIndex : text.length);
+	playerId = text.substring(startIndex, endIndex === -1 ? text.length : endIndex);
+}
+
+function getCurrentGamemode() {
+	let content = Array.from(document.querySelectorAll('head meta[name="description"]'))[0].getAttribute('content');
+	currentMode = content.substring(content.indexOf('(') + 1, content.indexOf(')'));
 }
 
 function getLocale() {
-	let text = document.querySelector('head > script:nth-child(23)').text;
+	let text = document.querySelector('html').getAttribute('lang');
 	let startIndex = text.indexOf('currentLocale') + 'currentLocale'.length + 4;
-	let endIndex = text.indexOf('"', startIndex);
-	return text.substring(startIndex, endIndex);
+	locale = text.substring(startIndex, text.indexOf('"', startIndex));
 }
 
 // getPlayerInfos
@@ -168,10 +179,10 @@ function RawHtmlToJson(content) {
 	return JSON.parse(htmlDecode(jsonText));
 }
 
-async function getPlayerRaw(gamemode, userId) {
+async function getPlayerRaw(gamemode, playerId) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			fetch(`https://osu.ppy.sh/users/${userId}/${gamemode}`).then(async (res) => {
+			fetch(`https://osu.ppy.sh/users/${playerId}/${gamemode}`).then(async (res) => {
 				res.text().then((rawHTML)=> {
 					let data_initial_data = RawHtmlToJson(rawHTML);
 					console.log(data_initial_data);
@@ -188,16 +199,16 @@ async function getPlayerInfos() {
 	let playerInfos = [];
 	return new Promise(async (resolve, reject) => {
 		for (let gamemode of ['osu', 'taiko', 'fruits', 'mania']) {
-			playerInfos.push(await getPlayerRaw(gamemode, dom.userId));
+			playerInfos.push(await getPlayerRaw(gamemode, dom.playerId));
 		}
-		localStorage.setItem(dom.userId, playerInfos);
+		localStorage.setItem(dom.playerId, playerInfos);
 		resolve(playerInfos);
 	});
 }
 
 function addCustomCSS() {
 	customCss = document.createElement('style');
-	styleElement.textContent = `
+	customCss.textContent = `
 	.remakeGrid { 
 		grid-template-columns: repeat(6,1fr);
 		gap: 2px;
@@ -210,11 +221,11 @@ function addCustomCSS() {
 	}
 	`;
 
-	document.head.appendChild(styleElement);
+	document.head.appendChild(customCss);
 }
 
 function addPlaceHolderHTML() {
-	playerInfos = localStorage.getItem(dom.userId);
+	playerInfos = localStorage.getItem(dom.playerId);
 	if (playerInfos == null) {
 
 	} else {
@@ -230,34 +241,56 @@ function updateHTML() {
 
 }
 
-async function main() {
-	console.log('please');
-	// addCustomCSS();
+async function addInfos() {
+	console.log('entering main');
 
-	// let userId = getUserId();
-	// let locale = getLocale();
+	getplayerId();
+	console.log(playerId);
 
-	// if (dom.userId == null) {
-	// 	dom.userId = userId;
-	// 	dom.locale = locale;
-	// 	addPlaceHolderHTML();
-	// 	dom.playerInfos = await getPlayerInfos();
-	// 	updateHTML();
-	// }
-	// else {
-	// 	addCustomHTML();
-	// 	if (userId != dom.userId) {
-	// 		dom.playerInfos = await getPlayerInfos();
-	// 		updateHTML();
-	// 	}
-	// 	dom.userId = userId;
-	// 	dom.locale = locale;
-	// }
+	addCustomCSS();
+	
+	playersInfos = localStorage["playersInfos"];
+
+	if (playersInfos == null) {
+		playerInfos = await getPlayerInfos();
+		addPlaceHolderHTML();
+		updateHTML();
+		playersInfos = {playerId: playerInfos};
+	}
+	else {
+		playerInfos = playersInfos[playerId];
+		addCustomHTML();
+		if (playerId != playerInfos.playerId) {
+			playerInfos = await getPlayerInfos();
+			updateHTML();
+		}
+	}
+	localStorage["playersInfos"] = playersInfos;
+
+	console.log(currentMode);
+	console.log(locale);
+}
+
+function updatePlayerInfos() {
+	upToDate = false;
+	if (playerInfos == null) {
+		localStorage["playerInfos"] = await getPlayerInfos();
+		upToDate = true;
+	} else {
+		if (playerId != playerInfos.playerId) {
+			playerInfos = await getPlayerInfos();
+		}
+		localStorage["playersInfos"] = playersInfos;
+		upToDate = true;
+	}
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	if (request.action === 'usersUpdated') {
-		main();
+	playerId = getplayerId();
+	if (request.action === 'addPlayerInfos') {
+		addPlayerInfos();
+	} else if (request.action === 'updatePlayerInfos') {
+		updatePlayerInfos();
 	}
 })
 

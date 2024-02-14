@@ -20,7 +20,7 @@
 			"128": "icons/chibi-128.png"
 		}
 	},
-	"permissions": ["activeTab", "scripting", "webNavigation"],
+	"permissions": ["activeTab", "clipboardWrite", "scripting", "storage", "unlimitedStorage", "webNavigation"],
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {

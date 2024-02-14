@@ -4,7 +4,7 @@
 
 #define BUF_SIZE 2048
 
-#define creport(fd, msg, ...) report(fd, "%s: "msg, server->name, ##__VA_ARGS__)
+#define creport(fd, msg, ...) freport(fd, "%s: "msg, server->name, ##__VA_ARGS__)
 
 void* callback(void* data) {
     Server* server = (Server*)data;
@@ -28,7 +28,7 @@ void* callback(void* data) {
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     if (setsockopt(server->socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1)
-        report(stderr, "second setsockopt failed: %s", strerror(errno));
+        ereport("second setsockopt failed: %s", strerror(errno));
 
     while (server->running) {
 /*
@@ -121,22 +121,22 @@ int main(void) {
     char server1_name[] = "HTTP Server";
     Server* server1 = new_server(server1_name, "25586", callback, sigint_handler);
     if (!server1) {
-        report(stderr, "failed to create %s", server1_name);
+        ereport("failed to create %s", server1_name);
         return 1;
     }
     char server2_name[] = "WebSocket Server";
     Server* server2 = new_server(server2_name, "25587", callback, sigint_handler);
     if (!server2) {
-        report(stderr, "failed to create %s", server2_name);
+        ereport("failed to create %s", server2_name);
         return 1;
     }
 
     if (start_server(server1)) {
-        report(stderr, "failed to start %s", server1->name);
+        ereport("failed to start %s", server1->name);
         return 1;
     }
     if (start_server(server2)) {
-        report(stderr, "failed to start %s", server2->name);
+        ereport("failed to start %s", server2->name);
         return 1;
     }
 
@@ -144,16 +144,16 @@ int main(void) {
     printf("\n");
 
     if (wait_server(server1)) {
-        report(stderr, "failed to wait %s", server1->name);
+        ereport("failed to wait %s", server1->name);
         r = 1;
     }
-    report(stdout, "%s terminted", server1->name);
+    report("%s terminted", server1->name);
 
     if (wait_server(server2)) {
-        report(stderr, "failed to wait %s", server2->name);
+        ereport("failed to wait %s", server2->name);
         r = 1;
     }
-    report(stdout, "%s terminted", server2->name);
+    report("%s terminted", server2->name);
 
     return r;
 }

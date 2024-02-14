@@ -6,8 +6,8 @@
 //#include <sql.h>
 
 struct MemoryStruct {
-    char *data;
-    size_t size;
+	char *data;
+	size_t size;
 };
 
 extern struct MemoryStruct curl_response;

@@ -1,7 +1,7 @@
 // chrome.runtime.onInstalled.addListener(() => {
-  // chrome.action.setBadgeText({
-  //   text: "OFF",
-  // });
+	// chrome.action.setBadgeText({
+	//   text: "OFF",
+	// });
 // });
 
 // chrome.action.onClicked.addListener(async (tab) => {
@@ -46,8 +46,14 @@
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	if (changeInfo.status !== 'unloaded') {
-		chrome.tabs.sendMessage(tabId, { action: 'usersUpdated' }, (response) => {
+		chrome.tabs.sendMessage(tabId, { action: 'updatePlayerInfos' }, (response) => {
 			if (chrome.runtime.lastError) {}
 		});
 	}
+});
+
+document.addEventListener("DOMContentLoaded", (event) => {
+	chrome.tabs.sendMessage(tabId, { action: 'addPlayerInfos' }, (response) => {
+		if (chrome.runtime.lastError) {}
+	});
 });
