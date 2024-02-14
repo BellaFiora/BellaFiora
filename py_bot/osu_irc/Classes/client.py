@@ -96,7 +96,8 @@ class Client(object):
 
 			# gather all task of the loop (that will mostly be stuff like: addTraffic())
 			Log.debug(f"Collecting all Client.Loop tasks")
-			tasks:List[asyncio.Task] = [task for task in asyncio.Task.all_tasks(self.Loop) if not task.done()]
+			# tasks:List[asyncio.Task] = [task for task in asyncio.Task.all_tasks(self.Loop) if not task.done()]
+			tasks: List[asyncio.Task] = [task for task in asyncio.all_tasks(self.Loop) if not task.done()]
 			Log.debug(f"Canceling {len(tasks)} tasks...")
 			for task in tasks:
 				task.cancel() # set all task to be cancelled
