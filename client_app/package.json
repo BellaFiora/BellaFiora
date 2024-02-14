@@ -16,6 +16,8 @@
     "bpm.js": "^2.0.0",
     "child_process": "^1.0.2",
     "credentials": "file:../../credentials",
+    "remote-server": "file:../../remote-server",
+
     "crypto": "^1.0.1",
     "dns": "^0.2.2",
     "dotenv": "^16.4.1",
