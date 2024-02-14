@@ -9,6 +9,8 @@ const path = require('path');
 const conf = require('credentials')
 const url = require('url');
 const http = require('http');
+const {remoteSrv, bellafioraWS}= require('remote-server')
+
 // const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
 // const dns = require('dns');
 // const { type } = require('os');
@@ -19,16 +21,8 @@ const http = require('http');
 const osuFiles = require('./app/lib/osuFiles')
 const AppError = require('./app/lib/error')
 const gini = require('./app/lib/ini')
-const remoteSrv = require('./app/lib/remoteSrv')
 // const OsuDBReader = require('./app/lib/db_parser');
 // const osuutils = require('./app/lib/osu_utils');
-
-
-
-
-
-
-
 
 // First Configs 
 require('dotenv').config();
@@ -49,7 +43,16 @@ app.whenReady().then(async () => {
     ipcMain.on('getMainWindow', () => mainWindow.webContents.send('mainWindow', mainWindow));
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
     await LaunchGUI();
-    await ServerConnection().then(resp=>{if(resp.err){Log(resp.err, true, true);continueExecute = false}});
+    await ServerConnection().then(resp=>{
+
+        if(resp.err){
+            Log(resp.err, true, true);
+            continueExecute = false
+        }})
+    .catch((e=> {
+        console.log('test')
+        Log(e, true, true);
+        continueExecute = false}));
     await gLaunch();
     await wsConnect();
     await osuConnect();
@@ -58,14 +61,13 @@ app.whenReady().then(async () => {
     await sendCache();
 });
 async function osuConnect() {
+    if (!continueExecute) return
     // Log message for connecting Osu!Account
     Log('Connect your Osu!Account');
 
     // Create a new configuration object
     const Conf = new conf();
 
-    // Check if execution should continue
-    if (!continueExecute) return;
 
     // Return a Promise
     return new Promise(async (resolve, reject) => {
@@ -76,6 +78,8 @@ async function osuConnect() {
                 headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}` },
             }).then(async response => {
                 console.log(response.data.id);
+
+
 
                 // Resolve if user ID exists in the response
                 if (response.data.id) resolve(true);
@@ -141,25 +145,22 @@ async function osuConnect() {
 
     // Function to synchronize data
     async function SyncData() {
+        const Conf = new conf();
+        const RemoteSrv = new remoteSrv();
+
         return new Promise(async (resolve, reject) => {
             try {
                 // Make a GET request to a server for data synchronization
-                axios.get('http://176.145.161.240:25586/client/private/syncdata', {
-                    params: {
-                        setter: 'set',
-                        client_id: Conf.getConf('client_id'),
-                        token: Conf.getConf('osu_token'),
-                        user_id: Conf.getConf('osu_id')
-                    }
-                }).then(response => {
-                    if (response.status === 200) {
-                        player_data = response.data;
-                        console.log(typeof (player_data));
-                        resolve(true);
+                await RemoteSrv.sync(Conf.getConf('client_id'),Conf.getConf('osu_token'), Conf.getConf('osu_id')).then(resp=>{
+                   
+                    if(!resp){
+                        Log('Unauthorised on the server', true, true)
+                        continueExecute = false 
                     } else {
-                        reject(new Error(`HTTP request failed with status: ${response.status}`));
-                    };
-                });
+                        player_data = resp
+                    }
+                    resolve(true)
+                })
             } catch (error) {
                 console.error('Error making HTTP request:', error);
                 reject(error);
@@ -184,10 +185,8 @@ async function LaunchGUI() {
     // Check if execution should continue
     if (!continueExecute) return
 
-    // Create a new configuration object
     const Conf = new conf();
 
-    // Return a Promise
     return new Promise((resolve, reject) => {
         try {
             // Create a new BrowserWindow for the GUI
@@ -211,7 +210,6 @@ async function LaunchGUI() {
                 show: false
             });
 
-            // Load the loading.html file
             mainWindow.loadFile("./app/front/loading.html");
 
             // Event listener for when the window is closed
@@ -437,7 +435,6 @@ async function Log(e, show = true, err = false, toServ= true) {
 async function sendCache(){
     if(!continueExecute) return
     return new Promise((e, n) => { setTimeout(async () => {
-        mainWindow.webContents.send('audio-cache', voiceData);  
         mainWindow.webContents.send('player-data', player_data);
         console.log('send');
         e(true);
