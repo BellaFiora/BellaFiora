@@ -139,11 +139,17 @@ async function addTotalPlaycount(playerInfos) {
 	});
 }
 
-function getUserId() {
+function getUrlInfos() {
 	let text = window.location.href;
 	startIndex = 'https://osu.ppy.sh/users/'.length;
 	endIndex = text.indexOf('/', startIndex);
-	return text.substring(startIndex, endIndex !== -1 ? endIndex : text.length);
+	if (endIndex === -1) {
+		const userId = text.substring(startIndex, text.length);
+		const currentMode = document.querySelectorAll('.game-mode-link--active')[0].getAttribute('data-mode')
+	} else {
+		const userId = text.substring(startIndex, endIndex);
+	}
+	return 
 }
 
 function getLocale() {
@@ -197,7 +203,7 @@ async function getPlayerInfos() {
 
 function addCustomCSS() {
 	customCss = document.createElement('style');
-	styleElement.textContent = `
+	customCss.textContent = `
 	.remakeGrid { 
 		grid-template-columns: repeat(6,1fr);
 		gap: 2px;
@@ -210,7 +216,7 @@ function addCustomCSS() {
 	}
 	`;
 
-	document.head.appendChild(styleElement);
+	document.head.appendChild(customCss);
 }
 
 function addPlaceHolderHTML() {
@@ -231,28 +237,29 @@ function updateHTML() {
 }
 
 async function main() {
-	console.log('please');
-	// addCustomCSS();
+	console.log('entering main');
+	addCustomCSS();
+	const userId = getUserId();
+	const locale = getLocale();
+	
+	var playersInfos = localStorage["playersInfos"];
+	var playerInfos;
 
-	// let userId = getUserId();
-	// let locale = getLocale();
-
-	// if (dom.userId == null) {
-	// 	dom.userId = userId;
-	// 	dom.locale = locale;
-	// 	addPlaceHolderHTML();
-	// 	dom.playerInfos = await getPlayerInfos();
-	// 	updateHTML();
-	// }
-	// else {
-	// 	addCustomHTML();
-	// 	if (userId != dom.userId) {
-	// 		dom.playerInfos = await getPlayerInfos();
-	// 		updateHTML();
-	// 	}
-	// 	dom.userId = userId;
-	// 	dom.locale = locale;
-	// }
+	if (playersInfos == null) {
+		addPlaceHolderHTML();
+		playerInfos = await getPlayerInfos();
+		updateHTML();
+		playersInfos = {userId: playerInfos};
+	}
+	else {
+		playerInfos = playersInfos[userId];
+		addCustomHTML();
+		if (userId != playerInfos.userId) {
+			playerInfos = await getPlayerInfos();
+			updateHTML();
+		}
+	}
+	localStorage["playersInfos"] = playersInfos;
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

@@ -45,7 +45,7 @@
 // });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-	if (changeInfo.status !== 'unloaded') {
+	if (changeInfo.status === 'complete') {
 		chrome.tabs.sendMessage(tabId, { action: 'usersUpdated' }, (response) => {
 			if (chrome.runtime.lastError) {}
 		});
