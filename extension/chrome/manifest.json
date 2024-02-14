@@ -4,21 +4,20 @@
 	"version": "1.0",
 	"description": "Enhance the osu! user page experience",
 	"icons": {
-		"16": "icons/chibi-16x16.png",
-		"32": "icons/chibi-32x32.png",
-		"48": "icons/chibi-48x48.png",
-		"128": "icons/chibi-128x128.png"
+		"16": "icons/chibi-16.png",
+		"32": "icons/chibi-32.png",
+		"48": "icons/chibi-48.png",
+		"128": "icons/chibi-128.png"
 	},
 	"background": {
 		"service_worker": "background.js"
 	},
 	"action": {
-		"default_popup": "bellafiora.html",
 		"default_icon": {
-			"16": "icons/chibi-16x16.png",
-			"32": "icons/chibi-32x32.png",
-			"48": "icons/chibi-48x48.png",
-			"128": "icons/chibi-128x128.png"
+			"16": "icons/chibi-16.png",
+			"32": "icons/chibi-32.png",
+			"48": "icons/chibi-48.png",
+			"128": "icons/chibi-128.png"
 		}
 	},
 	"permissions": ["activeTab", "scripting", "webNavigation"],
@@ -32,10 +31,9 @@
 	},
 	"content_scripts": [
 		{
-			"js": ["scripts/content.js"],
-			"matches": [
-				"https://osu.ppy.sh/users/*"
-			]
+			"js": ["scripts/users.js"],
+			"matches": ["https://osu.ppy.sh/users/*"],
+			"run_at": "document_start"
 		}
 	]
 }

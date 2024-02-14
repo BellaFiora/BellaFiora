@@ -45,5 +45,9 @@
 // });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-	chrome.tabs.sendMessage(tabId, { action: 'tabUpdated' });
+	if (changeInfo.status !== 'unloaded') {
+		chrome.tabs.sendMessage(tabId, { action: 'usersUpdated' }, (response) => {
+			if (chrome.runtime.lastError) {}
+		});
+	}
 });

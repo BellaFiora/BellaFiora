@@ -231,31 +231,32 @@ function updateHTML() {
 }
 
 async function main() {
-	addCustomCSS();
+	console.log('please');
+	// addCustomCSS();
 
-	let userId = getUserId();
-	let locale = getLocale();
+	// let userId = getUserId();
+	// let locale = getLocale();
 
-	if (dom.userId == null) {
-		dom.userId = userId;
-		dom.locale = locale;
-		addPlaceHolderHTML();
-		dom.playerInfos = await getPlayerInfos();
-		updateHTML();
-	}
-	else {
-		addCustomHTML();
-		if (userId != dom.userId) {
-			dom.playerInfos = await getPlayerInfos();
-			updateHTML();
-		}
-		dom.userId = userId;
-		dom.locale = locale;
-	}
+	// if (dom.userId == null) {
+	// 	dom.userId = userId;
+	// 	dom.locale = locale;
+	// 	addPlaceHolderHTML();
+	// 	dom.playerInfos = await getPlayerInfos();
+	// 	updateHTML();
+	// }
+	// else {
+	// 	addCustomHTML();
+	// 	if (userId != dom.userId) {
+	// 		dom.playerInfos = await getPlayerInfos();
+	// 		updateHTML();
+	// 	}
+	// 	dom.userId = userId;
+	// 	dom.locale = locale;
+	// }
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	if (request.action === 'tabUpdated') {
+	if (request.action === 'usersUpdated') {
 		main();
 	}
 })
