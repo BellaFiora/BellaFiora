@@ -18,3 +18,4 @@ update.ps1
 bm_manager/bin
 test*
 *.bkp
+dummy.txt
