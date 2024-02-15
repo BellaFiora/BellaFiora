@@ -449,6 +449,14 @@ class DockerManager:
 
 	def send(self, localpath, remotepath):
 		if not os.path.exists(localpath): return False
+		if os.path.isdir(localpath):
+			for root, dirs, files in os.walk(localpath):
+				for name in files:
+					tmp_localpath = os.path.join(localpath, name)
+					tmp_remotepath = os.path.join(localpath, name)
+					print(f'sending {tmp_localpath} -> {tmp_remotepath}')
+					self.send(tmp_localpath, tmp_remotepath)
+			return False
 		return self._send_with_options(localpath, remotepath)
 
 	# get utility
