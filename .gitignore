@@ -18,4 +18,3 @@ update.ps1
 bm_manager/bin
 test*
 *.bkp
-node_modules
