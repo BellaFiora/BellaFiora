@@ -12,7 +12,8 @@ def load_commands_options() -> None:
 		[True, None, ["pp"]],
 		[True, None, ["bpm"]],
 		[True, None, ["status"]],
-		[False, ["s"], ["save"]]
+		[False, ["s"], ["save"]],
+		[False, None, ["played"]]
 	]
 	default_bm_arguments = []
 	default_bm_options = ["-1", "-1", "-1", "-1", None, "-1", "-1", "1", False]
