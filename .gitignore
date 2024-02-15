@@ -5,8 +5,8 @@
 *.osu
 *.o
 *.d
-.token
-.apikeys
+*.token
+*.apikeys
 *.pyc
 *.stackdump
 cache
