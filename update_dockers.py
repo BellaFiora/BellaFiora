@@ -1,5 +1,5 @@
 import os, sys, time, mysql.connector, math
-from py_bot.python_utils.utils.all import *
+from osu_bot.python_utils.utils.all import *
 
 st_total = time.time()
 if len(sys.argv) == 1:
@@ -14,8 +14,12 @@ elif branch == 'dev':
 else:
 	print('give prod or dev as argument')
 	exit(1)
-args = read_file('.ssh').split('\n')[0:4]
-docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=4)
+root_depth = len(root.split('/')) - 2
+if not os.path.exists('.ssh'):
+	print('.ssh file not found')
+	exit(1)
+args = read_file('.ssh').split('\n')[:4]
+docker_manager = DockerManager(*args, dotenv_path=root+'common/env/.env', root_depth=root_depth)
 if docker_manager == None or docker_manager.sftp == None or docker_manager.sftp == None:
 	exit(1)
 docker_manager._send('dummy.txt', 'dummy.txt')
@@ -24,16 +28,20 @@ if docker_manager.sftp == None or docker_manager.sftp == None:
 
 commits_done_file = 'commits_done_'+branch
 commits_done = []
-updated_dockers = []
+updated_dockers = set()
 if os.path.exists(commits_done_file):
 	content = ''
 	with open(commits_done_file, 'r') as f:
 		content = f.read()
 	commits_done = content.split('\n')[:-1]
 
-docker_names = ['private_api', 'public_api', 'bm_manager', 'js_bot', 'py_bot', 'user_manager', 'webapp', 'common']
+docker_names = [name for name in os.listdir('.') if os.path.isdir(name)]
+docker_names.remove('dockers')
+docker_names.remove('desktop_app')
+docker_names.remove('.git')
 logs = os.popen('git log --name-status --oneline --no-decorate --format="///%H"').read()
 commits = logs.split('///')[1:]
+ignored = 0
 
 '''
 cmd>git log --name-status --oneline --no-decorate --format="///%H"
@@ -86,22 +94,23 @@ def process_commit(commit):
 		action = tmp[0][0]
 		path = tmp[1]
 		full_path = path.split('/')
+		# skip files at root
 		if len(full_path) <= 1: continue
 		docker = full_path[0]
 		if not docker in docker_names: continue
 		remotepath = root+path
 		if action == 'A' or action == 'M' or action == 'C':
-			print(f'sending {path} {remotepath}')
+			print(f'sending {path} -> {remotepath}')
 			if docker_manager.send(path, remotepath):
-				updated_dockers.append(docker)
+				updated_dockers.add(docker)
 		elif action == 'D':
 			print(f'removing {remotepath}')
 			if docker_manager.remove(remotepath):
-				updated_dockers.append(docker)
+				updated_dockers.add(docker)
 		elif action == 'T':
-			print(f'moving {path} {remotepath}')
+			print(f'moving {path} -> {remotepath}')
 			if docker_manager.move(path, remotepath):
-				updated_dockers.append(docker)
+				updated_dockers.add(docker)
 		elif action == 'R':
 			dest = tmp[2]
 			full_dest = dest.split('/')
@@ -109,14 +118,15 @@ def process_commit(commit):
 			docker = full_dest[0]
 			if not docker in docker_names: continue
 			remotedest = root+dest
-			print(f'renaming {remotepath} {remotedest}')
+			print(f'renaming {remotepath} -> {remotedest}')
 			if not docker_manager.rename(remotepath, remotedest):
 				if docker_manager.send(dest, remotedest):
-					updated_dockers.append(docker)
+					updated_dockers.add(docker)
 			else:
-				updated_dockers.append(docker)
+				updated_dockers.add(docker)
 		else:
 			print(f'ignoring {edit}')
+			ignored += 1
 	commits_done.append(commit_hash)
 
 st = time.time()
@@ -124,8 +134,7 @@ for commit in commits:
 	process_commit(commit)
 time_to_update_dockers = time.time() - st
 
-updated_dockers = list(set(updated_dockers))
-updated_dockers.delete('common')
+updated_dockers.remove('common')
 tsw_st = docker_manager.ti.time_spent_waiting()
 st = time.time()
 # update dockers in which files were added / modified / created / deleted / renamed
@@ -156,7 +165,8 @@ print(	f"took {time_to_update_dockers}s to update dockers\n"
 		f"sent {docker_manager.nb_send} files\n"
 		f"removed {docker_manager.nb_remove} files\n"
 		f"moved {docker_manager.nb_move} files\n"
-		f"renamed {docker_manager.nb_rename} files"
+		f"renamed {docker_manager.nb_rename} files\n"
+		f"ignored {ignored} files"
 		)
 mydb_logs = {
 	"update_dockers": math.floor(time_to_update_dockers*1000),
