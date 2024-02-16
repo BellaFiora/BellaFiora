@@ -19,3 +19,6 @@ bm_manager/bin
 test*
 *.bkp
 dummy.txt
+*/node_modules
+*/node_modules/
+*/node_modules/*
