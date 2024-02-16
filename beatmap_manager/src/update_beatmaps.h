@@ -11,11 +11,11 @@
 #include "../jansson-2.14/src/jansson.h"
 
 struct ThreadData {
-    size_t start;
-    size_t end;
-    DIR* bmsets;
-    sQueue* q;
-    pthread_mutex_t lock;
+	size_t start;
+	size_t end;
+	DIR* bmsets;
+	sQueue* q;
+	pthread_mutex_t lock;
 };
 
 // protos_flag

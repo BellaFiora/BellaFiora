@@ -14,37 +14,37 @@
 #include "jansson.h"
 
 struct hashtable_list {
-    struct hashtable_list* prev;
-    struct hashtable_list* next;
+	struct hashtable_list* prev;
+	struct hashtable_list* next;
 };
 
 /* "pair" may be a bit confusing a name, but think of it as a
    key-value pair. In this case, it just encodes some extra data,
    too */
 struct hashtable_pair {
-    struct hashtable_list list;
-    struct hashtable_list ordered_list;
-    size_t hash;
-    json_t* value;
-    size_t key_len;
-    char key[1];
+	struct hashtable_list list;
+	struct hashtable_list ordered_list;
+	size_t hash;
+	json_t* value;
+	size_t key_len;
+	char key[1];
 };
 
 struct hashtable_bucket {
-    struct hashtable_list* first;
-    struct hashtable_list* last;
+	struct hashtable_list* first;
+	struct hashtable_list* last;
 };
 
 typedef struct hashtable {
-    size_t size;
-    struct hashtable_bucket* buckets;
-    size_t order; /* hashtable has pow(2, order) buckets */
-    struct hashtable_list list;
-    struct hashtable_list ordered_list;
+	size_t size;
+	struct hashtable_bucket* buckets;
+	size_t order; /* hashtable has pow(2, order) buckets */
+	struct hashtable_list list;
+	struct hashtable_list ordered_list;
 } hashtable_t;
 
 #define hashtable_key_to_iter(key_)                                            \
-    (&(container_of(key_, struct hashtable_pair, key)->ordered_list))
+	(&(container_of(key_, struct hashtable_pair, key)->ordered_list))
 
 /**
  * hashtable_init - Initialize a hashtable object
@@ -84,7 +84,7 @@ void hashtable_close(hashtable_t* hashtable);
  * Returns 0 on success, -1 on failure (out of memory).
  */
 int hashtable_set(hashtable_t* hashtable, const char* key, size_t key_len,
-                  json_t* value);
+				  json_t* value);
 
 /**
  * hashtable_get - Get a value associated with a key
@@ -145,7 +145,7 @@ void* hashtable_iter(hashtable_t* hashtable);
  * specific key.
  */
 void* hashtable_iter_at(hashtable_t* hashtable, const char* key,
-                        size_t key_len);
+						size_t key_len);
 
 /**
  * hashtable_iter_next - Advance an iterator
