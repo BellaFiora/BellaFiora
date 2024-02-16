@@ -6,25 +6,25 @@
  */
 
 #ifndef _GNU_SOURCE
-#    define _GNU_SOURCE
+#	define _GNU_SOURCE
 #endif
 
 #include "jansson.h"
 
 const char* jansson_version_str(void) {
-    return JANSSON_VERSION;
+	return JANSSON_VERSION;
 }
 
 int jansson_version_cmp(int major, int minor, int micro) {
-    int diff;
+	int diff;
 
-    if ((diff = JANSSON_MAJOR_VERSION - major)) {
-        return diff;
-    }
+	if ((diff = JANSSON_MAJOR_VERSION - major)) {
+		return diff;
+	}
 
-    if ((diff = JANSSON_MINOR_VERSION - minor)) {
-        return diff;
-    }
+	if ((diff = JANSSON_MINOR_VERSION - minor)) {
+		return diff;
+	}
 
-    return JANSSON_MICRO_VERSION - micro;
+	return JANSSON_MICRO_VERSION - micro;
 }
