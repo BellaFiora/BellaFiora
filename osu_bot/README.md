@@ -8,7 +8,7 @@ If no command is given, shows the available commands.
 
 ## `!ping`
 
-Answer pong.
+Reply pong.
 
 ## `!echo <message>`
 
@@ -20,7 +20,7 @@ Shows all public informations on `<user>`.
 
 ## `!roll [options...] [lower] [upper]`
 
-Roll a dice and answer a random number between `<lower>` (default to 1) and `<upper>` (default to 1000).
+Roll a dice and reply a random number between `<lower>` (default to 1) and `<upper>` (default to 1000).
 
 The limit for both is ±2147483648.
 
@@ -59,10 +59,10 @@ Suggest a beatmap for the player.
 - `-played`
 	- Specifies whether to get an already played beatmap.
 - `-mod <mod>`
-	- Mods to be applied to the desired beatmap
-	- Non-case sensitive
-	- Multiple mods can be specified separated by commas, example: `-mod DT,hd`
-	- Valid mods are: `EZ`, `NF`, `HT`, `HR`, `SD`, `DT` or `NC`, `HD`, `FL`
+	- Mods to be applied to the desired beatmap.
+	- Non-case sensitive.
+	- Multiple mods can be specified separated by commas, example: `-mod DT,hd`.
+	- Valid mods are: `EZ`, `NF`, `HT`, `HR`, `SD`, `DT` or `NC`, `HD`, `FL`.
 
 For all options up to BPM, modifiers apply to ease the use. The `OD` option will be used as an example:
 
@@ -105,6 +105,8 @@ In this example, stream will have a weight of ~38% and jump ~62%.
 
 Not specifying them automatically apply equal ones.
 
+Example:
+
 - `!bm stream jump tech` <=> `!bm stream:0.33 jump:0.33 tech:0.33`.
 
 Valid patterns are `alt`, `jump`, `speed`, `stream`, `tech`.
@@ -125,9 +127,9 @@ Valid actions include the default ones. Use `!mp help` in game to see them or vi
 
 Examples:
 
-`!room invite lavtoancia`
+- `!room invite lavtoancia`
 
-`!room 0 size 3`
+- `!room 0 size 3`
 
 Valid actions also include all options from the `!bm` command, along with all their modifiers.
 
@@ -141,9 +143,9 @@ You can set a room saved settings using `!room [room id] saved <room_alias>`.
 
 Examples:
 
-`!room sr 6:1` <=> Only maps that are between 5.0* and 7.0* will be accepted (both included).
+- `!room sr 6:1` <=> Only maps that are between 5.0* and 7.0* will be accepted (both included).
 
-`!room played` <=> Only maps that you own will be accepted.
+- `!room played` <=> Only maps that you own will be accepted.
 
 Valid actions also include `type` and take one argument:
 
@@ -159,4 +161,4 @@ Valid actions also include `type` and take one argument:
 
 Example:
 
-`!room type tournament`
+- `!room type tournament`
