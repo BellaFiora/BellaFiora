@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-02-16T20:25:39.125Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.0.2 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="00gUVeag-aSrR7sevPK7" version="23.0.2" type="device" pages="11">
+<mxfile host="Electron" modified="2024-02-16T23:15:32.616Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.0.2 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="sGLoCpV1wJsPpgKxY5Kp" version="23.0.2" type="device" pages="11">
   <diagram name="overview" id="0PmOLJ4P72vsUwZt2hVw">
     <mxGraphModel dx="1509" dy="888" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
       <root>
@@ -61,7 +61,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="lcZiKHD-WFOV5JGFYPSl" name="beatmap_manager">
-    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1195" dy="703" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -111,19 +111,83 @@
           </mxCell>
         </UserObject>
         <mxCell id="O8qJawrubj0rv4ZzPsNq-1" value="respond with map infos" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="1030" y="400" width="120" height="60" as="geometry" />
+          <mxGeometry x="1830" y="380" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="O8qJawrubj0rv4ZzPsNq-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="O8qJawrubj0rv4ZzPsNq-2" target="O8qJawrubj0rv4ZzPsNq-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="O8qJawrubj0rv4ZzPsNq-2" value="get_map_infos" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
-          <mxGeometry x="1030" y="300" width="120" height="60" as="geometry" />
+          <mxGeometry x="1830" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="qoJ7G3Vf3dg19mobm_7O-1" target="hAvZ7o0pDSfyNq02cil5-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qoJ7G3Vf3dg19mobm_7O-1" value="On beatmapsets received" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-3" value="Process all beatmaps" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="hAvZ7o0pDSfyNq02cil5-5" target="hAvZ7o0pDSfyNq02cil5-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-5" value="On Graveyard" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="hAvZ7o0pDSfyNq02cil5-6" target="hAvZ7o0pDSfyNq02cil5-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-6" value="On WIP" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-7" value="On Ranked" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-8" value="On Approved" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="980" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-9" value="On Qualifed" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="1215" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="hAvZ7o0pDSfyNq02cil5-10" target="hAvZ7o0pDSfyNq02cil5-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-10" value="On Loved" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="hAvZ7o0pDSfyNq02cil5-12" target="hAvZ7o0pDSfyNq02cil5-16">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="475" />
+              <mxPoint x="440" y="130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-12" value="Does the beatmap map the song?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="410" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="hAvZ7o0pDSfyNq02cil5-14" target="hAvZ7o0pDSfyNq02cil5-16">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="475" />
+              <mxPoint x="660" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-14" value="Does the beatmap map the song?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="410" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-16" value="Discard beatmap" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hAvZ7o0pDSfyNq02cil5-19" value="Compute patterns + skillsets" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="430" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="a4ean0Q9orbKwyH8EAUX" name="client_manager">
-    <mxGraphModel dx="2206" dy="1698" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="1244" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -175,7 +239,7 @@
         <mxCell id="zFkmzYGPopT13j5-mH5K-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="l9D9UpxfxjlYzNRsa33O-1" target="l9D9UpxfxjlYzNRsa33O-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="l9D9UpxfxjlYzNRsa33O-1" value="HTTP Request" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+        <mxCell id="l9D9UpxfxjlYzNRsa33O-1" value="Login HTTP Request" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
           <mxGeometry x="415" y="20" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="zFkmzYGPopT13j5-mH5K-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="l9D9UpxfxjlYzNRsa33O-2" target="zFkmzYGPopT13j5-mH5K-12" edge="1">
