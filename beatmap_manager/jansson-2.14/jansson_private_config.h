@@ -1,4 +1,5 @@
-/* jansson_private_config.h.  Generated from jansson_private_config.h.in by configure.  */
+/* jansson_private_config.h.  Generated from jansson_private_config.h.in by
+ * configure.  */
 /* jansson_private_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if gcc's __atomic builtins are available */
@@ -122,7 +123,7 @@
 #define USE_URANDOM 1
 
 /* Define to 1 if CryptGenRandom should be used for seeding the hash function
-   */
+ */
 #define USE_WINDOWS_CRYPTOAPI 1
 
 /* Version number of package */

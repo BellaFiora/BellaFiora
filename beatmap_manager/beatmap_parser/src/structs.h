@@ -4,92 +4,92 @@
 #include "../../c_utils/src/list.h"
 
 typedef struct {
-	char* audioFilename;
-	int audioLeadIn;
-	char* audioHash;
-	int previewTime;
-	int countdown;
-	char* sampleSet;
-	float stackLeniency;
-	int mode; // 0 std 1 taiko 2 ctb 3 mania
-	int letterboxInBreaks;
-	int storyFireInFront;
-	int useSkinSprites;
-	int alwaysShowPlayfield;
-	char* overlayPosition;
-	char* skinPreference;
-	int epilepsyWarning;
-	int countdownOffset;
-	int specialStyle;
-	int widescreenStoryboard;
-	int samplesMatchPlaybackRate;
+    char* audioFilename;
+    int audioLeadIn;
+    char* audioHash;
+    int previewTime;
+    int countdown;
+    char* sampleSet;
+    float stackLeniency;
+    int mode; // 0 std 1 taiko 2 ctb 3 mania
+    int letterboxInBreaks;
+    int storyFireInFront;
+    int useSkinSprites;
+    int alwaysShowPlayfield;
+    char* overlayPosition;
+    char* skinPreference;
+    int epilepsyWarning;
+    int countdownOffset;
+    int specialStyle;
+    int widescreenStoryboard;
+    int samplesMatchPlaybackRate;
 } General;
 
 typedef struct {
-	iList* bookmarks;
-	float distanceSpacing;
-	int beatDivisor;
-	int gridSize;
-	float timelineZoom;
+    iList* bookmarks;
+    float distanceSpacing;
+    int beatDivisor;
+    int gridSize;
+    float timelineZoom;
 } Editor;
 
 typedef struct {
-	char* title;
-	char* titleUnicode;
-	char* artist;
-	char* artistUnicode;
-	char* creator;
-	char* version;
-	char* source;
-	sList* tags;
-	int beatmapID;
-	int beatmapSetID;
+    char* title;
+    char* titleUnicode;
+    char* artist;
+    char* artistUnicode;
+    char* creator;
+    char* version;
+    char* source;
+    sList* tags;
+    int beatmapID;
+    int beatmapSetID;
 } Metadata;
 
 typedef struct {
-	float hpDrainRate;
-	float circleSize;
-	float overallDifficulty;
-	float approachRate;
-	float sliderMultiplier;
-	float sliderTickRate;
+    float hpDrainRate;
+    float circleSize;
+    float overallDifficulty;
+    float approachRate;
+    float sliderMultiplier;
+    float sliderTickRate;
 } Difficulty;
 
 typedef struct {
-	char* filename;
-	int xOffset;
-	int yOffset;
+    char* filename;
+    int xOffset;
+    int yOffset;
 } BackgroundEvent;
 
 typedef struct {
-	char* filename;
-	int xOffset;
-	int yOffset;
+    char* filename;
+    int xOffset;
+    int yOffset;
 } VideoEvent;
 
 typedef struct {
-	int endTime;
+    int endTime;
 } BreakEvent;
 
 typedef struct {
-	int type; 
-	int startTime;
-	void* event; // 0 BackgroundEvent 1 VideoEvent 2 BreakEvent
+    int type;
+    int startTime;
+    void* event; // 0 BackgroundEvent 1 VideoEvent 2 BreakEvent
 } Event;
 
 typedef struct {
-	int time;
-	float beatLength;
-	int meter;
-	int sampleSet;
-	int sampleIndex;
-	int volume;
-	int uninherited;
-	int effects;
+    int time;
+    float beatLength;
+    int meter;
+    int sampleSet;
+    int sampleIndex;
+    int volume;
+    int uninherited;
+    int effects;
 } TimingPoint;
 
 typedef struct {
-	int combo;
+    int combo;
 } BeatmapComboColour;
 
 /* no additional params
@@ -103,36 +103,37 @@ typedef struct {
 } BeatmapSliderBorderColour; */
 
 typedef struct {
-	int type; // 0 BeatmapComboColour 1 BeatmapSliderTrackOverrideColour 2 BeatmapSliderBorderColour
-	int red;
-	int green;
-	int blue;
-	void* object;
+    int type; // 0 BeatmapComboColour 1 BeatmapSliderTrackOverrideColour 2
+              // BeatmapSliderBorderColour
+    int red;
+    int green;
+    int blue;
+    void* object;
 } BeatmapColour;
 
 typedef struct {
-	int normal;
-	int whistle;
-	int finish;
-	int clap;
+    int normal;
+    int whistle;
+    int finish;
+    int clap;
 } HitSound;
 
 typedef struct {
-	int normalSet;
-	int additionSet;
-	int index;
-	int volume;
-	char* filename;
+    int normalSet;
+    int additionSet;
+    int index;
+    int volume;
+    char* filename;
 } HitSample;
 
 typedef struct {
-	int x;
-	int y;
+    int x;
+    int y;
 } CurvePoint;
 
 typedef struct {
-	char* normalSet;
-	char* additionSet;
+    char* normalSet;
+    char* additionSet;
 } EdgeSet;
 
 /* no additional params
@@ -141,46 +142,46 @@ typedef struct {
 } HitCircle; */
 
 typedef struct {
-	char curveType;
-	List* curvePoints; // CurvePoint*
-	int slides;
-	float length;
-	iList* edgeSounds;
-	List* edgeSets;  // EdgeSet*
+    char curveType;
+    List* curvePoints; // CurvePoint*
+    int slides;
+    float length;
+    iList* edgeSounds;
+    List* edgeSets; // EdgeSet*
 } Slider;
 
 typedef struct {
-	// x = 256
-	// y = 192
-	int endTime;
+    // x = 256
+    // y = 192
+    int endTime;
 } Spinner;
 
 typedef struct {
-	// y = 192
-	int endTime;
+    // y = 192
+    int endTime;
 } Hold;
 
 typedef struct {
-	int x;
-	int y;
-	int time;
-	int type;
-	int new_combo;
-	int combo_skip;
-	HitSound* hitSound;
-	void* object; // 0 HitCircle 1 Slider 2 Spinner 3 Hold
-	HitSample* hitSample;
+    int x;
+    int y;
+    int time;
+    int type;
+    int new_combo;
+    int combo_skip;
+    HitSound* hitSound;
+    void* object; // 0 HitCircle 1 Slider 2 Spinner 3 Hold
+    HitSample* hitSample;
 } HitObject;
 
 typedef struct {
-	General* general;
-	Editor* editor;
-	Metadata* metadata;
-	Difficulty* difficulty;
-	List* events; // Event*
-	List* timingPoints; // TimingPoint*
-	List* beatmapColours; // BeatmapColour*
-	List* hitObjects; // HitObject*
+    General* general;
+    Editor* editor;
+    Metadata* metadata;
+    Difficulty* difficulty;
+    List* events; // Event*
+    List* timingPoints; // TimingPoint*
+    List* beatmapColours; // BeatmapColour*
+    List* hitObjects; // HitObject*
 } Beatmap;
 
 General* new_general();

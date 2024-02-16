@@ -9,12 +9,13 @@
 #define HASHTABLE_H
 
 #include <stdint.h>
-#include "jansson.h"
 #include <stdlib.h>
 
+#include "jansson.h"
+
 struct hashtable_list {
-    struct hashtable_list *prev;
-    struct hashtable_list *next;
+    struct hashtable_list* prev;
+    struct hashtable_list* next;
 };
 
 /* "pair" may be a bit confusing a name, but think of it as a
@@ -24,25 +25,25 @@ struct hashtable_pair {
     struct hashtable_list list;
     struct hashtable_list ordered_list;
     size_t hash;
-    json_t *value;
+    json_t* value;
     size_t key_len;
     char key[1];
 };
 
 struct hashtable_bucket {
-    struct hashtable_list *first;
-    struct hashtable_list *last;
+    struct hashtable_list* first;
+    struct hashtable_list* last;
 };
 
 typedef struct hashtable {
     size_t size;
-    struct hashtable_bucket *buckets;
+    struct hashtable_bucket* buckets;
     size_t order; /* hashtable has pow(2, order) buckets */
     struct hashtable_list list;
     struct hashtable_list ordered_list;
 } hashtable_t;
 
-#define hashtable_key_to_iter(key_)                                                      \
+#define hashtable_key_to_iter(key_)                                            \
     (&(container_of(key_, struct hashtable_pair, key)->ordered_list))
 
 /**
@@ -55,7 +56,7 @@ typedef struct hashtable {
  *
  * Returns 0 on success, -1 on error (out of memory).
  */
-int hashtable_init(hashtable_t *hashtable) JANSSON_ATTRS((warn_unused_result));
+int hashtable_init(hashtable_t* hashtable) JANSSON_ATTRS((warn_unused_result));
 
 /**
  * hashtable_close - Release all resources used by a hashtable object
@@ -64,7 +65,7 @@ int hashtable_init(hashtable_t *hashtable) JANSSON_ATTRS((warn_unused_result));
  *
  * Destroys a statically allocated hashtable object.
  */
-void hashtable_close(hashtable_t *hashtable);
+void hashtable_close(hashtable_t* hashtable);
 
 /**
  * hashtable_set - Add/modify value in hashtable
@@ -82,7 +83,8 @@ void hashtable_close(hashtable_t *hashtable);
  *
  * Returns 0 on success, -1 on failure (out of memory).
  */
-int hashtable_set(hashtable_t *hashtable, const char *key, size_t key_len, json_t *value);
+int hashtable_set(hashtable_t* hashtable, const char* key, size_t key_len,
+                  json_t* value);
 
 /**
  * hashtable_get - Get a value associated with a key
@@ -93,7 +95,7 @@ int hashtable_set(hashtable_t *hashtable, const char *key, size_t key_len, json_
  *
  * Returns value if it is found, or NULL otherwise.
  */
-void *hashtable_get(hashtable_t *hashtable, const char *key, size_t key_len);
+void* hashtable_get(hashtable_t* hashtable, const char* key, size_t key_len);
 
 /**
  * hashtable_del - Remove a value from the hashtable
@@ -104,7 +106,7 @@ void *hashtable_get(hashtable_t *hashtable, const char *key, size_t key_len);
  *
  * Returns 0 on success, or -1 if the key was not found.
  */
-int hashtable_del(hashtable_t *hashtable, const char *key, size_t key_len);
+int hashtable_del(hashtable_t* hashtable, const char* key, size_t key_len);
 
 /**
  * hashtable_clear - Clear hashtable
@@ -113,7 +115,7 @@ int hashtable_del(hashtable_t *hashtable, const char *key, size_t key_len);
  *
  * Removes all items from the hashtable.
  */
-void hashtable_clear(hashtable_t *hashtable);
+void hashtable_clear(hashtable_t* hashtable);
 
 /**
  * hashtable_iter - Iterate over hashtable
@@ -130,7 +132,7 @@ void hashtable_clear(hashtable_t *hashtable);
  * hashtable_iter_next() may be called on an iterator, and after that
  * the key/value pair pointed by the old iterator may be deleted.
  */
-void *hashtable_iter(hashtable_t *hashtable);
+void* hashtable_iter(hashtable_t* hashtable);
 
 /**
  * hashtable_iter_at - Return an iterator at a specific key
@@ -142,7 +144,8 @@ void *hashtable_iter(hashtable_t *hashtable);
  * Like hashtable_iter() but returns an iterator pointing to a
  * specific key.
  */
-void *hashtable_iter_at(hashtable_t *hashtable, const char *key, size_t key_len);
+void* hashtable_iter_at(hashtable_t* hashtable, const char* key,
+                        size_t key_len);
 
 /**
  * hashtable_iter_next - Advance an iterator
@@ -153,28 +156,28 @@ void *hashtable_iter_at(hashtable_t *hashtable, const char *key, size_t key_len)
  * Returns a new iterator pointing to the next element in the
  * hashtable or NULL if the whole hastable has been iterated over.
  */
-void *hashtable_iter_next(hashtable_t *hashtable, void *iter);
+void* hashtable_iter_next(hashtable_t* hashtable, void* iter);
 
 /**
  * hashtable_iter_key - Retrieve the key pointed by an iterator
  *
  * @iter: The iterator
  */
-void *hashtable_iter_key(void *iter);
+void* hashtable_iter_key(void* iter);
 
 /**
  * hashtable_iter_key_len - Retrieve the key length pointed by an iterator
  *
  * @iter: The iterator
  */
-size_t hashtable_iter_key_len(void *iter);
+size_t hashtable_iter_key_len(void* iter);
 
 /**
  * hashtable_iter_value - Retrieve the value pointed by an iterator
  *
  * @iter: The iterator
  */
-void *hashtable_iter_value(void *iter);
+void* hashtable_iter_value(void* iter);
 
 /**
  * hashtable_iter_set - Set the value pointed by an iterator
@@ -182,6 +185,6 @@ void *hashtable_iter_value(void *iter);
  * @iter: The iterator
  * @value: The value to set
  */
-void hashtable_iter_set(void *iter, json_t *value);
+void hashtable_iter_set(void* iter, json_t* value);
 
 #endif

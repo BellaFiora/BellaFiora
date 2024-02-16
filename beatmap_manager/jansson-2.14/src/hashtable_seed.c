@@ -3,43 +3,43 @@
 */
 
 #ifdef HAVE_CONFIG_H
-#include <jansson_private_config.h>
+#    include <jansson_private_config.h>
 #endif
 
 #include <stdio.h>
 #include <time.h>
 
 #ifndef HAVE_STDINT_H
-#include <stdint.h>
+#    include <stdint.h>
 #endif
 
 #ifdef HAVE_FCNTL_H
-#include <fcntl.h>
+#    include <fcntl.h>
 #endif
 
 #ifdef HAVE_SCHED_H
-#include <sched.h>
+#    include <sched.h>
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
+#    include <sys/stat.h>
 #endif
 
 #ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
+#    include <sys/time.h>
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
+#    include <sys/types.h>
 #endif
 
 #if defined(_WIN32)
 /* For GetModuleHandle(), GetProcAddress() and GetCurrentProcessId() */
-#include <windows.h>
+#    include <windows.h>
 #endif
 
 #include "jansson.h"
@@ -56,14 +56,14 @@
 
 /* /dev/urandom */
 #if !defined(_WIN32) && defined(USE_URANDOM)
-static int seed_from_urandom(uint32_t *seed) {
+static int seed_from_urandom(uint32_t* seed) {
     /* Use unbuffered I/O if we have open(), close() and read(). Otherwise
        fall back to fopen() */
 
     char data[sizeof(uint32_t)];
     int ok;
 
-#if defined(HAVE_OPEN) && defined(HAVE_CLOSE) && defined(HAVE_READ)
+#    if defined(HAVE_OPEN) && defined(HAVE_CLOSE) && defined(HAVE_READ)
     int urandom;
     urandom = open("/dev/urandom", O_RDONLY);
     if (urandom == -1)
@@ -71,8 +71,8 @@ static int seed_from_urandom(uint32_t *seed) {
 
     ok = read(urandom, data, sizeof(uint32_t)) == sizeof(uint32_t);
     close(urandom);
-#else
-    FILE *urandom;
+#    else
+    FILE* urandom;
 
     urandom = fopen("/dev/urandom", "rb");
     if (!urandom)
@@ -80,7 +80,7 @@ static int seed_from_urandom(uint32_t *seed) {
 
     ok = fread(data, 1, sizeof(uint32_t), urandom) == sizeof(uint32_t);
     fclose(urandom);
-#endif
+#    endif
 
     if (!ok)
         return 1;
@@ -92,15 +92,17 @@ static int seed_from_urandom(uint32_t *seed) {
 
 /* Windows Crypto API */
 #if defined(_WIN32) && defined(USE_WINDOWS_CRYPTOAPI)
-#include <wincrypt.h>
+#    include <wincrypt.h>
 
-typedef BOOL(WINAPI *CRYPTACQUIRECONTEXTA)(HCRYPTPROV *phProv, LPCSTR pszContainer,
+typedef BOOL(WINAPI* CRYPTACQUIRECONTEXTA)(HCRYPTPROV* phProv,
+                                           LPCSTR pszContainer,
                                            LPCSTR pszProvider, DWORD dwProvType,
                                            DWORD dwFlags);
-typedef BOOL(WINAPI *CRYPTGENRANDOM)(HCRYPTPROV hProv, DWORD dwLen, BYTE *pbBuffer);
-typedef BOOL(WINAPI *CRYPTRELEASECONTEXT)(HCRYPTPROV hProv, DWORD dwFlags);
+typedef BOOL(WINAPI* CRYPTGENRANDOM)(HCRYPTPROV hProv, DWORD dwLen,
+                                     BYTE* pbBuffer);
+typedef BOOL(WINAPI* CRYPTRELEASECONTEXT)(HCRYPTPROV hProv, DWORD dwFlags);
 
-static int seed_from_windows_cryptoapi(uint32_t *seed) {
+static int seed_from_windows_cryptoapi(uint32_t* seed) {
     HINSTANCE hAdvAPI32 = NULL;
     CRYPTACQUIRECONTEXTA pCryptAcquireContext = NULL;
     CRYPTGENRANDOM pCryptGenRandom = NULL;
@@ -118,7 +120,8 @@ static int seed_from_windows_cryptoapi(uint32_t *seed) {
     if (!pCryptAcquireContext)
         return 1;
 
-    pCryptGenRandom = (CRYPTGENRANDOM)GetProcAddress(hAdvAPI32, "CryptGenRandom");
+    pCryptGenRandom =
+        (CRYPTGENRANDOM)GetProcAddress(hAdvAPI32, "CryptGenRandom");
     if (!pCryptGenRandom)
         return 1;
 
@@ -137,13 +140,13 @@ static int seed_from_windows_cryptoapi(uint32_t *seed) {
     if (!ok)
         return 1;
 
-    *seed = buf_to_uint32((char *)data);
+    *seed = buf_to_uint32((char*)data);
     return 0;
 }
 #endif
 
 /* gettimeofday() and getpid() */
-static int seed_from_timestamp_and_pid(uint32_t *seed) {
+static int seed_from_timestamp_and_pid(uint32_t* seed) {
 #ifdef HAVE_GETTIMEOFDAY
     /* XOR of seconds and microseconds */
     struct timeval tv;
@@ -193,7 +196,8 @@ static uint32_t generate_seed() {
 
 volatile uint32_t hashtable_seed = 0;
 
-#if defined(HAVE_ATOMIC_BUILTINS) && (defined(HAVE_SCHED_YIELD) || !defined(_WIN32))
+#if defined(HAVE_ATOMIC_BUILTINS)                                              \
+    && (defined(HAVE_SCHED_YIELD) || !defined(_WIN32))
 static volatile char seed_initialized = 0;
 
 void json_object_seed(size_t seed) {
@@ -209,14 +213,15 @@ void json_object_seed(size_t seed) {
         } else {
             /* Wait for another thread to do the seeding */
             do {
-#ifdef HAVE_SCHED_YIELD
+#    ifdef HAVE_SCHED_YIELD
                 sched_yield();
-#endif
+#    endif
             } while (__atomic_load_n(&hashtable_seed, __ATOMIC_ACQUIRE) == 0);
         }
     }
 }
-#elif defined(HAVE_SYNC_BUILTINS) && (defined(HAVE_SCHED_YIELD) || !defined(_WIN32))
+#elif defined(HAVE_SYNC_BUILTINS)                                              \
+    && (defined(HAVE_SCHED_YIELD) || !defined(_WIN32))
 void json_object_seed(size_t seed) {
     uint32_t new_seed = (uint32_t)seed;
 
@@ -235,9 +240,9 @@ void json_object_seed(size_t seed) {
                 break;
             } else {
                 /* Wait for another thread to do the seeding */
-#ifdef HAVE_SCHED_YIELD
+#    ifdef HAVE_SCHED_YIELD
                 sched_yield();
-#endif
+#    endif
             }
         } while (hashtable_seed == 0);
     }

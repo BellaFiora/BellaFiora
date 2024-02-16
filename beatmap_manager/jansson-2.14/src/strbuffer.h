@@ -8,28 +8,29 @@
 #ifndef STRBUFFER_H
 #define STRBUFFER_H
 
-#include "jansson.h"
 #include <stdlib.h>
 
+#include "jansson.h"
+
 typedef struct {
-    char *value;
+    char* value;
     size_t length; /* bytes used */
-    size_t size;   /* bytes allocated */
+    size_t size; /* bytes allocated */
 } strbuffer_t;
 
-int strbuffer_init(strbuffer_t *strbuff) JANSSON_ATTRS((warn_unused_result));
-void strbuffer_close(strbuffer_t *strbuff);
+int strbuffer_init(strbuffer_t* strbuff) JANSSON_ATTRS((warn_unused_result));
+void strbuffer_close(strbuffer_t* strbuff);
 
-void strbuffer_clear(strbuffer_t *strbuff);
+void strbuffer_clear(strbuffer_t* strbuff);
 
-const char *strbuffer_value(const strbuffer_t *strbuff);
+const char* strbuffer_value(const strbuffer_t* strbuff);
 
 /* Steal the value and close the strbuffer */
-char *strbuffer_steal_value(strbuffer_t *strbuff);
+char* strbuffer_steal_value(strbuffer_t* strbuff);
 
-int strbuffer_append_byte(strbuffer_t *strbuff, char byte);
-int strbuffer_append_bytes(strbuffer_t *strbuff, const char *data, size_t size);
+int strbuffer_append_byte(strbuffer_t* strbuff, char byte);
+int strbuffer_append_bytes(strbuffer_t* strbuff, const char* data, size_t size);
 
-char strbuffer_pop(strbuffer_t *strbuff);
+char strbuffer_pop(strbuffer_t* strbuff);
 
 #endif
