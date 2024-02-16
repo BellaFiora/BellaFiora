@@ -22,3 +22,7 @@ dummy.txt
 */node_modules
 */node_modules/
 */node_modules/*
+*/node_modules/*/*
+*/*/.bin/
+*.bin
+client_manager/node_modules/.bin/mime

@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const dotenv = require('dotenv');
 const envFile = '/common/env/.env';
+
 dotenv.config({path: envFile});
 
 const db_bellafiora = new Sequelize({

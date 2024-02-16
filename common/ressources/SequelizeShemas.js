@@ -37,7 +37,7 @@ const db_bellafiora = require('/app/src/sequelize')
     raw: true,
   });
 
-  const User = sequelize.define('User', {
+  const User = db_bellafiora.define('User', {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
       primaryKey: true,
