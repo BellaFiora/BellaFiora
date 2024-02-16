@@ -81,6 +81,19 @@ void* callback(void* data) {
 			continue;
 		} else if (bytes_received == 0) {
 			// Connection closed by the client
+			/*use this request in the console:
+				fetch('url', {
+					method: 'HEAD' // Use the HEAD method to send an empty
+			   request
+				})
+				.then(() => {
+					console.log('Connection closed without sending data.');
+				})
+				.catch(error => {
+					console.error('There was a problem with the fetch
+			   operation:', error);
+				});
+			*/
 			creport(stdout, "client disconnected");
 			close(client_socket);
 			continue;
@@ -129,10 +142,6 @@ void* sigint_handler(void* data) {
 }
 
 int main(void) {
-	int i = 5;
-	DBGI(i);
-	return 0;
-
 	setup_sigint_handlers();
 	char server1_name[] = "HTTP Server";
 	Server* server1 =
