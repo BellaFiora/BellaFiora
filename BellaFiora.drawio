@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-02-16T19:37:29.588Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.0.2 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="8Dxvn3iuW33yyBqMJ5Mx" version="23.0.2" type="device" pages="11">
+<mxfile host="Electron" modified="2024-02-16T19:41:45.008Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.0.2 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="AaffF8iBoylD6Kj0voG7" version="23.0.2" type="device" pages="11">
   <diagram name="overview" id="0PmOLJ4P72vsUwZt2hVw">
     <mxGraphModel dx="2026" dy="1183" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
       <root>
@@ -123,7 +123,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="a4ean0Q9orbKwyH8EAUX" name="client_manager">
-    <mxGraphModel dx="2578" dy="1505" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3151" dy="2240" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -133,17 +133,17 @@
           </mxCell>
         </UserObject>
         <UserObject label="Desktop App" id="wJy8GslW49kcXiq_vR3D-3">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="150" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="Extension" id="wJy8GslW49kcXiq_vR3D-4">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="270" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="Mobile App" id="wJy8GslW49kcXiq_vR3D-5">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="390" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
@@ -153,7 +153,7 @@
           </mxCell>
         </UserObject>
         <UserObject label="Private API" id="wJy8GslW49kcXiq_vR3D-7">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="630" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
@@ -163,12 +163,12 @@
           </mxCell>
         </UserObject>
         <UserObject label="User Manager" id="wJy8GslW49kcXiq_vR3D-9">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="870" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="Website" id="wJy8GslW49kcXiq_vR3D-10">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="990" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
@@ -485,11 +485,21 @@
             <mxPoint x="1940" y="170" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="QPg7t8hjkKwuLMViDUYx-89" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="QPg7t8hjkKwuLMViDUYx-77" target="wJy8GslW49kcXiq_vR3D-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="930" y="1175" />
+              <mxPoint x="930" y="-30" />
+              <mxPoint x="220" y="-30" />
+              <mxPoint x="220" y="70" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="q5DG9TfE9dz0Gm4TEU_n" name="desktop_app">
-    <mxGraphModel dx="2518" dy="2074" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2876" dy="2283" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -804,7 +814,7 @@
           </mxCell>
         </UserObject>
         <UserObject label="Client Manager" id="wAsV79cJsWtjZubUfLlI-2">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="-780" y="-955" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
@@ -824,7 +834,7 @@
           </mxCell>
         </UserObject>
         <UserObject label="Private API" id="wAsV79cJsWtjZubUfLlI-7">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="-780" y="-465" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
@@ -1204,7 +1214,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="b7YJDWBTXyt980fKeeTV" name="user_manager">
-    <mxGraphModel dx="1418" dy="828" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2026" dy="1183" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1214,7 +1224,7 @@
           </mxCell>
         </UserObject>
         <UserObject label="Client Manager" id="FdyfPHY9zJWijkuVw8Rr-2">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="150" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
@@ -1242,7 +1252,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <UserObject label="Private API" id="FdyfPHY9zJWijkuVw8Rr-7">
-          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxCell style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" parent="1" vertex="1">
             <mxGeometry x="50" y="750" width="120" height="80" as="geometry" />
           </mxCell>
         </UserObject>
