@@ -21,7 +21,6 @@
 
 const https = require('https');
 const fs = require('fs');
-const querystring = require('querystring');
 
 const bmsetId = '2071776';
 let osuSession = '';
