@@ -50,9 +50,12 @@ Suggest a beatmap for the player.
 	- Valid ranking status are: `Graveyard`, `WIP`, `Ranked`, `Approved`, `Qualified`, `Loved`.
 - `-save <command_alias>`
 	- Saves the command and sets its alias to `<command_alias>`.
-	- View saved commands using: `!bm saved`.
-	- Use a saved command using: `!bm saved <command_alias> [options to overwrite...]`.
-	- Use a saved command from a given player using: `!bm saved <player>/<command_alias> [options to overwrite...]`.
+	- View saved commands using `!bm saved`.
+	- Use a saved command using `!bm saved <command_alias> [options/arguments to overwrite in this command only...]`.
+	- Save a command from a given player using `!bm saved <player>/<command_alias>`.
+	- Rename a `<command_alias>` using `!bm saved rename <old_command_alias> <new_command_alias>`.
+	- Edit a saved command with the provided options and arguments using `!bm saved edit <command_alias> [options/arguments to overwrite...]`.
+	- Delete a saved command using `!bm saved delete <command_alias>`.
 - `-played`
 	- Specifies whether to get an already played beatmap.
 - `-mod <mod>`
