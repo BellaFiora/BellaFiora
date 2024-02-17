@@ -1,5 +1,5 @@
 const dbreader = require('osudb')
-const conf = require('credentials')
+const conf = require('./priv/credentials')
 const fs = require('fs')
 const path = require('path')
 const AppError = require('./error')

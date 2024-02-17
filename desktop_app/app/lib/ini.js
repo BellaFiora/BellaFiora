@@ -1,5 +1,5 @@
 const ini = require('ini');
-const conf = require('credentials');
+const conf = require('./priv/credentials');
 const fs = require('fs');
 const path = require('path')
 class gini {
