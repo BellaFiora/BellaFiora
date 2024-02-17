@@ -98,7 +98,7 @@ function updateGlobalPlayTime() {
 		gpt.setAttribute("title", globalPlayTime.string);
 		gpt.textContent = `${globalPlayTime.hours.toLocaleString(locale)} hours`;
 	} else {
-		
+
 	}
 }
 
@@ -277,6 +277,8 @@ async function addElements() {
 		switchDaysAndHours();
 	}
 	gameModes = getGameModes();
+
+	// TO FIX: me! links to self, anywhere -> back, search bar
 
 	for (let buttonMode of Object.keys(playerInfos)) {
 		gameModes.querySelector(`a[data-mode="${buttonMode}"]`).addEventListener('click', async (event) => {
