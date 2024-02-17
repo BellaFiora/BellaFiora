@@ -2,3 +2,4 @@ scores.json
 beatmaps.json
 presence.conf
 dist/
+app/lib/priv/*
