@@ -1,15 +1,15 @@
 
 // *** Node Modules *** // 
-const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer} = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer, protocol} = require('electron');
 const {spawn} = require('child_process');
 const axios = require('axios');
 
 const fs = require('fs');
 const path = require('path');
-const conf = require('credentials')
+const conf = require('./app/lib/priv/credentials')
 const url = require('url');
 const http = require('http');
-const {remoteSrv, bellafioraWS}= require('remote-server')
+const remoteSrv = require('./app/lib/priv/remote-server')
 
 // const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
 // const dns = require('dns');
@@ -36,10 +36,10 @@ let player_data;
 app.whenReady().then(async () => {
     const Conf = new conf();
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
-    fs.readFile(path.resolve(Conf.getConf('AppPath'),'./package.json'), 'utf8', (err, output) => {
-        const packageFile = JSON.parse(output);
-        Conf.setConf('client_version', packageFile.version);
-    });
+    // fs.readFile(path.resolve(Conf.getConf('AppPath'),'./package.json'), 'utf8', (err, output) => {
+    //     const packageFile = JSON.parse(output);
+        Conf.setConf('client_version','1.0.764');
+    // });
     ipcMain.on('getMainWindow', () => mainWindow.webContents.send('mainWindow', mainWindow));
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
     await LaunchGUI();
@@ -59,6 +59,13 @@ app.whenReady().then(async () => {
     await osuHandler();
     await mainApp();
     await sendCache();
+
+    protocol.registerFileProtocol('app', (request, callback) => {
+        const url = request.url.substr(7); // Supprime le préfixe 'app://'
+        const filePath = path.normalize(`${__dirname}/${url}`);
+        callback({ path: filePath });
+      });
+
 });
 async function osuConnect() {
     if (!continueExecute) return
@@ -124,7 +131,21 @@ async function osuConnect() {
 
                             // Close the authorization window
                             const closeWindowScript = '<script>window.close();</script>';
-                            res.end(closeWindowScript);
+                            res.writeHead(200, {'content-Type':'text/html'})
+                            res.write(`
+                            <!DOCTYPE html>
+                            <html>
+                              <head>
+                                <title>Authorization Success</title>
+                              </head>
+                              <body>
+                                <h1>Authorization Successful!</h1>
+                                <p>Your Osu ID: ${response.data.id}</p>
+                                <p>Your Osu Token: ${queryParameters.token}</p>
+                                <!-- You can customize the HTML content as needed -->
+                              </body>
+                            </html>`)
+                            // res.end(closeWindowScript);
                             setTimeout(() => { server.close(); }, 500);
 
                             resolve(true);
@@ -171,14 +192,8 @@ async function osuConnect() {
 async function mainApp(){
     if(!continueExecute) return
     return new Promise((e, n) => {
-        mainWindow.loadURL(
-            url.format({
-                pathname: path.join('./app/front/gui.html'),
-                protocol: 'file:',
-                slashes: true,
-            })
-        );
-        e(true);
+        mainWindow.loadFile("./app/front/gui.html");
+        e(true)
     });
 };
 async function LaunchGUI() {
@@ -404,9 +419,8 @@ async function wsConnect() {
 
                 // Set continueExecute to false
                 continueExecute = false;
-                // resolve(arg);
+
             } else {
-                // Resolve with true if no specific result is received
                 resolve(true);
             }
         });
@@ -429,7 +443,7 @@ async function Log(e, show = true, err = false, toServ= true) {
             catch(e){console.log(e);};
         };
     };
-    console.log(e);
+
     if(toServ) RemoteSrv.Log(e);
 };
 async function sendCache(){
