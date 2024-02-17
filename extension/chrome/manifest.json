@@ -13,6 +13,7 @@
 		"service_worker": "background.js"
 	},
 	"action": {
+		"default_popup": "bellafiora.html",
 		"default_icon": {
 			"16": "icons/chibi-16.png",
 			"32": "icons/chibi-32.png",

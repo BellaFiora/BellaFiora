@@ -1,10 +1,35 @@
+var url = null;
+if (window.location.href === url) { exit(0); }
+url = window.location.href;
 
-var upToDate = false;
+var fetchPromise = null;
 var playerId = null;
-var currentMode;
-var locale;
-var playersInfos;
-var playerInfos;
+var mode = null;
+var locale = null;
+var historical = null;
+var playerInfos = {
+	'osu': null,
+	'taiko': null,
+	'fruits': null,
+	'mania': null
+};
+
+function parseUrl() {
+	const startIndex = 'https://osu.ppy.sh/users/'.length;
+	const endIndex = url.indexOf('/', startIndex);
+	if (endIndex === -1) {
+		playerId = url.substring(startIndex, url.length);
+		mode = '';
+		mode.length = 0;
+	} else {
+		playerId = url.substring(startIndex, endIndex);
+		mode = url.substring(endIndex + 1, url.length);
+	}
+	console.log('parseUrl: playerId = ' + playerId);
+	console.log('parseUrl: mode = ' + mode);
+}
+
+parseUrl();
 
 function convertTime(seconds) {
 	const days = Math.floor(seconds / (24 * 60 * 60));
@@ -26,76 +51,60 @@ function convertTime(seconds) {
 	}
 }
 
-var dom = {
-	_playerId: null,
-	_locale: null,
-	_playerInfos: null,
-	get playerId() { return this._playerId; },
-	set playerId(playerId) { this._playerId = playerId; },
-
-	get locale() { return this._locale; },
-	set locale(locale) { this._locale = locale; },
-
-	get playerInfos() { return this._playerInfos; },
-	set playerInfos(playerInfos) { this._playerInfos = playerInfos; },
-
-	getUsername() {
-		return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-info.profile-info--cover > div.profile-info__details > div.profile-info__info > h1 > span');
-	},
-
-	addGlobalPlayTime(props) {
-		let globalPlayTime = props[0].gpt + props[1].gpt + props[2].gpt + props[3].gpt;
-		globalPlayTime = convertTime(globalPlayTime);
-
-	
-		const labelElements = document.querySelectorAll('.value-display__label');
-		labelElements[4].innerText = `${currentMode} Playtime`;
-		labelElements[4].style= 'text-transform: capitalize;';
-		
-
-
-		const outerDiv = document.createElement("div");
-		outerDiv.classList.add("value-display", "value-display--plain", "value-display--plain-wide");
-	
-		const labelDiv = document.createElement("div");
-		labelDiv.classList.add("value-display__label");
-		labelDiv.textContent = "Total Playime";
-		const valueDiv = document.createElement("div");
-		valueDiv.classList.add("value-display__value");
-		const spanElement = document.createElement("span");
-		spanElement.setAttribute("data-tooltip-position", "bottom center");
-		spanElement.setAttribute("title", `${globalPlayTime.hours} hours`);
-		spanElement.textContent = globalPlayTime.string;
-		valueDiv.appendChild(spanElement);
-		outerDiv.appendChild(labelDiv);
-		outerDiv.appendChild(valueDiv);
-		document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid').appendChild(outerDiv);
-
-	},
-	
-
-	
+function getGameModes() {
+	return document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.header-v4.header-v4--users > div:nth-child(2) > div > div > ul.game-mode");
 }
 
 function getPlaycount() {
 	return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div.profile-stats > dl.profile-stats__entry.profile-stats__entry--key-play_count');
 }
 
-function getProfileDetail() {
-	return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3)');
-}
-
 function getProfileDetailChartNumbers() {
 	return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid');
 }
 
-function getProfileRankNote() {
-	return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div.profile-detail__chart-numbers.remakeProfilInfos > div:nth-child(2) > div');
+function addGlobalPlayTime() {
+	const labelElements = document.querySelectorAll('.value-display__label');
+	let mode_text = mode === 'fruits' ? 'ctb' : mode;
+	labelElements[4].innerText = `${mode_text} Playtime`;
+	labelElements[4].style = 'text-transform: capitalize;';
+
+	const outerDiv = document.createElement("div");
+	outerDiv.classList.add("value-display", "value-display--plain", "value-display--plain-wide");
+	outerDiv.setAttribute('id', 'TotalPlayTime');
+
+	const labelDiv = document.createElement("div");
+	labelDiv.classList.add("value-display__label");
+	labelDiv.textContent = "Total Playime";
+
+	const valueDiv = document.createElement("div");
+	valueDiv.classList.add("value-display__value");
+
+	const spanElement = document.createElement("span");
+	spanElement.setAttribute("data-tooltip-position", "bottom center");
+	spanElement.setAttribute("title", '-');
+	spanElement.textContent = '-';
+
+	valueDiv.appendChild(spanElement);
+	outerDiv.appendChild(labelDiv);
+	outerDiv.appendChild(valueDiv);
+	getProfileDetailChartNumbers().appendChild(outerDiv);
 }
 
-function addProfileStat(parent, keyTextContent, valueTextContent) {
+function updateGlobalPlayTime() {
+	const globalPlayTime = convertTime(playerInfos.osu.user.statistics.play_time + playerInfos.taiko.user.statistics.play_time + playerInfos.fruits.user.statistics.play_time + playerInfos.mania.user.statistics.play_time);
+	const gpt = document.getElementById('TotalPlayTime').querySelector('div:nth-child(2) > span');
+	if (true) {
+		gpt.setAttribute("title", globalPlayTime.string);
+		gpt.textContent = `${globalPlayTime.hours.toLocaleString(locale)} hours`;
+	} else {
+		
+	}
+}
+
+function addProfileStat(parent, keyTextContent, valueTextContent, id) {
 	var entry = document.createElement('dl');
-	entry.setAttribute('id', 'v2datas');
+	entry.setAttribute('id', id);
 	var key =  document.createElement('dt');
 	var value =  document.createElement('dd');
 	entry.classList.add('profile-stats__entry');
@@ -111,189 +120,186 @@ function addProfileStat(parent, keyTextContent, valueTextContent) {
 	return entry;
 }
 
-class LS {
-	constructor () {
-		this.playerId = text.substring(startIndex, endIndex !== -1 ? endIndex : text.length);
+const totalPlaycountId = 'total_playcount';
+const totalPlaycountV2Id = 'total_playcount_v2';
 
+function addTotalPlaycounts() {
+	const totalPlaycountEntry = addProfileStat(getPlaycount(), 'Total Play Count', '-', totalPlaycountId);
+	addProfileStat(totalPlaycountEntry, 'Total Play Count V2', '-', totalPlaycountV2Id);
+}
+
+function getTotalPlaycount() {
+	let totalPlaycount = 0;
+	for (let e of historical["monthly_playcounts"]) {
+		totalPlaycount += parseInt(e["count"]);
 	}
-	getUserStat() {
-		stats = localStorage.getItem(this.playerId);
-	}
-	setUserStat(statsArray) {
-		localStorage.setItem(this.playerId, statsArray);
-	}
+	return totalPlaycount;
 }
 
-async function addTotalPlaycount(playerInfos) {
-	return new Promise(async (resolve, reject) => {
-		const DOM = new dom();
-		try {
-			fetch(`https://osu.ppy.sh/users/${playerId}/extra-pages/historical`)
-			.then(response => response.json())
-			.then(data => {
-				let totalPlaycountValue = 0;
-				for (let e of data["monthly_playcounts"]) {
-					totalPlaycountValue += parseInt(e["count"]);
-				}
-				let totalPlaycountEntry = addProfileStat(getPlaycount(), 'Total Play Count', totalPlaycountValue.toLocaleString(locale));
-				addProfileStat(totalPlaycountEntry, 'Total Play Count V2', (parseInt(totalPlaycountValue) - parseInt(playerInfos[0].plc) - parseInt(playerInfos[1].plc) - parseInt(playerInfos[2].plc) - parseInt(playerInfos[3].plc)).toLocaleString(locale));
-			})
-			.catch(error => console.error("Error fetching data:", error));
-		} catch(e){
-			resolve(false);
-			throw Error(e);
-		}
-	});
+function getTotalPlaycountV2(totalPlaycount) {
+	return totalPlaycount - playerInfos['osu'].user.statistics.play_count - playerInfos['taiko'].user.statistics.play_count - playerInfos['fruits'].user.statistics.play_count - playerInfos['mania'].user.statistics.play_count;
 }
 
-function getplayerId() {
-	let text = window.location.href;
-	startIndex = 'https://osu.ppy.sh/users/'.length;
-	endIndex = text.indexOf('/', startIndex);
-	playerId = text.substring(startIndex, endIndex === -1 ? text.length : endIndex);
+function updateTotalPlaycounts() {
+	const totalPlaycount = getTotalPlaycount();
+	document.getElementById(totalPlaycountId).querySelector('.profile-stats__value').textContent = totalPlaycount.toLocaleString(locale);
+	document.getElementById(totalPlaycountV2Id).querySelector('.profile-stats__value').textContent = getTotalPlaycountV2(totalPlaycount).toLocaleString(locale);
 }
 
-function getCurrentGamemode() {
-	let content = Array.from(document.querySelectorAll('head meta[name="description"]'))[0].getAttribute('content');
-	currentMode = content.substring(content.indexOf('(') + 1, content.indexOf(')'));
-}
-
-function getLocale() {
-	let text = document.querySelector('html').getAttribute('lang');
-	let startIndex = text.indexOf('currentLocale') + 'currentLocale'.length + 4;
-	locale = text.substring(startIndex, text.indexOf('"', startIndex));
+async function fetchHistorical() {
+	const tmp = await fetch(`https://osu.ppy.sh/users/${playerId}/extra-pages/historical`);
+	historical = await tmp.json();
 }
 
 // getPlayerInfos
 
-function htmlDecode(input) {
-	var doc = new DOMParser().parseFromString(input, "text/html");
+async function htmlDecode(input) {
+	const doc = new DOMParser().parseFromString(input, "text/html");
 	return doc.documentElement.textContent;
 }
 
-function RawHtmlToJson(content) {
+async function RawHtmlToJson(content) {
 	const startIndex = content.indexOf('data-initial-data="') + 'data-initial-data="'.length;
 	content = content.substring(startIndex);
 	const endIndex = content.indexOf('</div>') - 7;
 	const jsonText = content.substring(0, endIndex);
-	return JSON.parse(htmlDecode(jsonText));
+	return JSON.parse(await htmlDecode(jsonText));
 }
 
-async function getPlayerRaw(gamemode, playerId) {
-	return new Promise(async (resolve, reject) => {
-		try {
-			fetch(`https://osu.ppy.sh/users/${playerId}/${gamemode}`).then(async (res) => {
-				res.text().then((rawHTML)=> {
-					let data_initial_data = RawHtmlToJson(rawHTML);
-					console.log(data_initial_data);
-					resolve(data_initial_data);
-				})
-			})
-		} catch(e){
-			throw Error(e);
-		}
-	})
+async function fetchMode(mode) {
+	try {
+		const res = await fetch(`https://osu.ppy.sh/users/${playerId}/${mode}`);
+		const tmp = await RawHtmlToJson(await res.text());
+		playerInfos[mode] = tmp;
+		localStorage['playerInfos_' + mode] = JSON.stringify(tmp);
+	} catch(e) {
+		throw Error(e);
+	}
 }
 
-async function getPlayerInfos() {
-	let playerInfos = [];
-	return new Promise(async (resolve, reject) => {
-		for (let gamemode of ['osu', 'taiko', 'fruits', 'mania']) {
-			playerInfos.push(await getPlayerRaw(gamemode, dom.playerId));
-		}
-		localStorage.setItem(dom.playerId, playerInfos);
-		resolve(playerInfos);
-	});
+async function fetchAllModes() {
+	try {
+		await Promise.all([fetchMode('osu'), fetchMode('taiko'), fetchMode('fruits'), fetchMode('mania')]);
+	} catch (e) {
+		throw Error(e);
+	}
 }
 
 function addCustomCSS() {
 	customCss = document.createElement('style');
 	customCss.textContent = `
-	.remakeGrid { 
+	#remakeGrid {
 		grid-template-columns: repeat(6,1fr);
 		gap: 2px;
 	}
-	.remakeProfilInfos {
+	#remakeProfileInfos {
 		gap: 0px;
 	}
-	.remakeRankNotes{
+	#remakeRankNotes {
 		margin-left: -17px;
+	}
+	#TotalPlayTime {
+		margin-left: -20px;
 	}
 	`;
 
 	document.head.appendChild(customCss);
+	document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid").setAttribute('id', 'remakeGrid');
+	document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1)").setAttribute('id', 'remakeProfileInfos');
+	document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div:nth-child(2)").setAttribute('id', 'remakeRankNotes');
+}
+
+function getCurrentGamemode() {
+	const meta = document.querySelectorAll('head > meta[name="description"]');
+	let content = Array.from(meta)[0].getAttribute('content');
+	mode = content.substring(content.indexOf('(') + 1, content.indexOf(')'));
+}
+
+function switchDaysAndHours() {
+	const pt = document.querySelector('#remakeGrid > div:nth-child(3) > div.value-display__value > span');
+	const tmp = pt.getAttribute('title');
+	pt.setAttribute('title', pt.textContent);
+	pt.textContent = tmp;
 }
 
 function addPlaceHolderHTML() {
-	playerInfos = localStorage.getItem(dom.playerId);
-	if (playerInfos == null) {
-
-	} else {
-		addCustomHTML(playerInfos);
+	if (mode.length === 0) {
+		getCurrentGamemode();
+		console.log('addPlaceHolderHTML: mode = ' + mode);
 	}
-}
-
-function addCustomHTML() {
-
+	addTotalPlaycounts();
+	addGlobalPlayTime();
 }
 
 function updateHTML() {
-
+	updateTotalPlaycounts();
+	updateGlobalPlayTime();
 }
 
-async function addInfos() {
-	console.log('entering main');
+async function fetchAll() {
+	return new Promise(async (resolve, reject) => {
+		console.log('entering fetchAll');
+		await fetchAllModes();
+		await fetchHistorical();
+		resolve(true);
+	});	
+}
 
-	getplayerId();
-	console.log(playerId);
+// undefined or false
+if (!localStorage['comeFromModeButton'] || localStorage['comeFromModeButton'] === 'false' || localStorage['comeFromMyProfile']) {
+	fetchPromise = fetchAll();
+} else {
+	playerInfos.osu = JSON.parse(localStorage['playerInfos_osu']);
+	playerInfos.taiko = JSON.parse(localStorage['playerInfos_taiko']);
+	playerInfos.fruits = JSON.parse(localStorage['playerInfos_fruits']);
+	playerInfos.mania = JSON.parse(localStorage['playerInfos_mania']);
+	fetchPromise = new Promise(async (resolve, reject) => {
+		await fetchHistorical();
+		await fetchMode(localStorage['targetMode']);
+		resolve(true);
+	});
+}
+localStorage['comeFromModeButton'] = 'false';
+localStorage['comeFromMyProfile'] = 'false';
 
+function getLocale() {
+	let text = document.querySelector('html').getAttribute('lang');
+	let startIndex = text.indexOf('currentLocale') + 'currentLocale'.length + 4;
+	locale = text.substring(startIndex, text.indexOf('"', startIndex));
+	console.log('getLocale: locale = ' + locale);
+}
+
+async function addElements() {
+	console.log('entering addElements');
 	addCustomCSS();
-	
-	playersInfos = localStorage["playersInfos"];
+	addPlaceHolderHTML();
+	if (true) {
+		switchDaysAndHours();
+	}
+	gameModes = getGameModes();
 
-	if (playersInfos == null) {
-		playerInfos = await getPlayerInfos();
-		addPlaceHolderHTML();
+	for (let buttonMode of Object.keys(playerInfos)) {
+		gameModes.querySelector(`a[data-mode="${buttonMode}"]`).addEventListener('click', async (event) => {
+			localStorage['comeFromModeButton'] = 'true';
+			localStorage['targetMode'] = buttonMode;
+			event.preventDefault();
+			window.location.href = `https://osu.ppy.sh/users/${playerId}/${buttonMode}`;
+		});
+	}
+	document.querySelector("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > div > div > a:nth-child(3)").addEventListener('click', async (event) => {
+		localStorage['comeFromMyProfile'] = 'true';
+		event.preventDefault();
+		window.location.href = document.querySelector("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > a").getAttribute('href');
+	});
+	getLocale();
+	fetchPromise.then(() => {
 		updateHTML();
-		playersInfos = {playerId: playerInfos};
-	}
-	else {
-		playerInfos = playersInfos[playerId];
-		addCustomHTML();
-		if (playerId != playerInfos.playerId) {
-			playerInfos = await getPlayerInfos();
-			updateHTML();
-		}
-	}
-	localStorage["playersInfos"] = playersInfos;
-
-	console.log(currentMode);
-	console.log(locale);
+	})
 }
 
-function updatePlayerInfos() {
-	upToDate = false;
-	if (playerInfos == null) {
-		localStorage["playerInfos"] = await getPlayerInfos();
-		upToDate = true;
-	} else {
-		if (playerId != playerInfos.playerId) {
-			playerInfos = await getPlayerInfos();
-		}
-		localStorage["playersInfos"] = playersInfos;
-		upToDate = true;
-	}
-}
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	playerId = getplayerId();
-	if (request.action === 'addPlayerInfos') {
-		addPlayerInfos();
-	} else if (request.action === 'updatePlayerInfos') {
-		updatePlayerInfos();
-	}
-})
-
+chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
+	addElements();
+});
 
 // function getHistoric() {
 // 	try {

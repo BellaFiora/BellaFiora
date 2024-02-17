@@ -44,16 +44,36 @@
 // 	}
 // });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-	if (changeInfo.status !== 'unloaded') {
-		chrome.tabs.sendMessage(tabId, { action: 'updatePlayerInfos' }, (response) => {
+// var url = null;
+
+
+
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+// 	return;
+// 	if (changeInfo.url === null) { return; }
+// 	if (changeInfo.url.startsWith('https://osu.ppy.sh/users/')) {
+// 		if (changeInfo.url === url) { return; }
+// 		// url has changed
+// 		url = changeInfo.url;
+// 		const { userId, mode } = parseUsersUrl();
+// 		chrome.tabs.sendMessage(tabId, { script: 'users', userId: userId, mode: mode }, (response) => {
+// 			if (chrome.runtime.lastError) {}
+// 		});
+// 	}
+// });
+
+chrome.webNavigation.onCompleted.addListener(function(details) {
+	if (details.url.startsWith('https://osu.ppy.sh/users/')) {
+		chrome.tabs.sendMessage(details.tabId, null, (response) => {
 			if (chrome.runtime.lastError) {}
 		});
 	}
 });
 
-document.addEventListener("DOMContentLoaded", (event) => {
-	chrome.tabs.sendMessage(tabId, { action: 'addPlayerInfos' }, (response) => {
-		if (chrome.runtime.lastError) {}
-	});
-});
+// chrome.webNavigation.onCommitted.addListener(function(details) {
+// 	if (details.transitionType === 'reload' && details.url.startsWith('https://osu.ppy.sh/users/')) {
+// 		chrome.tabs.sendMessage(details.tabId, null, (response) => {
+// 			if (chrome.runtime.lastError) {}
+// 		});
+// 	}
+// });
