@@ -188,14 +188,14 @@ async function fetchAllModes() {
 function addCustomCSS() {
 	customCss = document.createElement('style');
 	customCss.textContent = `
-	#remakeGrid {
+	body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid {
 		grid-template-columns: repeat(6,1fr);
 		gap: 2px;
 	}
-	#remakeProfileInfos {
+	body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) {
 		gap: 0px;
 	}
-	#remakeRankNotes {
+	body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div:nth-child(2) {
 		margin-left: -17px;
 	}
 	#TotalPlayTime {
@@ -204,9 +204,6 @@ function addCustomCSS() {
 	`;
 
 	document.head.appendChild(customCss);
-	document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid").setAttribute('id', 'remakeGrid');
-	document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1)").setAttribute('id', 'remakeProfileInfos');
-	document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div:nth-child(2)").setAttribute('id', 'remakeRankNotes');
 }
 
 function getCurrentGamemode() {
@@ -216,7 +213,7 @@ function getCurrentGamemode() {
 }
 
 function switchDaysAndHours() {
-	const pt = document.querySelector('#remakeGrid > div:nth-child(3) > div.value-display__value > span');
+	const pt = document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid > div:nth-child(3) > div.value-display__value > span');
 	const tmp = pt.getAttribute('title');
 	pt.setAttribute('title', pt.textContent);
 	pt.textContent = tmp;
@@ -278,7 +275,7 @@ async function addElements() {
 	}
 	gameModes = getGameModes();
 
-	// TO FIX: me! links to self, anywhere -> back, search bar
+	// TO FIX: me! links to self, anywhere -> back, search bar, profile banner from home
 
 	for (let buttonMode of Object.keys(playerInfos)) {
 		gameModes.querySelector(`a[data-mode="${buttonMode}"]`).addEventListener('click', async (event) => {
