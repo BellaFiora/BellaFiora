@@ -2,17 +2,6 @@ class Artisan {
     constructor(){
         this.headSection = []
         this.bodySections = []
-        this.globalContent = {
-            home: (active)=> {return this.home(active)},
-            botIG:()=> {},
-            gamePlay:()=> {},
-            regHelper:()=>{},
-            overlays:()=>{},
-            stats:()=>{},
-            history:()=>{},
-            promptGen:()=>{},
-            doc:()=>{}
-        }
         this.content ={
           construct:(content)=> { return this.serialize(content)}
         }
