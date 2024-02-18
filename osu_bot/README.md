@@ -41,8 +41,8 @@ Suggest a beatmap for the player.
 
 ### Options
 
-- `-od <od>` `-hp <hp>` `-cs <cs>` `-sr <sr>` `-pp <pp>` `-bpm <bpm>`
-	- OD/HP/CS/SR/PP/BPM of the desired beatmap.
+- `-ar <ar>` `-bpm <bpm>` `-cs <cs>` `-hp <hp>` `-od <od>` `-pp <pp>` `-sr <sr>`
+	- AR/BPM/CS/HP/OD/PP/SR of the desired beatmap.
 - `-mapper <mapper>`
 	- Mapper of the desired beatmap.
 	- Non-case sensitive.
