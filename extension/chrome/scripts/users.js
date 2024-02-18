@@ -1,4 +1,8 @@
 var url = null;
+
+var baseURLs = {
+	ppyOsuUser : "https://osu.ppy.sh/users/",
+}
 if (window.location.href === url) { exit(0); }
 url = window.location.href;
 
@@ -15,7 +19,8 @@ var playerInfos = {
 };
 
 function parseUrl() {
-	const startIndex = 'https://osu.ppy.sh/users/'.length;
+	const startIndex = baseURLs.ppyOsuUser.length;
+	console.log(startIndex )
 	const endIndex = url.indexOf('/', startIndex);
 	if (endIndex === -1) {
 		playerId = url.substring(startIndex, url.length);
@@ -147,7 +152,7 @@ function updateTotalPlaycounts() {
 }
 
 async function fetchHistorical() {
-	const tmp = await fetch(`https://osu.ppy.sh/users/${playerId}/extra-pages/historical`);
+	const tmp = await fetch(`${baseURLs.ppyOsuUser}${playerId}/extra-pages/historical`);
 	historical = await tmp.json();
 }
 
@@ -168,7 +173,7 @@ async function RawHtmlToJson(content) {
 
 async function fetchMode(mode) {
 	try {
-		const res = await fetch(`https://osu.ppy.sh/users/${playerId}/${mode}`);
+		const res = await fetch(`${baseURLs.ppyOsuUser}${playerId}/${mode}`);
 		const tmp = await RawHtmlToJson(await res.text());
 		playerInfos[mode] = tmp;
 		localStorage['playerInfos_' + mode] = JSON.stringify(tmp);
@@ -186,7 +191,7 @@ async function fetchAllModes() {
 }
 
 function addCustomCSS() {
-	customCss = document.createElement('style');
+	let customCss = document.createElement('style');
 	customCss.textContent = `
 	body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid {
 		grid-template-columns: repeat(6,1fr);
@@ -273,7 +278,7 @@ async function addElements() {
 	if (true) {
 		switchDaysAndHours();
 	}
-	gameModes = getGameModes();
+	let gameModes = getGameModes();
 
 	// TO FIX: me! links to self, anywhere -> back, search bar, profile banner from home
 
@@ -282,7 +287,7 @@ async function addElements() {
 			localStorage['comeFromModeButton'] = 'true';
 			localStorage['targetMode'] = buttonMode;
 			event.preventDefault();
-			window.location.href = `https://osu.ppy.sh/users/${playerId}/${buttonMode}`;
+			window.location.href = `${baseURLs.ppyOsuUser}${playerId}/${buttonMode}`;
 		});
 	}
 	document.querySelector("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > div > div > a:nth-child(3)").addEventListener('click', async (event) => {
