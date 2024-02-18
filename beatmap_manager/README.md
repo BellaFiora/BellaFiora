@@ -25,8 +25,8 @@ Same queries as `/beatmap_infos`.
 
 - `ids`
 	- Comma separated beatmaps' ids list.
-- `od` `hp` `cs` `sr` `pp` `bpm`
-	- Beatmaps' OD/HP/CS/SR/PP/BPM.
+- `ar` `bpm` `cs` `hp` `od` `pp` `sr`
+	- Beatmaps' AR/BPM/CS/HP/OD/PP/SR.
 	- Non-case sensitive.
 	- Uses same modifiers as described in the osu! bot.
 - `mappers`
@@ -61,13 +61,15 @@ The first id is not an id, it's a boolean telling if it sent all ids matching th
 
 Request example:
 
-`/beatmapsets_infos?statuses=ranked,loved&mappers=seamob&sr=7:.5&skillsets=aim,flowaim&patterns=tech`
+`/beatmapsets_infos?statuses=ranked,loved&mappers=seamob&sr=7:.5&ar=10&skillsets=aim,flowaim&patterns=tech`
 
 Response example:
 
 `1,1031991,2331986,2135813,4289418`
 
 ---
+
+This section explains in detail how patterns and skillsets are computed solely from the .osu file of a beatmap.
 
 # Patterns
 
@@ -107,7 +109,13 @@ Response example:
 
 ## read
 
+Insights:
 
+Read involves notes spacial and temporal density in proportion to AR and CS.
+
+In short, the better the match the easier the read.
+
+A low AR on an easy map is easy to read, whereas the same AR on a harder map is harder to read.
 
 ## rhythm
 
@@ -116,3 +124,17 @@ Response example:
 ## stamina
 
 
+
+## QNA:
+
+### Why not consider mappers' combos?
+
+This is moslty because most of the beatmaps are Graveyard. Even then, doing so makes it independant from the mapper's style of placing combos.
+
+### How about using beatmaps' SR?
+
+This makes these computations independant from what the game thinks a beatmap is worth overall. SR is also computed from the .osu files, all information it provides are contained within.
+
+### I d'ont see BPM being used, why?
+
+BPM information is contained within the time difference between each note. BPM is redundant information, though it contains overall beatmap's feel much like SR. BPM alone also needs context, 150BPM could be very slow streams or 300BPM jumps if the notes are far appart.
