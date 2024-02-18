@@ -67,49 +67,97 @@ Response example:
 
 `1,1031991,2331986,2135813,4289418`
 
----
-
-This section explains in detail how patterns and skillsets are computed solely from the .osu file of a beatmap.
-
 # Patterns
 
-## alt
+This section explains in detail how patterns are computed solely from the .osu file of a beatmap.
 
+## Alt
 
+### Insights
 
-## jump
+...
 
+### Specifics
 
+...
 
-## speed
+## Jump
 
+### Insights
 
+...
 
-## stream
+### Specifics
 
+...
 
+## Speed
 
-## tech
+### Insights
 
+...
 
+### Specifics
+
+...
+
+## Stream
+
+### Insights
+
+...
+
+### Specifics
+
+...
+
+## Tech
+
+### Insights
+
+...
+
+### Specifics
+
+...
 
 # Skillsets
 
-## aim
+This section explains in detail how skillsets are computed solely from the .osu file and patterns of a beatmap.
 
+## Aim
 
+### Insights
 
-## flowaim
+...
 
+### Specifics
 
+...
 
-## memory
+## Flowaim
 
+### Insights
 
+...
 
-## read
+### Specifics
 
-Insights:
+...
+
+## Memory
+
+### Insights
+
+...
+
+### Specifics
+
+...
+
+## Read
+
+### Insights
 
 Read involves notes spacial and temporal density in proportion to AR and CS.
 
@@ -117,13 +165,29 @@ In short, the better the match the easier the read.
 
 A low AR on an easy map is easy to read, whereas the same AR on a harder map is harder to read.
 
-## rhythm
+### Specifics
 
+...
 
+## Rhythm
 
-## stamina
+### Insights
 
+...
 
+### Specifics
+
+...
+
+## Stamina
+
+### Insights
+
+...
+
+### Specifics
+
+...
 
 ## QNA:
 
