@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../c_utils/src/debug.h"
+
 char unwanted[BUF_SIZE]; // used by remove_chars
 size_t unwanted_size;
 char line[BUF_SIZE]; // buffer for the current line
@@ -70,7 +72,7 @@ void substring(char** out_ptr, char* string, int start_index, int end_index) {
 		substring_length = end_index - start_index;
 	}
 	if (substring_length < 0) {
-		printf("substring: subvec_length negative (%i)\n", substring_length);
+		ereport("subvec_length negative (%i)", substring_length);
 		exit(1);
 	}
 	if (out == string)
@@ -93,7 +95,7 @@ void subvec(char* out, char* string, int start_index, int end_index) {
 		subvec_length = end_index - start_index;
 	}
 	if (subvec_length < 0) {
-		printf("subvec: subvec_length negative (%i)\n", subvec_length);
+		ereport("subvec_length negative (%i)", subvec_length);
 		exit(1);
 	}
 	if (out == string)
@@ -112,7 +114,7 @@ void subint(int* out_ptr, char* string, int start_index, int end_index) {
 		substring_length = end_index - start_index;
 	}
 	if (substring_length <= 0) {
-		printf("subint: substring_length negative or null\n");
+		ereport("substring_length negative or null");
 		return;
 	}
 	strncpy(tmp, string + start_index, substring_length);
@@ -122,7 +124,7 @@ void subint(int* out_ptr, char* string, int start_index, int end_index) {
 	if (*end_ptr != '\0') {
 		// printf("tmp = '%s'\n", tmp);
 		// printf("remove_chars(tmp) = '%s'\n", remove_chars(tmp));
-		printf("subint: strtol failed\n");
+		ereport("strtol failed");
 		exit(1);
 	}
 }
@@ -135,7 +137,7 @@ void subfloat(float* out_ptr, char* string, int start_index, int end_index) {
 		substring_length = end_index - start_index;
 	}
 	if (substring_length <= 0) {
-		printf("subfloat: substring_length negative or null\n");
+		ereport("substring_length negative or null");
 		return;
 	}
 	strncpy(tmp, string + start_index, substring_length);
@@ -143,7 +145,7 @@ void subfloat(float* out_ptr, char* string, int start_index, int end_index) {
 	char* end_ptr;
 	*out_ptr = strtof(nremove_chars(tmp, substring_length), &end_ptr);
 	if (*end_ptr != '\0') {
-		printf("subfloat: subfloat failed\n");
+		ereport("subfloat failed");
 		exit(1);
 	}
 }
@@ -199,7 +201,7 @@ void parse_general(General* general) {
 	else if (strncmp(line, "SamplesMatchPlaybackRate", 24) == 0)
 		subint(&general->samplesMatchPlaybackRate, line, 26, -1);
 	else {
-		printf("parse_general: impossible case reached\n");
+		ereport("impossible case reached");
 		exit(1);
 	}
 }
@@ -213,7 +215,7 @@ void parse_editor(Editor* editor) {
 			char* end_ptr;
 			long value = strtol(bookmark, &end_ptr, 10);
 			if (*end_ptr != '\0') {
-				printf("parse editor: strtol failed\n");
+				ereport("strtol failed");
 				exit(1);
 			}
 			ilist_add(editor->bookmarks, (int)value);
@@ -228,7 +230,7 @@ void parse_editor(Editor* editor) {
 	else if (strncmp(line, "TimelineZoom", 12) == 0)
 		subfloat(&editor->timelineZoom, line, 14, -1);
 	else {
-		printf("parse_editor: impossible case reached (%s)\n", line);
+		ereport("impossible case reached (%s)", line);
 		exit(1);
 	}
 }
@@ -261,7 +263,7 @@ void parse_metadata(Metadata* metadata) {
 	else if (strncmp(line, "BeatmapSetID", 12) == 0)
 		subint(&metadata->beatmapSetID, line, 13, -1);
 	else {
-		printf("parse_metadata: impossible case reached\n");
+		ereport("impossible case reached");
 		exit(1);
 	}
 }
@@ -280,7 +282,7 @@ void parse_difficulty(Difficulty* difficulty) {
 	else if (strncmp(line, "SliderTickRate", 14) == 0)
 		subfloat(&difficulty->sliderTickRate, line, 15, -1);
 	else {
-		printf("parse_difficulty: impossible case reached\n");
+		ereport("impossible case reached");
 		exit(1);
 	}
 	return;
@@ -293,7 +295,7 @@ void parse_backgroundEvent(Event* event) {
 	BackgroundEvent* cur_event = (BackgroundEvent*)event->event;
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_backgroundEvent: incomplete event, missing filename\n");
+		ereport("incomplete event, missing filename");
 		return;
 	}
 	parse_filename(&(cur_event->filename), token);
@@ -313,7 +315,7 @@ void parse_backgroundEvent(Event* event) {
 	token = strtok(NULL, ",");
 	if (token == NULL)
 		return;
-	printf("parse_backgroundEvent: impossible case reached\n");
+	ereport("impossible case reached");
 	exit(1);
 }
 
@@ -324,7 +326,7 @@ void parse_videoEvent(Event* event) {
 	VideoEvent* cur_event = (VideoEvent*)event->event;
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_videoEvent: incomplete event, missing filename\n");
+		ereport("incomplete event, missing filename");
 		return;
 	}
 	parse_filename(&(cur_event->filename), token);
@@ -344,7 +346,7 @@ void parse_videoEvent(Event* event) {
 	token = strtok(NULL, ",");
 	if (token == NULL)
 		return;
-	printf("parse_videoEvent: impossible case reached\n");
+	ereport("impossible case reached");
 	exit(1);
 }
 
@@ -355,14 +357,14 @@ void parse_breakEvent(Event* event) {
 	BreakEvent* cur_event = (BreakEvent*)event->event;
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_breakEvent: incomplete event, missing endTime\n");
+		ereport("incomplete event, missing endTime");
 		return;
 	}
 	subint(&cur_event->endTime, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL)
 		return;
-	printf("parse_backgroundEvent: impossible case reached\n");
+	ereport("impossible case reached");
 	exit(1);
 }
 
@@ -371,7 +373,7 @@ void parse_events(List* events) {
 	strcpy(buf, strtok(line, ","));
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_events: incomplete event, missing startTime\n");
+		ereport("incomplete event, missing startTime");
 		return;
 	}
 	Event* event = new_event();
@@ -384,7 +386,7 @@ void parse_events(List* events) {
 		else if (strncmp(buf, "2", 1) == 0)
 			parse_breakEvent(event);
 		else {
-			printf("parse_events: impossible case1 reached (%s)\n", buf);
+			ereport("impossible case1 reached (%s)", buf);
 			exit(1);
 		}
 	} else {
@@ -395,7 +397,7 @@ void parse_events(List* events) {
 		else if (strncmp(buf, "Break", 5) == 0)
 			parse_breakEvent(event);
 		else {
-			printf("parse_events: impossible case2 reached (%s)\n", buf);
+			ereport("impossible case2 reached (%s)", buf);
 			exit(1);
 		}
 	}
@@ -407,53 +409,49 @@ void parse_timingPoints(List* timingPoints) {
 	TimingPoint* timingPoint = new_timingPoint();
 	token = strtok(line, ",");
 	if (token == NULL) {
-		printf("parse_timingPoints: incomplete timingPoint, missing time\n");
+		ereport("incomplete timingPoint, missing time");
 		return;
 	}
 	subint(&timingPoint->time, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf(
-			"parse_timingPoints: incomplete timingPoint, missing beatLength\n");
+		ereport("incomplete timingPoint, missing beatLength");
 		return;
 	}
 	subfloat(&timingPoint->beatLength, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_timingPoints: incomplete timingPoint, missing meter\n");
+		ereport("incomplete timingPoint, missing meter");
 		return;
 	}
 	subint(&timingPoint->meter, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf(
-			"parse_timingPoints: incomplete timingPoint, missing sampleSet\n");
+		ereport("incomplete timingPoint, missing sampleSet");
 		return;
 	}
 	subint(&timingPoint->sampleSet, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_timingPoints: incomplete timingPoint, missing "
-			   "sampleIndex\n");
+		ereport("incomplete timingPoint, missing sampleIndex");
 		return;
 	}
 	subint(&timingPoint->sampleIndex, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_timingPoints: incomplete timingPoint, missing volume\n");
+		ereport("incomplete timingPoint, missing volume");
 		return;
 	}
 	subint(&timingPoint->volume, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_timingPoints: incomplete timingPoint, missing "
-			   "uninherited\n");
+		ereport("incomplete timingPoint, missing uninherited");
 		return;
 	}
 	subint(&timingPoint->uninherited, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_timingPoints: incomplete timingPoint, missing effects\n");
+		ereport("incomplete timingPoint, missing effects");
 		return;
 	}
 	subint(&timingPoint->effects, token, 0, -1);
@@ -462,7 +460,7 @@ void parse_timingPoints(List* timingPoints) {
 		list_add(timingPoints, timingPoint);
 		return;
 	}
-	printf("parse_timingPoints: impossible case reached\n");
+	ereport("impossible case reached");
 	exit(1);
 }
 
@@ -475,7 +473,7 @@ void parse_beatmapColours(List* beatmapColours) {
 		beatmapColour->object = new_beatmapComboColour();
 		char* found = strchr(line, ':');
 		if (found == NULL) {
-			printf("parse_beatmapColours: impossible case reached\n");
+			ereport("impossible case reached");
 			exit(1);
 		}
 		size_t end_index = found - line;
@@ -489,34 +487,31 @@ void parse_beatmapColours(List* beatmapColours) {
 		beatmapColour->type = 2;
 		beatmapColour_start = 15;
 	} else {
-		printf("parse_beatmapColours: impossible case reached\n");
+		ereport("impossible case reached");
 		exit(1);
 	}
 	subvec(line, line, beatmapColour_start, -1);
 	token = strtok(line, ",");
 	if (token == NULL) {
-		printf("parse_beatmapColours: incomplete BeatmapColour object, missing "
-			   "red\n");
+		ereport("incomplete BeatmapColour object, missing red");
 		return;
 	}
 	subint(&beatmapColour->red, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_beatmapColours: incomplete BeatmapColour object, missing "
-			   "green\n");
+		ereport("incomplete BeatmapColour object, missing green");
 		return;
 	}
 	subint(&beatmapColour->green, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_beatmapColours: incomplete BeatmapColour object, missing "
-			   "blue\n");
+		ereport("incomplete BeatmapColour object, missing blue");
 		return;
 	}
 	subint(&beatmapColour->blue, token, 0, -1);
 	list_add(beatmapColours, beatmapColour);
 	if (strtok(NULL, ",") != NULL) {
-		printf("parse_beatmapColours: impossible case reached\n");
+		ereport("impossible case reached");
 		exit(1);
 	}
 }
@@ -524,7 +519,7 @@ void parse_beatmapColours(List* beatmapColours) {
 char* parse_curvePoint(Slider* slider, char* token) {
 	char* colon = strchr(token, ':');
 	if (colon == NULL) {
-		printf("parse_curvePoint: wrong CurvePoint format (%s)\n", token);
+		ereport("wrong CurvePoint format (%s)", token);
 		exit(1);
 	}
 	CurvePoint* curvePoint = new_curvePoint();
@@ -545,7 +540,7 @@ char* parse_edgeSound(Slider* slider, char* token) {
 char* parse_edgeSet(Slider* slider, char* token) {
 	char* colon = strchr(token, ':');
 	if (colon == NULL) {
-		printf("parse_edgeSet: wrong EdgeSet format\n");
+		ereport("wrong EdgeSet format");
 		exit(1);
 	}
 	EdgeSet* edgeSet = new_edgeSet();
@@ -614,7 +609,7 @@ char* parse_slider(HitObject* hitObject) {
 	hitObject->object = slider;
 	token = strtok(NULL, "|");
 	if (token == NULL) {
-		printf("parse_slider: incomplete Slider, missing curveType\n");
+		ereport("incomplete Slider, missing curveType");
 		return NULL;
 	}
 	slider->curveType = token[0];
@@ -626,13 +621,13 @@ char* parse_slider(HitObject* hitObject) {
 		token = parse_curvePoint(slider, token);
 	token = strtok(next_token, ",");
 	if (token == NULL) {
-		printf("parse_slider: incomplete Slider, missing slides\n");
+		ereport("incomplete Slider, missing slides");
 		return NULL;
 	}
 	subint(&slider->slides, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_slider: incomplete Slider, missing length\n");
+		ereport("incomplete Slider, missing length");
 		return NULL;
 	}
 	subfloat(&slider->length, token, 0, -1);
@@ -678,25 +673,25 @@ void parse_hitObject(List* hitObjects) {
 	HitObject* hitObject = new_hitObject();
 	token = strtok(line, ",");
 	if (token == NULL) {
-		printf("parse_hitObject: incomplete hitObject, missing x\n");
+		ereport("incomplete hitObject, missing x");
 		return;
 	}
 	subint(&hitObject->x, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_hitObject: incomplete hitObject, missing y\n");
+		ereport("incomplete hitObject, missing y");
 		return;
 	}
 	subint(&hitObject->y, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_hitObject: incomplete hitObject, missing time\n");
+		ereport("incomplete hitObject, missing time");
 		return;
 	}
 	subint(&hitObject->time, token, 0, -1);
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_hitObject: incomplete hitObject, missing type\n");
+		ereport("incomplete hitObject, missing type");
 		return;
 	}
 	int type_flags;
@@ -705,7 +700,7 @@ void parse_hitObject(List* hitObjects) {
 	hitObject->combo_skip = (type_flags & 0b01110000) >> 4;
 	token = strtok(NULL, ",");
 	if (token == NULL) {
-		printf("parse_hitObject: incomplete hitObject, missing hitSound\n");
+		ereport("incomplete hitObject, missing hitSound");
 		return;
 	}
 	int hitSound_flags;
@@ -730,7 +725,7 @@ void parse_hitObject(List* hitObjects) {
 		list_add(hitObjects, hitObject);
 		return;
 	} else {
-		printf("parse_hitObject: unkown type (%i)\n", type);
+		ereport("unkown type (%i)", type);
 		return;
 	}
 	parse_hitSample(hitObject, next_token);
@@ -754,10 +749,14 @@ Beatmap* parse_beatmap(char* osuFile) {
 	unwanted_size = 4;
 	FILE* file = fopen(osuFile, "r");
 	if (file == NULL) {
-		printf("parse_beatmap: failed to open the file\n");
+		ereport("fopen failed");
 		return NULL;
 	}
 	Beatmap* beatmap = new_beatmap();
+	if (beatmap == NULL) {
+		ereport("new_beatmap failed");
+		return NULL;
+	}
 #ifdef DEBUG
 	int line_count = 0;
 #endif
@@ -769,8 +768,8 @@ Beatmap* parse_beatmap(char* osuFile) {
 			continue;
 		else if (strncmp(line, "osu file format v", 17) == 0) {
 			if (line[17] != '1' || line[18] != '4')
-				printf("parse_beatmap: does not support other osu file format "
-					   "than 14 (unsure yet, safety first)\n");
+				ereport("does not support other osu file format "
+						"than 14 (unsure yet, safety first)");
 		} else if (strncmp(line, "[General]", 9) == 0) {
 			while (fgets(line, sizeof(line), file)) {
 #ifdef DEBUG

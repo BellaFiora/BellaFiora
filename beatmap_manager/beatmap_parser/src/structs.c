@@ -4,26 +4,26 @@
 #include <string.h>
 
 General* new_general() {
-	General* r = malloc(sizeof(General));
-	r->audioFilename = malloc(1 * sizeof(char));
+	General* r = calloc(1, sizeof(General));
+	r->audioFilename = calloc(1, sizeof(char));
 	r->audioLeadIn = 0;
-	r->audioHash = malloc(1 * sizeof(char));
+	r->audioHash = calloc(1, sizeof(char));
 	r->previewTime = -1;
 	r->countdown = 1;
-	r->sampleSet = malloc(6 * sizeof(char));
+	r->sampleSet = calloc(6, sizeof(char));
 	strcpy(r->sampleSet, "Normal");
 	r->sampleSet[6] = '\0';
-	r->skinPreference = malloc(1 * sizeof(char));
+	r->skinPreference = calloc(1, sizeof(char));
 	r->stackLeniency = 0.7;
 	r->mode = 0;
 	r->letterboxInBreaks = 0;
 	r->storyFireInFront = 1;
 	r->useSkinSprites = 0;
 	r->alwaysShowPlayfield = 0;
-	r->overlayPosition = malloc(8 * sizeof(char) + 1);
+	r->overlayPosition = calloc(8, sizeof(char) + 1);
 	strcpy(r->overlayPosition, "NoChange");
 	r->overlayPosition[8] = '\0';
-	r->skinPreference = malloc(1 * sizeof(char));
+	r->skinPreference = calloc(1, sizeof(char));
 	r->epilepsyWarning = 0;
 	r->countdownOffset = 0;
 	r->specialStyle = 0;
@@ -33,7 +33,7 @@ General* new_general() {
 }
 
 Editor* new_editor() {
-	Editor* r = malloc(sizeof(Editor));
+	Editor* r = calloc(1, sizeof(Editor));
 	r->bookmarks = new_ilist(0);
 	r->distanceSpacing = 0.0;
 	r->beatDivisor = 0;
@@ -43,14 +43,14 @@ Editor* new_editor() {
 }
 
 Metadata* new_metadata() {
-	Metadata* r = malloc(sizeof(Metadata));
-	r->title = malloc(1 * sizeof(char));
-	r->titleUnicode = malloc(1 * sizeof(char));
-	r->artist = malloc(1 * sizeof(char));
-	r->artistUnicode = malloc(1 * sizeof(char));
-	r->creator = malloc(1 * sizeof(char));
-	r->version = malloc(1 * sizeof(char));
-	r->source = malloc(1 * sizeof(char));
+	Metadata* r = calloc(1, sizeof(Metadata));
+	r->title = calloc(1, sizeof(char));
+	r->titleUnicode = calloc(1, sizeof(char));
+	r->artist = calloc(1, sizeof(char));
+	r->artistUnicode = calloc(1, sizeof(char));
+	r->creator = calloc(1, sizeof(char));
+	r->version = calloc(1, sizeof(char));
+	r->source = calloc(1, sizeof(char));
 	r->tags = new_slist(0);
 	r->beatmapID = 0;
 	r->beatmapSetID = 0;
@@ -58,7 +58,7 @@ Metadata* new_metadata() {
 }
 
 Difficulty* new_difficulty() {
-	Difficulty* r = malloc(sizeof(Difficulty));
+	Difficulty* r = calloc(1, sizeof(Difficulty));
 	r->hpDrainRate = 5.0;
 	r->circleSize = 5.0;
 	r->overallDifficulty = 5.0;
@@ -69,7 +69,7 @@ Difficulty* new_difficulty() {
 }
 
 BackgroundEvent* new_backgroundEvent() {
-	BackgroundEvent* r = malloc(sizeof(BackgroundEvent));
+	BackgroundEvent* r = calloc(1, sizeof(BackgroundEvent));
 	r->filename = calloc(1, 1);
 	r->xOffset = 0;
 	r->yOffset = 0;
@@ -77,7 +77,7 @@ BackgroundEvent* new_backgroundEvent() {
 }
 
 VideoEvent* new_videoEvent() {
-	VideoEvent* r = malloc(sizeof(VideoEvent));
+	VideoEvent* r = calloc(1, sizeof(VideoEvent));
 	r->filename = calloc(1, 1);
 	r->xOffset = 0;
 	r->yOffset = 0;
@@ -85,13 +85,13 @@ VideoEvent* new_videoEvent() {
 }
 
 BreakEvent* new_breakEvent() {
-	BreakEvent* r = malloc(sizeof(BreakEvent));
+	BreakEvent* r = calloc(1, sizeof(BreakEvent));
 	r->endTime = 0;
 	return r;
 }
 
 Event* new_event() {
-	Event* r = malloc(sizeof(Event));
+	Event* r = calloc(1, sizeof(Event));
 	r->type = 0;
 	r->startTime = 0;
 	r->event = NULL;
@@ -99,7 +99,7 @@ Event* new_event() {
 }
 
 TimingPoint* new_timingPoint() {
-	TimingPoint* r = malloc(sizeof(TimingPoint));
+	TimingPoint* r = calloc(1, sizeof(TimingPoint));
 	r->time = 0;
 	r->beatLength = 0.0;
 	r->meter = 0;
@@ -112,13 +112,13 @@ TimingPoint* new_timingPoint() {
 }
 
 BeatmapComboColour* new_beatmapComboColour() {
-	BeatmapComboColour* r = malloc(sizeof(BeatmapComboColour));
+	BeatmapComboColour* r = calloc(1, sizeof(BeatmapComboColour));
 	r->combo = 0;
 	return r;
 }
 
 BeatmapColour* new_beatmapColour() {
-	BeatmapColour* r = malloc(sizeof(BeatmapColour));
+	BeatmapColour* r = calloc(1, sizeof(BeatmapColour));
 	r->type = 0;
 	r->red = 0;
 	r->green = 0;
@@ -128,7 +128,7 @@ BeatmapColour* new_beatmapColour() {
 }
 
 HitSound* new_hitSound() {
-	HitSound* r = malloc(sizeof(HitSound));
+	HitSound* r = calloc(1, sizeof(HitSound));
 	r->normal = 1;
 	r->whistle = 0;
 	r->finish = 0;
@@ -137,7 +137,7 @@ HitSound* new_hitSound() {
 }
 
 HitSample* new_hitSample() {
-	HitSample* r = malloc(sizeof(HitSample));
+	HitSample* r = calloc(1, sizeof(HitSample));
 	r->normalSet = 0;
 	r->additionSet = 0;
 	r->index = 0;
@@ -147,21 +147,21 @@ HitSample* new_hitSample() {
 }
 
 CurvePoint* new_curvePoint() {
-	CurvePoint* r = malloc(sizeof(CurvePoint));
+	CurvePoint* r = calloc(1, sizeof(CurvePoint));
 	r->x = 0;
 	r->y = 0;
 	return r;
 }
 
 EdgeSet* new_edgeSet() {
-	EdgeSet* r = malloc(sizeof(EdgeSet));
+	EdgeSet* r = calloc(1, sizeof(EdgeSet));
 	r->normalSet = NULL;
 	r->additionSet = NULL;
 	return r;
 }
 
 Slider* new_slider() {
-	Slider* r = malloc(sizeof(Slider));
+	Slider* r = calloc(1, sizeof(Slider));
 	r->curveType = 0;
 	r->curvePoints = new_list(0);
 	r->slides = 0;
@@ -172,19 +172,19 @@ Slider* new_slider() {
 }
 
 Spinner* new_spinner() {
-	Spinner* r = malloc(sizeof(Spinner));
+	Spinner* r = calloc(1, sizeof(Spinner));
 	r->endTime = 0;
 	return r;
 }
 
 Hold* new_hold() {
-	Hold* r = malloc(sizeof(Hold));
+	Hold* r = calloc(1, sizeof(Hold));
 	r->endTime = 0;
 	return r;
 }
 
 HitObject* new_hitObject() {
-	HitObject* r = malloc(sizeof(HitObject));
+	HitObject* r = calloc(1, sizeof(HitObject));
 	r->x = 0;
 	r->y = 0;
 	r->time = 0;
@@ -198,7 +198,7 @@ HitObject* new_hitObject() {
 }
 
 Beatmap* new_beatmap() {
-	Beatmap* r = malloc(sizeof(Beatmap));
+	Beatmap* r = calloc(1, sizeof(Beatmap));
 	r->general = new_general();
 	r->editor = new_editor();
 	r->metadata = new_metadata();
