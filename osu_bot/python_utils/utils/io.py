@@ -1,15 +1,17 @@
 import os
 from .print import cprint
 
-def read_file(path, mode='r'):
+
+def read_file(path, mode="r"):
 	r = None
 	if os.path.exists(path):
 		try:
 			with open(path, mode) as f:
 				r = f.read()
 		except:
-			cprint('read_file: failed tp read '+path, 'red')
+			cprint("read_file: failed tp read " + path, "red")
 	return r
+
 
 def count_files_in_dir(directory, check_if_file=True):
 	count = 0

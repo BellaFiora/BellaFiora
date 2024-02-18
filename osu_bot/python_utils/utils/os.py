@@ -2,16 +2,20 @@ import os, threading, platform, io, sys, asyncio, time
 from .print import cprint
 from .constants import measure_time
 
+
 def from_windows():
-	return platform.system() == 'Windows'
+	return platform.system() == "Windows"
+
 
 def split_path(path):
 	return os.path.split(path)
+
 
 def run(func, delay):
 	timer = threading.Timer(delay, func)
 	timer.start()
 	return timer
+
 
 # source: ChatGPT
 # returns what func printed to the console if it did, otherwise its return value
@@ -30,14 +34,17 @@ def capture_console_output(func, *args):
 	else:
 		return return_value
 
+
 async def check_loop(check_func, timeout, *args):
 	wait = 0
 	while wait < timeout:
 		r = await check_func(*args)
-		if r: return True
+		if r:
+			return True
 		await asyncio.sleep(1)
 		wait += 1
 	return False
+
 
 class TimeIt:
 	def __init__(self):

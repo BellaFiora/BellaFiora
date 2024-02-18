@@ -9,11 +9,13 @@ class str(str):
 			indices.append(index)
 			start = index + len(substring)
 		return indices
+
 	def to_octal(self):
-		r = ''
+		r = ""
 		for c in self:
-			r += '\\'+oct(ord(c))[2:]
+			r += "\\" + oct(ord(c))[2:]
 		return r
+
 	def to_int(self):
 		try:
 			return int(self)
