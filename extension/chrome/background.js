@@ -64,12 +64,12 @@
 
 chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.url.startsWith('https://osu.ppy.sh/users/')) {
-		chrome.tabs.sendMessage(details.tabId, 'f1', (response) => {
+		chrome.tabs.sendMessage(details.tabId, 'addElements', (response) => {
 			if (chrome.runtime.lastError) {}
 		});
 	} 
 	if (details.url.startsWith('https://osu.ppy.sh/')) {
-		chrome.tabs.sendMessage(details.tabId, 'f2', (response) => {
+		chrome.tabs.sendMessage(details.tabId, 'createNotifications', (response) => {
 			if (chrome.runtime.lastError) {}
 		});
 	} 

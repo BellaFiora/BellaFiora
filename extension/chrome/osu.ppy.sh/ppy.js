@@ -1,4 +1,5 @@
-function createNotification(data){
+
+function createNotifications(data){
 	const notifElement = document.querySelector("#notification-widget-icon > span > span")
 	notifElement.innerText = parseInt(notifElement.textContent)+1
 	const notification = document.createElement('div')
@@ -79,9 +80,9 @@ function createNotification(data){
 
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-	if(msg ==='f2'){
+	if(msg === 'createNotifications'){
 		// console.log('fgekjgne')
-		createNotification({
+		createNotifications({
             subtitle: 'name of beatmap',
             title: 'Bella Fiora: New Beatmap Ranked !',
             url : null,

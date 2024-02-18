@@ -1,17 +1,17 @@
-var url = null;
+let url = null;
 
-var baseURLs = {
-	ppyOsuUser : "https://osu.ppy.sh/users/",
-}
+let baseURLs = {
+	ppyOsuUsers : "https://osu.ppy.sh/users/"
+};
 if (window.location.href === url) { exit(0); }
 url = window.location.href;
 
-var fetchPromise = null;
-var playerId = null;
-var mode = null;
-var locale = null;
-var historical = null;
-var playerInfos = {
+let fetchPromise = null;
+let playerId = null;
+let mode = null;
+let locale = null;
+let historical = null;
+const playerInfos = {
 	'osu': null,
 	'taiko': null,
 	'fruits': null,
@@ -20,7 +20,7 @@ var playerInfos = {
 
 function parseUrl() {
 	
-	const startIndex = baseURLs.ppyOsuUser.length;
+	const startIndex = baseURLs.ppyOsuUsers.length;
 	// console.log(startIndex )
 	let endIndex = url.indexOf('/', startIndex);
 	if (endIndex === -1) {
@@ -39,7 +39,7 @@ function parseUrl() {
 	if (endIndex !== -1) {
 		mode = mode.substring(0, endIndex);
 	}
-	console.log('parseUrl: playerId = ' + playerId);
+	// console.log('parseUrl: playerId = ' + playerId);
 	// console.log('parseUrl: mode = ' + mode);
 }
 
@@ -65,6 +65,10 @@ function convertTime(seconds) {
 	}
 }
 
+function getUsername() {
+	return document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-info.profile-info--cover > div.profile-info__details > div.profile-info__info > h1 > span");
+}
+
 function getGameModes() {
 	return document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.header-v4.header-v4--users > div:nth-child(2) > div > div > ul.game-mode");
 }
@@ -79,7 +83,7 @@ function getProfileDetailChartNumbers() {
 
 function addGlobalPlayTime() {
 	const labelElements = document.querySelectorAll('.value-display__label');
-	let mode_text = mode === 'fruits' ? 'ctb' : mode;
+	const mode_text = mode === 'fruits' ? 'ctb' : mode;
 	labelElements[4].innerText = `${mode_text} Playtime`;
 	labelElements[4].style = 'text-transform: capitalize;';
 
@@ -117,10 +121,10 @@ function updateGlobalPlayTime() {
 }
 
 function addProfileStat(parent, keyTextContent, valueTextContent, id) {
-	var entry = document.createElement('dl');
+	const entry = document.createElement('dl');
 	entry.setAttribute('id', id);
-	var key =  document.createElement('dt');
-	var value =  document.createElement('dd');
+	const key =  document.createElement('dt');
+	const value =  document.createElement('dd');
 	entry.classList.add('profile-stats__entry');
 	entry.classList.add('profile-stats__entry--key-play_count');
 	key.classList.add('profile-stats__key');
@@ -161,7 +165,7 @@ function updateTotalPlaycounts() {
 }
 
 async function fetchHistorical() {
-	const tmp = await fetch(`${baseURLs.ppyOsuUser}${playerId}/extra-pages/historical`);
+	const tmp = await fetch(`${baseURLs.ppyOsuUsers}${playerId}/extra-pages/historical`);
 	historical = await tmp.json();
 }
 
@@ -183,7 +187,7 @@ async function RawHtmlToJson(content) {
 
 async function fetchMode(mode) {
 	try {
-		const res = await fetch(`${baseURLs.ppyOsuUser}${playerId}/${mode}`);
+		const res = await fetch(`${baseURLs.ppyOsuUsers}${playerId}/${mode}`);
 		const tmp = await RawHtmlToJson(await res.text());
 		playerInfos[mode] = tmp;
 		localStorage['playerInfos_' + mode] = JSON.stringify(tmp);
@@ -201,7 +205,10 @@ async function fetchAllModes() {
 }
 
 function addCustomCSS() {
-	let customCss = document.createElement('style');
+	const customCss = document.createElement('style');
+	// always takes 3s for one gradient to fully slide
+	// shorter usernames will have longer times to make up for the short name
+	const animationTime = 124/getUsername().offsetWidth*3;
 	customCss.textContent = `
 	body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid {
 		grid-template-columns: repeat(6,1fr);
@@ -216,6 +223,47 @@ function addCustomCSS() {
 	#TotalPlayTime {
 		margin-left: -20px;
 	}
+	@keyframes slidingBackground {
+		0% {
+			background-position: 0 0;
+		}
+
+		100% {
+			background-position: 100% 0;
+		}
+	}
+	#username {
+		background: linear-gradient(
+			90deg,
+			rgba(255, 0, 0, 1) 0%,
+			rgba(255, 154, 0, 1) 5%,
+			rgba(208, 222, 33, 1) 10%,
+			rgba(79, 220, 74, 1) 15%,
+			rgba(63, 218, 216, 1) 20%,
+			rgba(47, 201, 226, 1) 25%,
+			rgba(28, 127, 238, 1) 30%,
+			rgba(95, 21, 242, 1) 35%,
+			rgba(186, 12, 248, 1) 40%,
+			rgba(251, 7, 217, 1) 45%,
+			rgba(255, 0, 0, 1) 50%,
+			rgba(255, 154, 0, 1) 55%,
+			rgba(208, 222, 33, 1) 60%,
+			rgba(79, 220, 74, 1) 65%,
+			rgba(63, 218, 216, 1) 70%,
+			rgba(47, 201, 226, 1) 75%,
+			rgba(28, 127, 238, 1) 80%,
+			rgba(95, 21, 242, 1) 85%,
+			rgba(186, 12, 248, 1) 90%,
+			rgba(251, 7, 217, 1) 95%,
+			rgba(255, 0, 0, 1) 100%
+		);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		text-shadow: initial;
+		animation: slidingBackground ${animationTime}s linear infinite;
+		background-size: 200% 100%;
+	}
 	`;
 
 	document.head.appendChild(customCss);
@@ -223,7 +271,7 @@ function addCustomCSS() {
 
 function getCurrentGamemode() {
 	const meta = document.querySelectorAll('head > meta[name="description"]');
-	let content = Array.from(meta)[0].getAttribute('content');
+	const content = Array.from(meta)[0].getAttribute('content');
 	mode = content.substring(content.indexOf('(') + 1, content.indexOf(')'));
 }
 
@@ -275,8 +323,8 @@ localStorage['comeFromModeButton'] = 'false';
 localStorage['comeFromMyProfile'] = 'false';
 
 function getLocale() {
-	let text = document.querySelector('html').getAttribute('lang');
-	let startIndex = text.indexOf('currentLocale') + 'currentLocale'.length + 4;
+	const text = document.querySelector('html').getAttribute('lang');
+	const startIndex = text.indexOf('currentLocale') + 'currentLocale'.length + 4;
 	locale = text.substring(startIndex, text.indexOf('"', startIndex));
 	// console.log('getLocale: locale = ' + locale);
 }
@@ -286,11 +334,12 @@ async function addElements() {
 	
 	addCustomCSS();
 	addPlaceHolderHTML();
+	addFun();
 
 	if (true) {
 		switchDaysAndHours();
 	}
-	let gameModes = getGameModes();
+	const gameModes = getGameModes();
 
 	// TO FIX: me! links to self, anywhere -> back, search bar, profile banner from home
 
@@ -299,7 +348,7 @@ async function addElements() {
 			localStorage['comeFromModeButton'] = 'true';
 			localStorage['targetMode'] = buttonMode;
 			event.preventDefault();
-			window.location.href = `${baseURLs.ppyOsuUser}${playerId}/${buttonMode}`;
+			window.location.href = `${baseURLs.ppyOsuUsers}${playerId}/${buttonMode}`;
 		});
 	}
 	document.querySelector("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > div > div > a:nth-child(3)").addEventListener('click', async (event) => {
@@ -314,97 +363,42 @@ async function addElements() {
 }
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-	if(msg ==='f1'){
+	if (msg === 'addElements'){
 		addElements();
 	}
 });
 
+// fun
 
+function addFun() {
+	if (playerId === '11103956' || playerId === '5146531') {
+		getUsername().setAttribute('id', 'username');
+	}
+}
 
-
-
-
-// function getHistoric() {
-// 	try {
-// 		return document.querySelector('div.js-sortable--page[data-page-id="historical"]');
-// 	} catch (e) {
-// 		return null;
+// async function updateUsername(username) {
+// 	let hue = 0;
+// 	let angle = 0;
+// 	const radius = 100;
+// 	let xOffset = 0;
+// 	let yOffset = 0;
+// 	let sign = 1;
+// 	let scale = 1;
+// 	while (true) {
+// 		username.style = `color: hsl(${hue}, 100%, 50%); transform: rotate(${hue}deg) scale(${scale}) translate(${xOffset}px, ${yOffset}px);`;
+// 		username.style = `color: hsl(${hue}, 100%, 50%);`;
+// 		hue = (hue + 1) % 360;
+// 		xOffset = radius * Math.cos(angle);
+// 		yOffset = radius * Math.sin(angle);
+// 		angle = (angle + 0.1) % 360;
+// 		scale += sign / 360;
+// 		if (scale >= 1.5) {
+// 			sign = -sign;
+// 			continue;
+// 		}
+// 		if (scale <= 0.5) {
+// 			sign = -sign;
+// 		}
+// 		await new Promise(resolve => setTimeout(resolve, 10));
 // 	}
 // }
-
-// function getGraph(historic) {
-// 	try {
-// 		return historic.querySelector('div > :nth-child(2) > div > div > svg > g > path');
-// 	} catch (e) {
-// 		return null;
-// 	}
-// }
-
-// function getHistoricHeader3(historic) {
-// 	try {
-// 		return historic.querySelector('div > :nth-child(2) > h3');
-// 	} catch (e) {
-// 		return null;
-// 	}
-// }
-
-// function getScale(historic) {
-// 	try {
-// 		return historic.querySelector('div > :nth-child(2) > div > div > svg > g > g:nth-child(2)').querySelectorAll('g');
-// 	} catch (e) {
-// 		return null;
-// 	}
-// }
-
-// function getLimits(scale) {
-// 	var min = +Infinity;
-// 	var max = 0;
-// 	scale.forEach((e) => {
-// 		v = getValue(e);
-// 		if (v < min) { min = v; }
-// 		if (v > max) { max = v; }
-// 	})
-// 	return {lowest:min, highest:max};
-// }
-
-// function checkForClassElements(targetClass, desiredCount) {
-// 	let observer = new MutationObserver(function(mutations) {
-// 		for (var i = 0; i < mutations.length; i++) {
-			// historic = getHistoric(); if (historic == null) { break; }
-			// // console.log('got historic');
-			// header = getHistoricHeader3(historic); if (header == null) { break; }
-			// // console.log('got header');
-			// scale = getScale(historic); if (scale == null) { break; }
-			// // console.log('got scale');
-			// graph = getGraph(historic); if (graph == null) { break; }
-			// // console.log('got graph');
-			// observer.disconnect();
-			// requestAnimationFrame(() => {
-				// document.querySelector(".profile-info__bg").scrollIntoView({ behavior: "instant", block: "start" });
-				// var parentElement = document.querySelector('.parent-element');
-				// parentElement.appendChild(elements[1]);
-				// console.log(historic);
-				// console.log(header);
-				// console.log(scale);
-				// console.log(graph);
-			// 	limits = getLimits(scale);
-			// 	header.textContent = header.textContent + ' (' + calculateSum(limits.lowest, limits.highest, graph.getAttribute('d')) + ')';
-			// });
-			// break;
-	// 	}
-	// });
-
-	// document.querySelector(".title--page-extra-small").scrollIntoView({ behavior: "instant", block: "start" });
-// 	observer.observe(document, { childList: true, subtree: true });
-// };
-
-
-// checkForClassElements('.line-chart__line', 3);
-
-
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//     if (message.action === "runContentScript") {
-//     	checkForClassElements('.line-chart__line', 3);
-//     }
-// });
-
