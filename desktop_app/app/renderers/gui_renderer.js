@@ -27,11 +27,12 @@ ipcRenderer.on('audio-cache', (event, cache) => {
   audioCache = cache;
 });
 ipcRenderer.on('player-data', (event, data) => {
-    const player_data = JSON.parse(data)
+    const player_data = data
     basic_infos = player_data.basic_informations
+    console.log(player_data)
     gameplay = player_data.gameplay
 
-    IntroduceDataPlayer(basic_infos.playmode)
+    // IntroduceDataPlayer(basic_infos.playmode)
 })
 async function IntroduceDataPlayer(defaultMod = false) {
   var defaultMod
