@@ -1626,14 +1626,31 @@ body {
     display: flex;
     background-color: var(--color1);
 }
-.ext-nav-top .img_bf {
-    width: 50px;
-    height: 100%;
+.ext-nav-top .desktop_link{
+    max-width: 135px;
+    min-width: 110px;
+    height: calc(100% - 11px);;
     display: flex;
-    padding: 2px;
+    padding: 4px; 
+    align-items: center;
+    background-color: rgba(236, 213, 213, 0.082);
+    margin: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 4px;
+    flex-direction: column;
+} 
+.ext-nav-top j{
+    color: rgb(248, 172, 84);
+    font-weight: 600;
+} 
+#dapp_link.linked {
+    color:rgb(169, 247, 169);
 }
+
 .ext-nav-top span {
-    width: calc(100% - 50px);
+    width: calc(100% - 200px);
     height: 100%;
     display: flex;
     justify-content: center;
