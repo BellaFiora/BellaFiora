@@ -1,16 +1,13 @@
 from typing import TYPE_CHECKING, Optional
+
 if TYPE_CHECKING:
 	from .client import Client as OsuClient
 	from .user import User as OsuUser
 	from .channel import Channel as OsuChannel
 
 import re
-from ..Utils.regex import (
-	ReUserName,
-	ReRoomName,
-	ReContent,
-	ReAction
-)
+from ..Utils.regex import ReUserName, ReRoomName, ReContent, ReAction
+
 
 class Message(object):
 	"""
@@ -26,25 +23,26 @@ class Message(object):
 	:The_CJ!cho@ppy.sh PRIVMSG Phaazebot :hello there
 	```
 	"""
+
 	def __repr__(self):
 		return f"<{self.__class__.__name__} channel='{self.room_name}' user='{self.user_name}'>"
 
 	def __str__(self):
 		return self.content
 
-	def __init__(self, raw:Optional[str]):
+	def __init__(self, raw: Optional[str]):
 		# props
-		self._user_name:Optional[str] = None
-		self._room_name:Optional[str] = None
-		self._content:Optional[str] = None
+		self._user_name: Optional[str] = None
+		self._room_name: Optional[str] = None
+		self._content: Optional[str] = None
 
 		# classes
-		self.Author:Optional["OsuUser"] = None
-		self.Channel:["OsuChannel"] = None
+		self.Author: Optional["OsuUser"] = None
+		self.Channel: ["OsuChannel"] = None
 
 		# other
-		self.is_action:bool = False
-		self._channel_type:int = 0
+		self.is_action: bool = False
+		self._channel_type: int = 0
 
 		if raw:
 			try:
@@ -55,7 +53,7 @@ class Message(object):
 
 	# utils
 	def compact(self) -> dict:
-		d:dict = dict()
+		d: dict = dict()
 		d["user_name"] = self.user_name
 		d["room_name"] = self.room_name
 		d["content"] = self.content
@@ -64,8 +62,8 @@ class Message(object):
 		d["channel_type"] = self.channel_type
 		return d
 
-	def messageBuild(self, raw:str) -> None:
-		search:re.Match
+	def messageBuild(self, raw: str) -> None:
+		search: re.Match
 
 		# _user_name
 		search = re.search(ReUserName, raw)
@@ -90,8 +88,8 @@ class Message(object):
 		Just looks if the name starts with a #, if yes, than the message comes from a room,
 		any we remove the #, to keep all names clean
 		"""
-		if self.room_name.startswith('#'):
-			self._room_name = self.room_name.strip('#')
+		if self.room_name.startswith("#"):
+			self._room_name = self.room_name.strip("#")
 			self._channel_type = 1
 		else:
 			self._channel_type = 2
@@ -101,12 +99,12 @@ class Message(object):
 		Checks if the message is a action,
 		action means its a /me message. If it is, change content and set is_action true
 		"""
-		search:re.Match = re.search(ReAction, self.content)
+		search: re.Match = re.search(ReAction, self.content)
 		if search:
 			self.is_action = True
 			self._content = search.group(1)
 
-	async def reply(self, cls:"OsuClient", reply:str) -> None:
+	async def reply(self, cls: "OsuClient", reply: str) -> None:
 		"""
 		Fast reply with content to a message,
 		requires you to give this function the Client class, don't ask why...
@@ -135,10 +133,14 @@ class Message(object):
 
 	@property
 	def channel_type(self) -> str:
-		if self._channel_type == 0: return "Unset"
-		if self._channel_type == 1: return "Room"
-		if self._channel_type == 2: return "PM"
-		else: return "Unknown"
+		if self._channel_type == 0:
+			return "Unset"
+		if self._channel_type == 1:
+			return "Room"
+		if self._channel_type == 2:
+			return "PM"
+		else:
+			return "Unknown"
 
 	@property
 	def is_private(self) -> bool:

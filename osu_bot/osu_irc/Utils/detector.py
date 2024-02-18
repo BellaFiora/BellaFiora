@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
 	from ..Classes.client import Client
 
@@ -8,18 +9,30 @@ import asyncio
 from ..Utils.cmd import sendPong
 from ..Utils.errors import InvalidAuth
 from ..Utils.handler import (
-	handleJoin, handlePart, handleQuit,
-	handleUserList, handlePrivMessage, handleMOTDEvent,
-	handleMode
+	handleJoin,
+	handlePart,
+	handleQuit,
+	handleUserList,
+	handlePrivMessage,
+	handleMOTDEvent,
+	handleMode,
 )
 from ..Utils.regex import (
-	ReGarbage, RePing, ReWrongAuth,
-	ReOnReady, ReUserList, RePrivMessage,
-	ReJoin, RePart, ReQuit,
-	ReMOTD, ReMode
+	ReGarbage,
+	RePing,
+	ReWrongAuth,
+	ReOnReady,
+	ReUserList,
+	RePrivMessage,
+	ReJoin,
+	RePart,
+	ReQuit,
+	ReMOTD,
+	ReMode,
 )
 
-async def garbageDetector(_cls:"Client", payload:str) -> bool:
+
+async def garbageDetector(_cls: "Client", payload: str) -> bool:
 	"""
 	This detector is suppose to catch all known patterns that are also known as trash.
 	Like this the very beginning where bancho boat is drawn in ASCII
@@ -29,7 +42,8 @@ async def garbageDetector(_cls:"Client", payload:str) -> bool:
 
 	return False
 
-async def mainEventDetector(cls:"Client", payload:str) -> bool:
+
+async def mainEventDetector(cls: "Client", payload: str) -> bool:
 	"""
 	This detector is suppose to catch all events we can somehow process, if not, give back False.
 	If that happens the Client `cls` makes additional handling

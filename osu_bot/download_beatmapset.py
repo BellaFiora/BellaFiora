@@ -13,34 +13,42 @@
 
 import requests, http, time, urllib
 
+
 def replace_forbidden_characters(filename):
 	forbidden_characters = '<>:"/\\|?*'
 	for char in forbidden_characters:
-		filename = filename.replace(char, '_')
-	return filename.rstrip('.')
+		filename = filename.replace(char, "_")
+	return filename.rstrip(".")
 
-bmset_id = '2071776'
-osu_session = ''
 
-with open('osu_session', 'r') as f:
+bmset_id = "2071776"
+osu_session = ""
+
+with open("osu_session", "r") as f:
 	osu_session = f.read()
 
 headers = {
 	"Referer": f"https://osu.ppy.sh/beatmapsets/{bmset_id}",
-	"Cookie": f"locale=en; osu_session={osu_session}"
+	"Cookie": f"locale=en; osu_session={osu_session}",
 }
 
-r = requests.get(f'https://osu.ppy.sh/beatmapsets/{bmset_id}/download', headers=headers, allow_redirects=False)
+r = requests.get(
+	f"https://osu.ppy.sh/beatmapsets/{bmset_id}/download",
+	headers=headers,
+	allow_redirects=False,
+)
 print(r.status_code, http.HTTPStatus(r.status_code).phrase)
-setcookie = r.headers.get('Set-Cookie')
-setcookie = setcookie[setcookie.find('osu_session') + len('osu_session') + 1:]
-osu_session = setcookie[:setcookie.find(';')]
-filename = r.headers['Location']
-filename = filename[filename.find('?fs=') + len('?fs='):]
-filename = replace_forbidden_characters(urllib.parse.unquote(filename[:filename.find('.osz&fd=')]))
-r = requests.get(r.headers['Location'], headers=headers)
-with open(f'{filename}.osz', 'wb') as f:
+setcookie = r.headers.get("Set-Cookie")
+setcookie = setcookie[setcookie.find("osu_session") + len("osu_session") + 1 :]
+osu_session = setcookie[: setcookie.find(";")]
+filename = r.headers["Location"]
+filename = filename[filename.find("?fs=") + len("?fs=") :]
+filename = replace_forbidden_characters(
+	urllib.parse.unquote(filename[: filename.find(".osz&fd=")])
+)
+r = requests.get(r.headers["Location"], headers=headers)
+with open(f"{filename}.osz", "wb") as f:
 	f.write(r.content)
 
-with open('osu_session', 'w') as f:
+with open("osu_session", "w") as f:
 	f.write(osu_session)
