@@ -19,8 +19,9 @@ var playerInfos = {
 };
 
 function parseUrl() {
+	
 	const startIndex = baseURLs.ppyOsuUser.length;
-	console.log(startIndex )
+	// console.log(startIndex )
 	const endIndex = url.indexOf('/', startIndex);
 	if (endIndex === -1) {
 		playerId = url.substring(startIndex, url.length);
@@ -30,8 +31,8 @@ function parseUrl() {
 		playerId = url.substring(startIndex, endIndex);
 		mode = url.substring(endIndex + 1, url.length);
 	}
-	console.log('parseUrl: playerId = ' + playerId);
-	console.log('parseUrl: mode = ' + mode);
+	// console.log('parseUrl: playerId = ' + playerId);
+	// console.log('parseUrl: mode = ' + mode);
 }
 
 parseUrl();
@@ -158,6 +159,7 @@ async function fetchHistorical() {
 
 // getPlayerInfos
 
+
 async function htmlDecode(input) {
 	const doc = new DOMParser().parseFromString(input, "text/html");
 	return doc.documentElement.textContent;
@@ -227,7 +229,7 @@ function switchDaysAndHours() {
 function addPlaceHolderHTML() {
 	if (mode.length === 0) {
 		getCurrentGamemode();
-		console.log('addPlaceHolderHTML: mode = ' + mode);
+		// console.log('addPlaceHolderHTML: mode = ' + mode);
 	}
 	addTotalPlaycounts();
 	addGlobalPlayTime();
@@ -240,7 +242,7 @@ function updateHTML() {
 
 async function fetchAll() {
 	return new Promise(async (resolve, reject) => {
-		console.log('entering fetchAll');
+		// console.log('entering fetchAll');
 		await fetchAllModes();
 		await fetchHistorical();
 		resolve(true);
@@ -268,13 +270,15 @@ function getLocale() {
 	let text = document.querySelector('html').getAttribute('lang');
 	let startIndex = text.indexOf('currentLocale') + 'currentLocale'.length + 4;
 	locale = text.substring(startIndex, text.indexOf('"', startIndex));
-	console.log('getLocale: locale = ' + locale);
+	// console.log('getLocale: locale = ' + locale);
 }
 
 async function addElements() {
-	console.log('entering addElements');
+	// console.log('entering addElements');
+	
 	addCustomCSS();
 	addPlaceHolderHTML();
+
 	if (true) {
 		switchDaysAndHours();
 	}
@@ -302,8 +306,15 @@ async function addElements() {
 }
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-	addElements();
+	if(msg ==='f1'){
+		addElements();
+	}
 });
+
+
+
+
+
 
 // function getHistoric() {
 // 	try {
