@@ -1,3 +1,7 @@
+BellaFiora's osu! stable in game bot.
+Provides fun and utility commands for beatmaps and managing lobbies.
+It also allows users to interact with the BellaFiora's ecosystem.
+
 # Commands
 
 ## `!help [command]`
@@ -37,8 +41,8 @@ Suggest a beatmap for the player.
 
 ### Options
 
-- `-od <od>` `-hp <hp>` `-cs <cs>` `-sr <sr>` `-pp <pp>` `-bpm <bpm>`
-	- OD/HP/CS/SR/PP/BPM of the desired beatmap.
+- `-ar <ar>` `-bpm <bpm>` `-cs <cs>` `-hp <hp>` `-od <od>` `-pp <pp>` `-sr <sr>`
+	- AR/BPM/CS/HP/OD/PP/SR of the desired beatmap.
 - `-mapper <mapper>`
 	- Mapper of the desired beatmap.
 	- Non-case sensitive.
@@ -109,11 +113,7 @@ Example:
 
 - `!bm stream jump tech` <=> `!bm stream:0.33 jump:0.33 tech:0.33`.
 
-Valid patterns are `alt`, `jump`, `speed`, `stream`, `tech`.
-
-Valid skillsets are `aim`, `flowaim`, `memory`, `read`, `rhythm` or `accuracy`, `stamina`.
-
-All are explained in the beatmap_manager README.
+Valid patterns and skillsets are all explained in the beatmap_manager README.
 
 ## `!room [room id] <action> [arguments...]`
 
