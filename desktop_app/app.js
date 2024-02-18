@@ -3,6 +3,7 @@
 const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer, protocol} = require('electron');
 const {spawn} = require('child_process');
 const axios = require('axios');
+const tmp = require('tmp');
 
 const fs = require('fs');
 const path = require('path');
@@ -15,12 +16,11 @@ const remoteSrv = require('./app/lib/priv/remote-server')
 // const dns = require('dns');
 // const { type } = require('os');
 
-
-
 // *** App Libs *** // 
 const osuFiles = require('./app/lib/osuFiles')
 const AppError = require('./app/lib/error')
 const gini = require('./app/lib/ini')
+const Artisan = require('./app/lib/artisan')
 // const OsuDBReader = require('./app/lib/db_parser');
 // const osuutils = require('./app/lib/osu_utils');
 
@@ -31,6 +31,7 @@ let continueExecute = true ;
 let isOsuLanuched;
 let gmIsReady;
 let player_data;
+
 // let isFirstTime = true;
 
 app.whenReady().then(async () => {
@@ -42,31 +43,23 @@ app.whenReady().then(async () => {
     // });
     ipcMain.on('getMainWindow', () => mainWindow.webContents.send('mainWindow', mainWindow));
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
-    await LaunchGUI();
+    await LaunchLoading();
     await ServerConnection().then(resp=>{
-
         if(resp.err){
             Log(resp.err, true, true);
             continueExecute = false
-        }})
-    .catch((e=> {
+        }
+    }).catch((e=> {
         console.log('test')
         Log(e, true, true);
         continueExecute = false}));
-    await gLaunch();
-    await wsConnect();
-    await osuConnect();
-    await osuHandler();
-    await mainApp();
-    await sendCache();
-
-    protocol.registerFileProtocol('app', (request, callback) => {
-        const url = request.url.substr(7); // Supprime le préfixe 'app://'
-        const filePath = path.normalize(`${__dirname}/${url}`);
-        callback({ path: filePath });
-      });
-
-});
+        await gLaunch();
+        await wsConnect();
+        await osuConnect();
+        await osuHandler();
+        await LaunchGUI();
+        await sendCache();
+    });
 async function osuConnect() {
     if (!continueExecute) return
     // Log message for connecting Osu!Account
@@ -89,10 +82,11 @@ async function osuConnect() {
 
 
                 // Resolve if user ID exists in the response
-                if (response.data.id) resolve(true);
+                if (response.data.id) 
 
                 // Call SyncData function
                 await SyncData();
+                resolve(true);
             }).catch(error => {
                 console.error('Error fetching data:', error.message);
                 reject(error);
@@ -178,7 +172,7 @@ async function osuConnect() {
                         Log('Unauthorised on the server', true, true)
                         continueExecute = false 
                     } else {
-                        player_data = resp
+                        player_data = JSON.parse(resp)
                     }
                     resolve(true)
                 })
@@ -189,14 +183,7 @@ async function osuConnect() {
         });
     };
 };
-async function mainApp(){
-    if(!continueExecute) return
-    return new Promise((e, n) => {
-        mainWindow.loadFile("./app/front/gui.html");
-        e(true)
-    });
-};
-async function LaunchGUI() {
+async function LaunchLoading() {
     // Check if execution should continue
     if (!continueExecute) return
 
@@ -239,8 +226,6 @@ async function LaunchGUI() {
 
                 // Show the main window
                 mainWindow.show();
-
-                // Send client information to the window
                 let clientInfo = {
                     client_version: Conf.getConf('client_version'),
                     client_ip: Conf.getConf('client_ip'),
@@ -251,8 +236,11 @@ async function LaunchGUI() {
 
                 // Save the mainWindow reference in configuration
                 Conf.setConf('app', mainWindow);
-
+                
                 resolve(mainWindow);
+             
+                // Send client information to the window
+     
             });
 
             // Resolve with the mainWindow reference
@@ -262,6 +250,110 @@ async function LaunchGUI() {
             continueExecute = false
             reject(error);
         };
+    });
+};
+async function LaunchGUI(){
+    if(!continueExecute) return
+    return new Promise(async (e, n) => {
+        const filePath = path.join('./app/src/html/body.raw');        
+        const rawHTML = fs.readFileSync(filePath, 'utf-8');
+        const artisan = new Artisan();
+        let default_mode = player_data.gameplay.playmode
+        default_mode = (default_mode === 'osu') ? 'm0' :
+                    (default_mode === 'mania') ? 'm3' :
+                    (default_mode === 'taiko') ? 'm1' :
+                    (default_mode === 'fruits') ? 'm2' : 'm0';
+        let gameplay = player_data.gameplay[default_mode]
+
+        let data = {
+            windowTitle: 'Bella Fiora Desktop',
+            username: player_data.basic_informations.username,
+            accuracy: parseFloat(gameplay.accuracy).toFixed(2),
+            playcount: gameplay.plays_count,
+            total_score: gameplay.total_score,
+            maxCombo:gameplay.combo_max,
+            ssh:gameplay.notes.ssh,
+            ss:gameplay.notes.ss,
+            sh:gameplay.notes.sh,
+            s:gameplay.notes.s,
+            a:gameplay.notes.a,
+            global_rank:gameplay.global_rank,
+            country_rank:gameplay.country_rank,
+            clicks:gameplay.clicks,
+            pp:parseFloat(gameplay.pp).toFixed(2),
+            avatar_url:player_data.basic_informations.avatar_url,
+            country:player_data.basic_informations.country,
+        }
+        artisan.create({
+            props: {
+                lang: (player_data.basic_informations.country).toLowerCase(),
+                // lang: 'en',
+                objectType: 'document',
+                format: 'html',
+                charset: 'UTF-8', 
+                viewPort: 'width=device-width, initial-scale=1.0',
+                ressources: {
+                  css: ["../src/style.css", "https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.css"],
+                  scripts: [
+                    {
+                      href: '../renderers/gui_renderer.js',
+                      defer: true,
+                      position: 'endBody'
+                    }, 
+                    {
+                      href: 'https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js',
+                      position: 'Header',
+                      type: 'module'
+                    }, {
+                        href: 'https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js',
+                        position: 'Header',
+                        nomodule: true
+                    }
+                  ], 
+                  links: [
+                    {
+                      href: 'https://fonts.googleapis.com',
+                      rel: 'preconnect',
+                      position: 'Header'
+                    }, {
+                      href: 'https://fonts.gstatic.com',
+                      rel: 'preconnect',
+                      position: 'Header',
+                      cross : "crossorigin"
+                    }, {
+                      href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap',
+                      rel: 'stylesheet',
+                      position: 'Header'
+                    }, {
+                      href: 'https://fonts.googleapis.com/css2?family=Righteous&display=swap',
+                      rel: 'stylesheet',
+                      position: 'Header'
+                    }, {
+                      href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300&display=swap',
+                      rel: 'stylesheet',
+                      position: 'Header'
+                    }, {
+                      href: 'https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.css',
+                      rel: 'stylesheet',
+                      position: 'Header'
+                    },
+                  ]
+                }
+            }
+        })
+        .addContentHTML(rawHTML, data)
+        .construct().then(r=>{
+            const tempHTMLPath = path.join('./app/front/gui2.html');
+            fs.writeFile(tempHTMLPath, r, (writeErr) => {
+                if (writeErr) {
+                    console.error('Erreur lors de l\'écriture du fichier temporaire:', writeErr);
+                    return;
+                }
+                mainWindow.loadFile("./app/front/gui2.html");
+                e(true);
+            });  
+        });
+        e(true)
     });
 };
 async function ServerConnection() {
@@ -449,8 +541,9 @@ async function Log(e, show = true, err = false, toServ= true) {
 async function sendCache(){
     if(!continueExecute) return
     return new Promise((e, n) => { setTimeout(async () => {
+        console.log(player_data.basic_informations)
+        
         mainWindow.webContents.send('player-data', player_data);
-        console.log('send');
         e(true);
     }, 1000);});
 };
