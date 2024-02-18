@@ -22,7 +22,7 @@ function parseUrl() {
 	
 	const startIndex = baseURLs.ppyOsuUser.length;
 	// console.log(startIndex )
-	const endIndex = url.indexOf('/', startIndex);
+	let endIndex = url.indexOf('/', startIndex);
 	if (endIndex === -1) {
 		playerId = url.substring(startIndex, url.length);
 		mode = '';
@@ -31,7 +31,15 @@ function parseUrl() {
 		playerId = url.substring(startIndex, endIndex);
 		mode = url.substring(endIndex + 1, url.length);
 	}
-	// console.log('parseUrl: playerId = ' + playerId);
+	endIndex = playerId.indexOf('#');
+	if (endIndex !== -1) {
+		playerId = playerId.substring(0, endIndex);
+	}
+	endIndex = mode.indexOf('#');
+	if (endIndex !== -1) {
+		mode = mode.substring(0, endIndex);
+	}
+	console.log('parseUrl: playerId = ' + playerId);
 	// console.log('parseUrl: mode = ' + mode);
 }
 
