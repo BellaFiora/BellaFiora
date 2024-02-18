@@ -1,6 +1,8 @@
 class Artisan {
 	constructor() {
-		this.headSection = [] this.bodySections = [] this.content = {
+		this.headSection = [] 
+		this.bodySections = [] 
+		this.content = {
 			construct : (content) => {
 				return this.serialize(content)
 			}
@@ -26,7 +28,9 @@ class Artisan {
 		return this;
 	}
 	create(props) {
-		this.props = props.props this.local = this.props.lang this.type = props.props.objectType
+		this.props = props.props 
+		this.local = this.props.lang 
+		this.type = props.props.objectType
 		return this;
 	}
 	link(obj) {
@@ -42,7 +46,8 @@ class Artisan {
 		return this
 	}
 	meta(obj) {
-		this.props.meta.viewPort = obj.viewPort ? obj.viewPort : '' this.props.meta.charset = obj.charset ? obj.charset : ''
+		this.props.meta.viewPort = obj.viewPort ? obj.viewPort : ''
+		 this.props.meta.charset = obj.charset ? obj.charset : ''
 		return this
 	}
 	script(obj) {
@@ -64,7 +69,8 @@ class Artisan {
 	async construct() {
 		return new Promise((resolve, reject) => {
 			let page =
-				[ { Head : '', Body : '', End : '' } ] if (this.props.viewPort) {
+				[ { Head : '', Body : '', End : '' } ] 
+				if (this.props.viewPort) {
 				page[0].Head += `<meta name="viewport" content="${this.props.viewPort}"/>\n`
 			}
 			if (this.props.charset) {

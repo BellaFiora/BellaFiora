@@ -1,5 +1,7 @@
 var hitErrorArrayTab
-var key1ArrayHits = [] var key2ArrayHits = [] const { ipcRenderer } = require('electron');
+var key1ArrayHits = [] 
+var key2ArrayHits = [] 
+const { ipcRenderer } = require('electron');
 const Highcharts = require('highcharts');
 require('highcharts/modules/exporting')(Highcharts);
 const BPDPC = require('osu-bpdpc');
@@ -11,10 +13,12 @@ var playing = false
 var wsData = null
 var basic_infos
 var gameplay
-var missChecker = { Miss : 0, checked : false } var sbChecker = {
+var missChecker = { Miss : 0, checked : false } 
+var sbChecker = {
 	SB : 0,
 	checked : false
-} var audioCache;
+} 
+var audioCache;
 
 ipcRenderer.on('audio-cache', (event, cache) => {
 	audioCache = cache;
@@ -474,7 +478,8 @@ document.getElementById('bmstats').classList.remove('hidden')
   ipcRenderer.on('startPlaying', (event, bm) => {
 	  hitErrorArrayTab = []
 	  key1ArrayHits = []
-	  key2ArrayHits = [] const container = document.getElementById('playing_keys');
+	  key2ArrayHits = [] 
+	  const container = document.getElementById('playing_keys');
   })
 
   // ipcRenderer.on('dataPlaying', (event, gameplay, bm) => {
@@ -542,7 +547,8 @@ document.getElementById('bmstats').classList.remove('hidden')
 			  sbChecker.checked = true
 			  // playVoice('FR', 'aim')
 		  }
-		  let lastHit = [] const gameplay = wsData.gameplay
+		  let lastHit = [] 
+		  const gameplay = wsData.gameplay
 		  if (gameplay.hits.hitErrorArray) {
 			  hitErrorArrayTab = gameplay.hits.hitErrorArray.slice(-200);
 			  lastHit = gameplay.hits.hitErrorArray.slice(-1);
