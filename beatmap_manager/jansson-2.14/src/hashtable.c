@@ -206,8 +206,8 @@ static pair_t* init_pair(json_t* value, const char* key, size_t key_len,
 	pair_t* pair;
 
 	/* offsetof(...) returns the size of pair_t without the last,
-   flexible member. This way, the correct amount is
-   allocated. */
+	 flexible member. This way, the correct amount is
+	 allocated. */
 
 	if (key_len >= (size_t)-1 - offsetof(pair_t, key)) {
 		/* Avoid an overflow if the key is very long */

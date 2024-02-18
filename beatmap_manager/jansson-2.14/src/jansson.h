@@ -28,7 +28,7 @@ extern "C" {
 #define JANSSON_VERSION "2.14"
 
 /* Version as a 3-byte hex number, e.g. 0x010201 == 1.2.1. Use this
-   for numeric comparisons, e.g. #if JANSSON_VERSION_HEX >= ... */
+	 for numeric comparisons, e.g. #if JANSSON_VERSION_HEX >= ... */
 #define JANSSON_VERSION_HEX                                                    \
 	((JANSSON_MAJOR_VERSION << 16) | (JANSSON_MINOR_VERSION << 8)              \
 	 | (JANSSON_MICRO_VERSION << 0))

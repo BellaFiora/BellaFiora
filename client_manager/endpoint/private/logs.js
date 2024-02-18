@@ -1,8 +1,7 @@
 module.exports = {
-    handleRequest: (query) => {
+	handleRequest : (query) => {
+		console.log(`Client ${query.idApp} [LOG : ${query.logs}]`)
 
-      console.log(`Client ${query.idApp} [LOG : ${query.logs}]`)
-        
-      return 'done';
-    },
+		return 'done';
+	},
 };

@@ -1,9 +1,7 @@
-const {ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
 function restart() {
-    ipcRenderer.send('restart_app');
-      
+	ipcRenderer.send('restart_app');
 }
 
-ipcRenderer.on('err', (event, data) =>{
-    document.getElementById('err').innerText = data
-})
+ipcRenderer.on(
+	'err', (event, data) => { document.getElementById('err').innerText = data })

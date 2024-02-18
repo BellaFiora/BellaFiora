@@ -1,6 +1,6 @@
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "src/jsonify.h"
 #include "src/parser.h"

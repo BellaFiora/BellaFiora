@@ -19,8 +19,8 @@ struct hashtable_list {
 };
 
 /* "pair" may be a bit confusing a name, but think of it as a
-   key-value pair. In this case, it just encodes some extra data,
-   too */
+	 key-value pair. In this case, it just encodes some extra data,
+	 too */
 struct hashtable_pair {
 	struct hashtable_list list;
 	struct hashtable_list ordered_list;

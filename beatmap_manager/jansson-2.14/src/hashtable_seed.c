@@ -1,5 +1,5 @@
 /* Generate sizeof(uint32_t) bytes of as random data as possible to seed
-   the hash function.
+	 the hash function.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -58,7 +58,7 @@
 #if !defined(_WIN32) && defined(USE_URANDOM)
 static int seed_from_urandom(uint32_t* seed) {
 	/* Use unbuffered I/O if we have open(), close() and read(). Otherwise
-	   fall back to fopen() */
+		 fall back to fopen() */
 
 	char data[sizeof(uint32_t)];
 	int ok;
@@ -183,7 +183,7 @@ static uint32_t generate_seed() {
 
 	if (!done) {
 		/* Fall back to timestamp and PID if no better randomness is
-		   available */
+			 available */
 		seed_from_timestamp_and_pid(&seed);
 	}
 
@@ -228,8 +228,8 @@ void json_object_seed(size_t seed) {
 	if (hashtable_seed == 0) {
 		if (new_seed == 0) {
 			/* Explicit synchronization fences are not supported by the
-			   __sync builtins, so every thread getting here has to
-			   generate the seed value.
+				 __sync builtins, so every thread getting here has to
+				 generate the seed value.
 			*/
 			new_seed = generate_seed();
 		}

@@ -47,8 +47,8 @@
 	(l_isdigit(c) || ('A' <= (c) && (c) <= 'F') || ('a' <= (c) && (c) <= 'f'))
 
 /* Read one byte from stream, convert to unsigned char, then int, and
-   return. return EOF on end of file. This corresponds to the
-   behaviour of fgetc(). */
+	 return. return EOF on end of file. This corresponds to the
+	 behaviour of fgetc(). */
 typedef int (*get_func)(void* data);
 
 typedef struct {
@@ -195,7 +195,7 @@ static int stream_get(stream_t* stream, json_error_t* error) {
 		stream->column = 0;
 	} else if (utf8_check_first(c)) {
 		/* track the Unicode character column, so increment only if
-		   this is the first character of a UTF-8 sequence */
+			 this is the first character of a UTF-8 sequence */
 		stream->column++;
 	}
 
@@ -356,11 +356,11 @@ static void lex_scan_string(lex_t* lex, json_error_t* error) {
 	}
 
 	/* the actual value is at most of the same length as the source
-	   string, because:
+		 string, because:
 		 - shortcut escapes (e.g. "\t") (length 2) are converted to 1 byte
 		 - a single \uXXXX escape (length 6) is converted to at most 3 bytes
 		 - two \uXXXX escapes (length 12) forming an UTF-16 surrogate pair
-		   are converted to 4 bytes
+			 are converted to 4 bytes
 	*/
 	t = jsonp_malloc(lex->saved_text.length + 1);
 	if (!t) {
@@ -630,7 +630,7 @@ static int lex_scan(lex_t* lex, json_error_t* error) {
 
 	else {
 		/* save the rest of the input UTF-8 sequence to get an error
-		   message of valid UTF-8 */
+			 message of valid UTF-8 */
 		lex_save_cached(lex);
 		lex->token = TOKEN_INVALID;
 	}

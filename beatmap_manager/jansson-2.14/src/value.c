@@ -406,7 +406,7 @@ static json_t* json_object_deep_copy(const json_t* object,
 		goto out;
 
 	/* Cannot use json_object_foreach because object has to be cast
-	   non-const */
+		 non-const */
 	iter = json_object_iter((json_t*)object);
 	while (iter) {
 		const char* key;
@@ -1114,7 +1114,7 @@ json_t* do_deep_copy(const json_t* json, hashtable_t* parents) {
 	case JSON_ARRAY:
 		return json_array_deep_copy(json, parents);
 		/* for the rest of the types, deep copying doesn't differ from
-		   shallow copying */
+			 shallow copying */
 	case JSON_STRING:
 		return json_string_copy(json);
 	case JSON_INTEGER:

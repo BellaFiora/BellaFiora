@@ -44,7 +44,7 @@ size_t utf8_check_first(char byte) {
 
 	if (0x80 <= u && u <= 0xBF) {
 		/* second, third or fourth byte of a multi-byte
-		   sequence, i.e. a "continuation byte" */
+			 sequence, i.e. a "continuation byte" */
 		return 0;
 	} else if (u == 0xC0 || u == 0xC1) {
 		/* overlong encoding of an ASCII byte */
@@ -62,7 +62,7 @@ size_t utf8_check_first(char byte) {
 		return 4;
 	} else { /* u >= 0xF5 */
 		/* Restricted (start of 4-, 5- or 6-byte sequence) or invalid
-		   UTF-8 */
+			 UTF-8 */
 		return 0;
 	}
 }

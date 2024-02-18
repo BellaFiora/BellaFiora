@@ -87,7 +87,7 @@
 #define HAVE_UNSIGNED_LONG_LONG_INT 1
 
 /* Number of buckets new object hashtables contain is 2 raised to this power.
-   E.g. 3 -> 2^3 = 8. */
+	 E.g. 3 -> 2^3 = 8. */
 #define INITIAL_HASHTABLE_ORDER 3
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
@@ -115,8 +115,8 @@
 #define PACKAGE_VERSION "2.14"
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
-   required in a freestanding environment). This macro is provided for
-   backward compatibility; new code need not use it. */
+	 required in a freestanding environment). This macro is provided for
+	 backward compatibility; new code need not use it. */
 #define STDC_HEADERS 1
 
 /* Define to 1 if /dev/urandom should be used for seeding the hash function */
@@ -130,33 +130,33 @@
 #define VERSION "2.14"
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
-   #define below would cause a syntax error. */
+	 <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+	 #define below would cause a syntax error. */
 /* #undef _UINT32_T */
 
 /* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
-   #define below would cause a syntax error. */
+	 <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+	 #define below would cause a syntax error. */
 /* #undef _UINT8_T */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
-   calls it, or to nothing if 'inline' is not supported under any name.  */
+	 calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
 /* #undef inline */
 #endif
 
 /* Define to the type of a signed integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
+	 such a type exists and the standard includes do not define it. */
 /* #undef int32_t */
 
 /* Define to the type of an unsigned integer type of width exactly 16 bits if
-   such a type exists and the standard includes do not define it. */
+	 such a type exists and the standard includes do not define it. */
 /* #undef uint16_t */
 
 /* Define to the type of an unsigned integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
+	 such a type exists and the standard includes do not define it. */
 /* #undef uint32_t */
 
 /* Define to the type of an unsigned integer type of width exactly 8 bits if
-   such a type exists and the standard includes do not define it. */
+	 such a type exists and the standard includes do not define it. */
 /* #undef uint8_t */

@@ -1,9 +1,9 @@
 let url = null;
 
-let baseURLs = {
-	ppyOsuUsers : "https://osu.ppy.sh/users/"
-};
-if (window.location.href === url) { exit(0); }
+let baseURLs = { ppyOsuUsers : 'https://osu.ppy.sh/users/' };
+if (window.location.href === url) {
+	exit(0);
+}
 url = window.location.href;
 
 let fetchPromise = null;
@@ -12,14 +12,13 @@ let mode = null;
 let locale = null;
 let historical = null;
 const playerInfos = {
-	'osu': null,
-	'taiko': null,
-	'fruits': null,
-	'mania': null
+	'osu' : null,
+	'taiko' : null,
+	'fruits' : null,
+	'mania' : null
 };
 
 function parseUrl() {
-	
 	const startIndex = baseURLs.ppyOsuUsers.length;
 	// console.log(startIndex )
 	let endIndex = url.indexOf('/', startIndex);
@@ -49,36 +48,39 @@ function convertTime(seconds) {
 	const days = Math.floor(seconds / (24 * 60 * 60));
 	const hours = Math.floor((seconds % (24 * 60 * 60)) / 3600);
 	const minutes = Math.floor((seconds % 3600) / 60);
-	let result = "";
+	let result = '';
 	if (days > 0) {
-		result += days + "d ";
+		result += days + 'd ';
 	}
 	if (hours > 0) {
-		result += hours + "h ";
+		result += hours + 'h ';
 	}
 	if (minutes > 0) {
-		result += minutes + "m ";
+		result += minutes + 'm ';
 	}
 	return {
-		string: result.trim(),
-		hours: Math.floor(seconds/3600)
+		string: result.trim(), hours: Math.floor(seconds / 3600)
 	}
 }
 
 function getUsername() {
-	return document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-info.profile-info--cover > div.profile-info__details > div.profile-info__info > h1 > span");
+	return document.querySelector(
+		'body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-info.profile-info--cover > div.profile-info__details > div.profile-info__info > h1 > span');
 }
 
 function getGameModes() {
-	return document.querySelector("body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.header-v4.header-v4--users > div:nth-child(2) > div > div > ul.game-mode");
+	return document.querySelector(
+		'body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.header-v4.header-v4--users > div:nth-child(2) > div > div > ul.game-mode');
 }
 
 function getPlaycount() {
-	return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div.profile-stats > dl.profile-stats__entry.profile-stats__entry--key-play_count');
+	return document.querySelector(
+		'body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div.profile-stats > dl.profile-stats__entry.profile-stats__entry--key-play_count');
 }
 
 function getProfileDetailChartNumbers() {
-	return document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid');
+	return document.querySelector(
+		'body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid');
 }
 
 function addGlobalPlayTime() {
@@ -87,20 +89,21 @@ function addGlobalPlayTime() {
 	labelElements[4].innerText = `${mode_text} Playtime`;
 	labelElements[4].style = 'text-transform: capitalize;';
 
-	const outerDiv = document.createElement("div");
-	outerDiv.classList.add("value-display", "value-display--plain", "value-display--plain-wide");
+	const outerDiv = document.createElement('div');
+	outerDiv.classList.add(
+		'value-display', 'value-display--plain', 'value-display--plain-wide');
 	outerDiv.setAttribute('id', 'TotalPlayTime');
 
-	const labelDiv = document.createElement("div");
-	labelDiv.classList.add("value-display__label");
-	labelDiv.textContent = "Total Playime";
+	const labelDiv = document.createElement('div');
+	labelDiv.classList.add('value-display__label');
+	labelDiv.textContent = 'Total Playime';
 
-	const valueDiv = document.createElement("div");
-	valueDiv.classList.add("value-display__value");
+	const valueDiv = document.createElement('div');
+	valueDiv.classList.add('value-display__value');
 
-	const spanElement = document.createElement("span");
-	spanElement.setAttribute("data-tooltip-position", "bottom center");
-	spanElement.setAttribute("title", '-');
+	const spanElement = document.createElement('span');
+	spanElement.setAttribute('data-tooltip-position', 'bottom center');
+	spanElement.setAttribute('title', '-');
 	spanElement.textContent = '-';
 
 	valueDiv.appendChild(spanElement);
@@ -110,21 +113,22 @@ function addGlobalPlayTime() {
 }
 
 function updateGlobalPlayTime() {
-	const globalPlayTime = convertTime(playerInfos.osu.user.statistics.play_time + playerInfos.taiko.user.statistics.play_time + playerInfos.fruits.user.statistics.play_time + playerInfos.mania.user.statistics.play_time);
-	const gpt = document.getElementById('TotalPlayTime').querySelector('div:nth-child(2) > span');
+	const globalPlayTime = convertTime(
+		playerInfos.osu.user.statistics.play_time + playerInfos.taiko.user.statistics.play_time + playerInfos.fruits.user.statistics.play_time + playerInfos.mania.user.statistics.play_time);
+	const gpt = document.getElementById('TotalPlayTime')
+					.querySelector('div:nth-child(2) > span');
 	if (true) {
-		gpt.setAttribute("title", globalPlayTime.string);
+		gpt.setAttribute('title', globalPlayTime.string);
 		gpt.textContent = `${globalPlayTime.hours.toLocaleString(locale)} hours`;
 	} else {
-
 	}
 }
 
 function addProfileStat(parent, keyTextContent, valueTextContent, id) {
 	const entry = document.createElement('dl');
 	entry.setAttribute('id', id);
-	const key =  document.createElement('dt');
-	const value =  document.createElement('dd');
+	const key = document.createElement('dt');
+	const value = document.createElement('dd');
 	entry.classList.add('profile-stats__entry');
 	entry.classList.add('profile-stats__entry--key-play_count');
 	key.classList.add('profile-stats__key');
@@ -142,14 +146,16 @@ const totalPlaycountId = 'total_playcount';
 const totalPlaycountV2Id = 'total_playcount_v2';
 
 function addTotalPlaycounts() {
-	const totalPlaycountEntry = addProfileStat(getPlaycount(), 'Total Play Count', '-', totalPlaycountId);
-	addProfileStat(totalPlaycountEntry, 'Total Play Count V2', '-', totalPlaycountV2Id);
+	const totalPlaycountEntry = addProfileStat(
+		getPlaycount(), 'Total Play Count', '-', totalPlaycountId);
+	addProfileStat(
+		totalPlaycountEntry, 'Total Play Count V2', '-', totalPlaycountV2Id);
 }
 
 function getTotalPlaycount() {
 	let totalPlaycount = 0;
-	for (let e of historical["monthly_playcounts"]) {
-		totalPlaycount += parseInt(e["count"]);
+	for (let e of historical['monthly_playcounts']) {
+		totalPlaycount += parseInt(e['count']);
 	}
 	return totalPlaycount;
 }
@@ -160,20 +166,26 @@ function getTotalPlaycountV2(totalPlaycount) {
 
 function updateTotalPlaycounts() {
 	const totalPlaycount = getTotalPlaycount();
-	document.getElementById(totalPlaycountId).querySelector('.profile-stats__value').textContent = totalPlaycount.toLocaleString(locale);
-	document.getElementById(totalPlaycountV2Id).querySelector('.profile-stats__value').textContent = getTotalPlaycountV2(totalPlaycount).toLocaleString(locale);
+	document.getElementById(totalPlaycountId)
+		.querySelector('.profile-stats__value')
+		.textContent
+		= totalPlaycount.toLocaleString(locale);
+	document.getElementById(totalPlaycountV2Id)
+		.querySelector('.profile-stats__value')
+		.textContent
+		= getTotalPlaycountV2(totalPlaycount).toLocaleString(locale);
 }
 
 async function fetchHistorical() {
-	const tmp = await fetch(`${baseURLs.ppyOsuUsers}${playerId}/extra-pages/historical`);
+	const tmp = await fetch(
+		`${baseURLs.ppyOsuUsers}${playerId}/extra-pages/historical`);
 	historical = await tmp.json();
 }
 
 // getPlayerInfos
 
-
 async function htmlDecode(input) {
-	const doc = new DOMParser().parseFromString(input, "text/html");
+	const doc = new DOMParser().parseFromString(input, 'text/html');
 	return doc.documentElement.textContent;
 }
 
@@ -191,14 +203,17 @@ async function fetchMode(mode) {
 		const tmp = await RawHtmlToJson(await res.text());
 		playerInfos[mode] = tmp;
 		localStorage['playerInfos_' + mode] = JSON.stringify(tmp);
-	} catch(e) {
+	} catch (e) {
 		throw Error(e);
 	}
 }
 
 async function fetchAllModes() {
 	try {
-		await Promise.all([fetchMode('osu'), fetchMode('taiko'), fetchMode('fruits'), fetchMode('mania')]);
+		await Promise.all([
+			fetchMode('osu'), fetchMode('taiko'), fetchMode('fruits'),
+			fetchMode('mania')
+		]);
 	} catch (e) {
 		throw Error(e);
 	}
@@ -208,7 +223,7 @@ function addCustomCSS() {
 	const customCss = document.createElement('style');
 	// always takes 3s for one gradient to fully slide
 	// shorter usernames will have longer times to make up for the short name
-	const animationTime = 124/getUsername().offsetWidth*3;
+	const animationTime = 124 / getUsername().offsetWidth * 3;
 	customCss.textContent = `
 	body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid {
 		grid-template-columns: repeat(6,1fr);
@@ -276,7 +291,8 @@ function getCurrentGamemode() {
 }
 
 function switchDaysAndHours() {
-	const pt = document.querySelector('body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid > div:nth-child(3) > div.value-display__value > span');
+	const pt = document.querySelector(
+		'body > div.osu-layout__section.osu-layout__section--full > div > div > div > div.osu-page.osu-page--generic-compact > div:nth-child(1) > div.profile-detail > div > div:nth-child(1) > div:nth-child(3) > div.profile-detail__values.profile-detail__values--grid > div:nth-child(3) > div.value-display__value > span');
 	const tmp = pt.getAttribute('title');
 	pt.setAttribute('title', pt.textContent);
 	pt.textContent = tmp;
@@ -302,7 +318,7 @@ async function fetchAll() {
 		await fetchAllModes();
 		await fetchHistorical();
 		resolve(true);
-	});	
+	});
 }
 
 // undefined or false
@@ -331,7 +347,7 @@ function getLocale() {
 
 async function addElements() {
 	// console.log('entering addElements');
-	
+
 	addCustomCSS();
 	addPlaceHolderHTML();
 	addFun();
@@ -341,21 +357,29 @@ async function addElements() {
 	}
 	const gameModes = getGameModes();
 
-	// TO FIX: me! links to self, anywhere -> back, search bar, profile banner from home
+	// TO FIX: me! links to self, anywhere -> back, search bar, profile banner
+	// from home
 
 	for (let buttonMode of Object.keys(playerInfos)) {
-		gameModes.querySelector(`a[data-mode="${buttonMode}"]`).addEventListener('click', async (event) => {
-			localStorage['comeFromModeButton'] = 'true';
-			localStorage['targetMode'] = buttonMode;
-			event.preventDefault();
-			window.location.href = `${baseURLs.ppyOsuUsers}${playerId}/${buttonMode}`;
-		});
+		gameModes.querySelector(`a[data-mode="${buttonMode}"]`)
+			.addEventListener('click', async (event) => {
+				localStorage['comeFromModeButton'] = 'true';
+				localStorage['targetMode'] = buttonMode;
+				event.preventDefault();
+				window.location.href = `${baseURLs.ppyOsuUsers}${playerId}/${buttonMode}`;
+			});
 	}
-	document.querySelector("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > div > div > a:nth-child(3)").addEventListener('click', async (event) => {
-		localStorage['comeFromMyProfile'] = 'true';
-		event.preventDefault();
-		window.location.href = document.querySelector("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > a").getAttribute('href');
-	});
+	document
+		.querySelector(
+			'body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > div > div > a:nth-child(3)')
+		.addEventListener('click', async (event) => {
+			localStorage['comeFromMyProfile'] = 'true';
+			event.preventDefault();
+			window.location.href = document
+									   .querySelector(
+										   'body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body > div.osu-page > div > div.nav2__colgroup.nav2__colgroup--icons.js-nav-button--container > div.nav2__col.nav2__col--avatar > a')
+									   .getAttribute('href');
+		});
 	getLocale();
 	fetchPromise.then(() => {
 		updateHTML();
@@ -363,7 +387,7 @@ async function addElements() {
 }
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-	if (msg === 'addElements'){
+	if (msg === 'addElements') {
 		addElements();
 	}
 });
@@ -385,7 +409,8 @@ function addFun() {
 // 	let sign = 1;
 // 	let scale = 1;
 // 	while (true) {
-// 		username.style = `color: hsl(${hue}, 100%, 50%); transform: rotate(${hue}deg) scale(${scale}) translate(${xOffset}px, ${yOffset}px);`;
+// 		username.style = `color: hsl(${hue}, 100%, 50%); transform:
+// rotate(${hue}deg) scale(${scale}) translate(${xOffset}px, ${yOffset}px);`;
 // 		username.style = `color: hsl(${hue}, 100%, 50%);`;
 // 		hue = (hue + 1) % 360;
 // 		xOffset = radius * Math.cos(angle);

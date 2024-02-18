@@ -24,8 +24,8 @@ void* callback(void* data) {
 		// Make the server socket non blocking
 		int optval = 1;
 		if (setsockopt(server->socket, SOL_SOCKET, SOCK_NONBLOCK, &optval,
-	   sizeof(optval)) == -1) report(stderr, "first setsockopt failed: %s",
-	   strerror(errno));
+		 sizeof(optval)) == -1) report(stderr, "first setsockopt failed: %s",
+		 strerror(errno));
 	*/
 	// Set a timeout of 1s
 	struct timeval timeout;
@@ -40,12 +40,12 @@ void* callback(void* data) {
 		/*
 
 				// All this mess basically makes sure there is data to read on
-		   server->socket
+			 server->socket
 				// while adding a timeout of 1s to check for SIGINT
 				FD_ZERO(&read_fds);
 				FD_SET(server->socket, &read_fds);
 				if (select(server->socket + 1, &read_fds, NULL, NULL, &timeout)
-		   <= 0) {
+			 <= 0) {
 					// Either select failed or timeout is over
 					//creport(stdout, "select timeout");
 					continue;
@@ -84,14 +84,14 @@ void* callback(void* data) {
 			/*use this request in the console:
 				fetch('url', {
 					method: 'HEAD' // Use the HEAD method to send an empty
-			   request
+				 request
 				})
 				.then(() => {
 					console.log('Connection closed without sending data.');
 				})
 				.catch(error => {
 					console.error('There was a problem with the fetch
-			   operation:', error);
+				 operation:', error);
 				});
 			*/
 			creport(stdout, "client disconnected");

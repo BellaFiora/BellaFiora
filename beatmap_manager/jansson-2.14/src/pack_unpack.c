@@ -117,7 +117,7 @@ static void set_error(scanner_t* s, const char* source,
 static json_t* pack(scanner_t* s, va_list* ap);
 
 /* ours will be set to 1 if jsonp_free() must be called for the result
-   afterwards */
+	 afterwards */
 static char* read_string(scanner_t* s, va_list* ap, const char* purpose,
 						 size_t* out_len, int* ours, int optional) {
 	char t;
@@ -476,9 +476,9 @@ static int unpack_object(scanner_t* s, json_t* root, va_list* ap) {
 	int gotopt = 0;
 
 	/* Use a set (emulated by a hashtable) to check that all object
-	   keys are accessed. Checking that the correct number of keys
-	   were accessed is not enough, as the same key can be unpacked
-	   multiple times.
+		 keys are accessed. Checking that the correct number of keys
+		 were accessed is not enough, as the same key can be unpacked
+		 multiple times.
 	*/
 	hashtable_t key_set;
 

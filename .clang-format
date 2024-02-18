@@ -1,3 +1,7 @@
+---
+Language: Cpp
+UseTab: Always
+TabWidth: 4
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: false
@@ -55,7 +59,6 @@ IndentPPDirectives: AfterHash
 IndentWidth: 4
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: false
-Language: Cpp
 NamespaceIndentation: All
 PointerAlignment: Left
 ReflowComments: true
@@ -75,5 +78,9 @@ SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-TabWidth: 4
+---
+Language: JavaScript
+BasedOnStyle: Webkit
 UseTab: Always
+TabWidth: 4
+BreakBeforeBraces: Attach
