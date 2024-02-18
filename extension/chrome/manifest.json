@@ -35,6 +35,11 @@
 			"js": ["scripts/users.js"],
 			"matches": ["https://osu.ppy.sh/users/*"],
 			"run_at": "document_start"
+		},
+		{
+			"js": ["scripts/osu.ppy.sh.js"],
+			"matches": ["https://osu.ppy.sh/*"],
+			"run_at": "document_start"
 		}
 	]
 }
