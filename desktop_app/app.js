@@ -1,15 +1,16 @@
 // *** Node Modules *** // 
-const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer, protocol} = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer, protocol, session} = require('electron');
 const {spawn} = require('child_process');
 const axios = require('axios');
 const tmp = require('tmp');
+const vm = require('vm');
+
 
 const fs = require('fs');
 const path = require('path');
-const conf = require('./app/lib/priv/credentials')
 const url = require('url');
 const http = require('http');
-const remoteSrv = require('./app/lib/priv/remote-server')
+
 
 // const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
 // const dns = require('dns');
@@ -20,26 +21,29 @@ const osuFiles = require('./app/lib/osuFiles')
 const AppError = require('./app/lib/error')
 const gini = require('./app/lib/ini')
 const Artisan = require('./app/lib/artisan')
+const remoteSrv = require('./app/lib/priv/remote-server')
+const localSrv = require('./app/lib/local_server')
+const conf = require('./app/lib/priv/credentials');
+const LocalServer = require('./app/lib/local_server');
 // const OsuDBReader = require('./app/lib/db_parser');
 // const osuutils = require('./app/lib/osu_utils');
 
 // First Configs 
 require('dotenv').config();
-let mainWindow = null ; //Main view Window Application
-let continueExecute = true ;
-let isOsuLanuched;
-let gmIsReady;
-let player_data;
-
+let mainWindow //Main view Window Application
+let cookieCheckWindow
+let continueExecute = true
+let isOsuLanuched
+let gmIsReady
+let player_data
 // let isFirstTime = true;
 
 app.whenReady().then(async () => {
     const Conf = new conf();
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
-    // fs.readFile(path.resolve(Conf.getConf('AppPath'),'./package.json'), 'utf8', (err, output) => {
-    //     const packageFile = JSON.parse(output);
-        Conf.setConf('client_version','1.0.764');
-    // });
+    Conf.setConf('client_version','1.0.764');
+  
+
     ipcMain.on('getMainWindow', () => mainWindow.webContents.send('mainWindow', mainWindow));
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
     await LaunchLoading();
@@ -49,7 +53,6 @@ app.whenReady().then(async () => {
             continueExecute = false
         }
     }).catch((e=> {
-        console.log('test')
         Log(e, true, true);
         continueExecute = false}));
         await gLaunch();
@@ -58,7 +61,27 @@ app.whenReady().then(async () => {
         await osuHandler();
         await LaunchGUI();
         await sendCache();
-    });
+        // await getOsuSession()
+
+        // Declaring API endpoints for external plugins
+        const pluginAPI = {
+            //Initalisation and creation of the user interface 
+            Initialize: (obj) => {},
+            Tab: (obj) => { },
+            
+            //Error monitoring and management
+            Log:(obj)=> {},
+            FatalError:(obj)=>{},
+            Error:(obj)=>{}, 
+
+            //Get Objetcts
+            PlayerData:async ()=>{}, //Return an object
+            Osu: async()=>{}, //Return an object
+
+          };
+          await loadPlugin(pluginAPI)
+
+})
 async function osuConnect() {
     if (!continueExecute) return
     // Log message for connecting Osu!Account
@@ -66,8 +89,6 @@ async function osuConnect() {
 
     // Create a new configuration object
     const Conf = new conf();
-
-
     // Return a Promise
     return new Promise(async (resolve, reject) => {
         // Check if Osu token exists in configuration
@@ -78,11 +99,8 @@ async function osuConnect() {
             }).then(async response => {
                 console.log(response.data.id);
 
-
-
                 // Resolve if user ID exists in the response
                 if (response.data.id) 
-
                 // Call SyncData function
                 await SyncData();
                 resolve(true);
@@ -417,9 +435,9 @@ async function gLaunch(){
                                 if (e.includes("Initialized successfully") || e.includes("Initialization complete")) {
                                     gmIsReady = true;  
                                     clearTimeout(s);
-                                    const gIni = new gini();
+                                    new gini().set('Main', 'update',1);
                                     gosumemoryProcess = externalProcess;
-                                    gIni.set('Main', 'update',1);
+                                    // gIni.set('Main', 'update',1);
                                     n(externalProcess);
                                 };
                             })
@@ -512,6 +530,7 @@ async function wsConnect() {
                 continueExecute = false;
 
             } else {
+				const localServer = new LocalServer(51247)
                 resolve(true);
             }
         });
@@ -545,4 +564,110 @@ async function sendCache(){
         mainWindow.webContents.send('player-data', player_data);
         e(true);
     }, 1000);});
+};
+async function loadPlugin(pluginAPI) {
+    return new Promise((resolve, reject) => {
+        global.pluginAPI = pluginAPI;
+        const pluginsPath = path.join(__dirname, 'plugin');
+        const pluginFolders = fs.readdirSync(pluginsPath);
+        pluginFolders.forEach((folder) => {
+            const pluginFolderPath = path.join(pluginsPath, folder);
+            const piFilePath = path.join(pluginFolderPath, 'pi.js');
+            try {
+                const pluginContent = fs.readFileSync(piFilePath, 'utf-8');
+                const context = {
+                    modulePath: piFilePath,
+                    module: {},
+                    exports: {},
+                    require: (modulePath) => {
+                        throw new Error(`Module "${modulePath}" is not allowed.`);
+                    }
+                };
+                const sanitizedContent = checkPlugin(pluginContent);
+                const script = new vm.Script(sanitizedContent, {
+                    filename: piFilePath,
+                    displayErrors: true
+                });
+                script.runInNewContext(context);
+                const resolvedPath = require.resolve(piFilePath);
+                const plugin = require(resolvedPath);
+                if (typeof plugin.init === 'function') {
+                    plugin.init(global.pluginAPI);
+                    resolve(true);
+                } else {
+                    console.error('Initialization was not possible due to the absence of an initialization function')
+                }
+            } catch (error) {
+                console.error(`Error when loading ${folder}:`, error);
+                reject(error);
+            }
+        });
+    });
+};
+async function checkPlugin(pluginContent) {
+    const restrictedRequire = `if (modulePath.startsWith('app/lib')) { throw new Error('Cannot load Private Module'); }`;
+    const electronRequire = `if (modulePath === 'electron') { throw new Error('Cannot load Electron'); }`;
+    return `${electronRequire}; ${restrictedRequire}; ${pluginContent}`;
+};
+async function getOsuSession() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const session = await createCookieCheckWindow();
+            if(session){
+                if(cookieCheckWindow){
+                    cookieCheckWindow.close();
+                }
+                resolve(session)
+            } else {
+                const intervalId = setInterval(async () => {
+                    try {
+                    const cookies = await session.cookies.get({});
+                    const osuSessionCookie = cookies.find(cookie => cookie.name === 'osu_session');
+                    if (osuSessionCookie) {
+                        
+                        resolve(osuSessionCookie)
+
+                        clearInterval(intervalId);
+                    }
+                    } catch (error) {
+                    console.error(error);
+                    }
+                }, 1000);
+            }
+            
+            } catch (error) {
+            console.error(error);
+            }
+    })
+    async function createCookieCheckWindow() {
+        return new Promise((resolve, reject) => {
+          cookieCheckWindow = new BrowserWindow({
+            width: 800,
+            height: 600,
+            webPreferences: {
+              nodeIntegration: true,
+            },
+          });
+    
+          cookieCheckWindow.loadURL('https://osu.ppy.sh');
+          const cookieSession = cookieCheckWindow.webContents.session;
+          cookieCheckWindow.on('closed', () => {
+            cookieCheckWindow = null;
+          });
+          cookieCheckWindow.webContents.on('did-finish-load', async () => {
+            try {
+              const cookies = await cookieSession.cookies.get({});
+              const osuSessionCookie = cookies.find(cookie => cookie.name === 'osu_session');
+              if (osuSessionCookie) {
+                resolve({session:osuSessionCookie.value});
+                cookieCheckWindow.close();
+              }
+              resolve({session:null});
+              
+            } catch (error) {
+              reject(error);
+            }
+          });
+        });
+    };
 };
