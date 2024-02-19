@@ -155,7 +155,7 @@ Recover a file in your extension folder.
 await app.LoadFile('example-plugin', '/assets/data.json').then(callback  =>{
     try {
         jsonObject = JSON.parse(callback)
-    } catch(e){
+    } catch(e) {
         app.Error(e)
     }
 })
