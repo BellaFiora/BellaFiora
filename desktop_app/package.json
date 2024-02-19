@@ -8,6 +8,7 @@
     "dist": "electron-builder --win ",
     "build": "pkg main.js --target win --output bellafiora --node 16"
   },
+  "license": "MIT",
   "author": "",
   "protocols": {
     "myapp": {
@@ -16,7 +17,6 @@
       ]
     }
   },
-  "license": "ISC",
   "dependencies": {
     "axios": "^1.6.7",
     "child_process": "^1.0.2",
@@ -41,21 +41,21 @@
     "uleb128": "^1.0.1",
     "url": "^0.11.3",
     "util": "^0.12.5",
+    "vm": "^0.1.0",
+    "websocket": "^1.0.34",
     "ws": "^8.16.0"
   },
   "devDependencies": {
     "clean-modules": "^3.0.4",
     "electron": "^28.2.1",
-    "electron-builder": "^24.9.1",
-    "eslint": "^8.56.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1"
+    "electron-builder": "^24.9.1"
   },
   "win": {
     "target": "nsis"
   },
+  "files": [
+    "**/*"
+  ],
   "build": {
     "appId": "fr.techalchemy.bellafiora",
     "productName": "Bella Fiora test",
@@ -89,6 +89,7 @@
       ]
     },
     "nsis": {
+      "license": "LICENSE.txt",
       "oneClick": false,
       "perMachine": false,
       "createDesktopShortcut": true,
