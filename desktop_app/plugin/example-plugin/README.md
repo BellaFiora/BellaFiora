@@ -7,18 +7,18 @@ How to create your own plugin compatible with Bella Fiora Desktop
 
 **Structure of plugin directory**
 
-└── [app-location]/  
+    └── [app-location]/  
 
-	└── plugins/ //insert your plugin inside 
+        └── plugins/ //insert your plugin inside 
 
-		└── plugin-name/ 
+            └── plugin-name/ 
 
-			├── assets 
+                ├── assets 
 
-			├── scripts 
+                ├── scripts 
 
-			└── pi.js
-            
+                └── pi.js
+
 
 ### Take into account that the plugin does not have access to all private modules of Bella Fiora.
 #### Unsupported:
