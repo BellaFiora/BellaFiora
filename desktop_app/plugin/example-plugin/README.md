@@ -56,7 +56,7 @@ module.exports  = {
 
 
 
-### app.Initialize() *(required)*
+### `app.Initialize()` *(required)*
 
  - `pluginName` 
 	 - string:[A-Z-a-z] [2-8] chars
@@ -67,14 +67,14 @@ module.exports  = {
  - `version` 
 	 - float: format[xx.xx.xx]
 
-### app.Tab() *(required)*
+### `app.Tab()` *(required)*
 
  - `tabName`
 	 - string:[A-Z-a-z] [2-8] chars
  - `icon`
 	 - ion-icon librairies
  
- ### app.PlayerData(callback) *(await/async)*
+ ### `app.PlayerData(callback)` *(await/async)*
  - Return `callback`
  
   **Description**:
@@ -87,7 +87,7 @@ await app.PlayerData().then(callback  =>{
 	(callback) //use player data after app launched
 })
 ````
-### app.Osu(callback) *(await/async)*
+### `app.Osu(callback)` *(await/async)*
  - return `callback`
  
  **Description**:
@@ -101,7 +101,7 @@ await app.Osu().then(callback  =>{
 	(callback) //use Gosumemory data after app launched
 })
 ````
-### app.Error
+### `app.Error()`
  - `error`
 	 - string:[A-Z-a-z-0-9] [2-256] chars
  - `exit`
@@ -117,7 +117,7 @@ app.Error({
 	exit: false 
 })
 ````
-### app.FatalError
+### `app.FatalError()`
  - `error`
 	 - string:[A-Z-a-z-0-9] [2-256] chars
 
