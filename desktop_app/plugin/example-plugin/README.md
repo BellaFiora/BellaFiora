@@ -9,7 +9,7 @@ How to create your own plugin compatible with Bella Fiora Desktop
 
     └── [app-location]/  
         └── plugins/ //insert your plugin inside 
-            └── plugin-name/ 
+            └── example-plugin/ 
                 ├── assets 
                 ├── scripts 
                 └── pi.js
@@ -37,7 +37,7 @@ Consult the rest of the documentation to see how to exploit some features of the
 module.exports  = {
 	init: (app) => {
 		app.Initialize({
-			pluginName:  'Plugin Name',
+			pluginName:  'example-plugin',
 			author:  'Puparia',
 			description:  'Descript your plugin here',
 			version:  '1.0.0' 
