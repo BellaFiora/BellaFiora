@@ -8,15 +8,10 @@ How to create your own plugin compatible with Bella Fiora Desktop
 **Structure of plugin directory**
 
     └── [app-location]/  
-
         └── plugins/ //insert your plugin inside 
-
             └── plugin-name/ 
-
                 ├── assets 
-
                 ├── scripts 
-
                 └── pi.js
 
 
