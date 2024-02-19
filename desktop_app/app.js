@@ -4,9 +4,9 @@ const {spawn} = require('child_process');
 const axios = require('axios');
 const tmp = require('tmp');
 const vm = require('vm');
-
-
+const util = require('util');
 const fs = require('fs');
+
 const path = require('path');
 const url = require('url');
 const http = require('http');
@@ -18,7 +18,7 @@ const http = require('http');
 
 // *** App Libs *** // 
 const osuFiles = require('./app/lib/osuFiles')
-const AppError = require('./app/lib/error')
+const {AppError, PluginError} = require('./app/lib/error')
 const gini = require('./app/lib/ini')
 const Artisan = require('./app/lib/artisan')
 const remoteSrv = require('./app/lib/priv/remote-server')
@@ -37,6 +37,9 @@ let isOsuLanuched
 let gmIsReady
 let player_data
 // let isFirstTime = true;
+
+
+const readFile = util.promisify(fs.readFile);
 
 app.whenReady().then(async () => {
     const Conf = new conf();
@@ -67,16 +70,36 @@ app.whenReady().then(async () => {
         const pluginAPI = {
             //Initalisation and creation of the user interface 
             Initialize: (obj) => {},
-            Tab: (obj) => { },
+            Tab: (obj) => {},
             
             //Error monitoring and management
-            Log:(obj)=> {},
-            FatalError:(obj)=>{},
-            Error:(obj)=>{}, 
+            Log:(obj)=> {
+                console.log(obj)
+            },
+            FatalError:(obj)=>{
+                PluginError(mainWindow, obj, true)
+            },
+            Error:(obj, exit = false)=>{
+                PluginError(mainWindow, obj, exit)
+            }, 
 
             //Get Objetcts
             PlayerData:async ()=>{}, //Return an object
             Osu: async()=>{}, //Return an object
+
+            //GetFile
+            LoadFile : async(Ext, file)=>{
+                return new Promise((resolve, reject) => {
+                    fs.readFile(`${Conf.getConf('AppPath')}/plugin/${Ext}/${file}`, 'utf8', (err, file) => {
+                        if (err) {
+                            PluginError(mainWindow, `Cannot load file <b>${file}</b>`)
+                        } else {
+                            resolve(file)
+                        }
+                    });
+                })
+               
+            }
 
           };
           await loadPlugin(pluginAPI)
@@ -566,45 +589,61 @@ async function sendCache(){
     }, 1000);});
 };
 async function loadPlugin(pluginAPI) {
-    return new Promise((resolve, reject) => {
-        global.pluginAPI = pluginAPI;
-        const pluginsPath = path.join(__dirname, 'plugin');
-        const pluginFolders = fs.readdirSync(pluginsPath);
-        pluginFolders.forEach((folder) => {
-            const pluginFolderPath = path.join(pluginsPath, folder);
-            const piFilePath = path.join(pluginFolderPath, 'pi.js');
-            try {
-                const pluginContent = fs.readFileSync(piFilePath, 'utf-8');
-                const context = {
-                    modulePath: piFilePath,
-                    module: {},
-                    exports: {},
-                    require: (modulePath) => {
-                        throw new Error(`Module "${modulePath}" is not allowed.`);
-                    }
-                };
-                const sanitizedContent = checkPlugin(pluginContent);
-                const script = new vm.Script(sanitizedContent, {
-                    filename: piFilePath,
-                    displayErrors: true
-                });
-                script.runInNewContext(context);
-                const resolvedPath = require.resolve(piFilePath);
-                const plugin = require(resolvedPath);
-                if (typeof plugin.init === 'function') {
-                    plugin.init(global.pluginAPI);
-                    resolve(true);
-                } else {
-                    console.error('Initialization was not possible due to the absence of an initialization function')
+    global.pluginAPI = pluginAPI;
+    const pluginsPath = path.join(__dirname, 'plugin');
+    const pluginFolders = fs.readdirSync(pluginsPath);
+
+    for (const folder of pluginFolders) {
+        const pluginFolderPath = path.join(pluginsPath, folder);
+        const piFilePath = path.join(pluginFolderPath, 'pi.js');
+        let valid = true
+        try {
+            const pluginContent = await readFile(piFilePath, 'utf-8');
+            const context = {
+                modulePath: piFilePath,
+                module: {},
+                exports: {},
+                require: (modulePath) => {
+                    PluginError(mainWindow, `Module <b>${modulePath.substring(modulePath.lastIndexOf("/") + 1)}</b> is not allowed 
+                    in <b>${folder}</b>`, true)
+                    // console.error(`Module "${modulePath.substring(modulePath.lastIndexOf("/") + 1)}" is not allowed.`);
+                    valid = false
                 }
-            } catch (error) {
-                console.error(`Error when loading ${folder}:`, error);
-                reject(error);
+            };
+
+            const sanitizedContent = checkPlugin(pluginContent);
+
+            const script = new vm.Script(sanitizedContent, {
+                filename: piFilePath,
+                displayErrors: true
+            });
+
+            const scriptResult = script.runInNewContext(context);
+            const plugin = scriptResult || require(piFilePath); 
+            if(valid){
+                if (typeof plugin.init === 'function') {
+                    if (plugin.init.length > 0) {
+                        await new Promise((resolve) => plugin.init(global.pluginAPI, resolve));
+                    } else {
+                        plugin.init(global.pluginAPI);
+                    }
+                    return true;
+                } else {
+                    console.error('Initialization was not possible due to the absence of an initialization function');
+                }
+            } else {
+                return false
             }
-        });
-    });
-};
-async function checkPlugin(pluginContent) {
+           
+        } catch (error) {
+            console.error(`Error when loading ${folder}:`, error);
+            throw error;
+        }
+    }
+
+    return false;
+}
+function checkPlugin(pluginContent) {
     const restrictedRequire = `if (modulePath.startsWith('app/lib')) { throw new Error('Cannot load Private Module'); }`;
     const electronRequire = `if (modulePath === 'electron') { throw new Error('Cannot load Electron'); }`;
     return `${electronRequire}; ${restrictedRequire}; ${pluginContent}`;

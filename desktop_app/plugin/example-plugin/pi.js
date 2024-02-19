@@ -1,6 +1,6 @@
 module.exports = {
     //init plugin
-    init: (app) => {
+    init: async (app) => {
       app.Initialize({ 
         pluginName: 'Plugin Name',
         author: 'Puparia',

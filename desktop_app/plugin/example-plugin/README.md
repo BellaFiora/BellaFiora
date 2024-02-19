@@ -54,9 +54,6 @@ module.exports  = {
 };
 ````
 ##  API
-
-
-
 ### `app.Initialize()` *(required)*
 
  - `pluginName` 
@@ -68,6 +65,7 @@ module.exports  = {
  - `version` 
 	 - float: format[xx.xx.xx]
 
+---
 ### `app.Tab()` *(required)*
 
  - `tabName`
@@ -75,7 +73,8 @@ module.exports  = {
  - `icon`
 	 - ion-icon librairies
  
- ### `app.PlayerData(callback)` *(await/async)*
+---
+### `app.PlayerData(callback)` *(await/async)*
  - Return `callback`
  
 **Description**:
@@ -89,6 +88,7 @@ await app.PlayerData().then(callback  =>{
 	(callback) //use player data after app launched
 })
 ````
+---
 ### `app.Osu(callback)` *(await/async)*
  - return `callback`
  
@@ -104,6 +104,7 @@ await app.Osu().then(callback  =>{
 	(callback) //use Gosumemory data after app launched
 })
 ````
+---
 ### `app.Error()`
  - `error`
 	 - string:[A-Z-a-z-0-9] [2-256] chars
@@ -121,6 +122,7 @@ app.Error({
 	exit: false 
 })
 ````
+---
 ### `app.FatalError()`
  - `error`
 	 - string:[A-Z-a-z-0-9] [2-256] chars
@@ -135,6 +137,29 @@ app.FatalError({
 	error: 'Error content'
 })
 ````
+---
 
+### `app.LoadFile(callback)` *(await/async)*
+
+ - Plugin Folder Name
+ - Your File
+ -  return `callback`
+
+**Description**:
+
+Recover a file in your extension folder.
+
+**Example**:
+
+````JS
+await app.LoadFile('example-plugin', '/assets/data.json').then(callback  =>{
+    try {
+        jsonObject = JSON.parse(callback)
+    } catch(e){
+        app.Error(e)
+    }
+})
+````
+---
  
 

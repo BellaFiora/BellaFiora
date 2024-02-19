@@ -4,4 +4,4 @@ function restart() {
 }
 
 ipcRenderer.on(
-	'err', (event, data) => { document.getElementById('err').innerText = data })
+	'err', (event, data) => { document.getElementById('err').innerHTML = data })
