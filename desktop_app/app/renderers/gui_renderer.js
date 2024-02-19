@@ -23,6 +23,20 @@ var audioCache;
 ipcRenderer.on('audio-cache', (event, cache) => {
 	audioCache = cache;
 });
+
+
+ipcRenderer.on('api', (event, data) => {
+	if(data.event === 'createHTMLObject'){
+		document.getElementById('endOfNav').insertAdjacentHTML('afterend', data.HTML );
+	}
+});
+
+global.pluginInterface = {getWindow:()=>window}
+
+
+
+
+
 ipcRenderer.on('player-data', (event, data) => {
     const player_data = data
 basic_infos = player_data.basic_informations
@@ -31,6 +45,9 @@ console.log(player_data)
 
     // IntroduceDataPlayer(basic_infos.playmode)
 })
+
+
+
 	async function IntroduceDataPlayer(defaultMod = false) {
 		var defaultMod
 
@@ -828,6 +845,11 @@ document.getElementById('bmstats').classList.remove('hidden')
 	  console.log(gamemodeId)
 	  IntroduceDataPlayer(gamemodeId)
   }
+
+
+  ipcRenderer.on('getPlayerData', (event) => {
+	event.sender.send('PlayerData-reply', {basic_infos,gameplay});
+  });
 
   // var gosumemory = [
   //         settings = {

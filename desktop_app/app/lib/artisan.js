@@ -27,6 +27,10 @@ class Artisan {
 		this.bodySections.push(raw);
 		return this;
 	}
+
+	addPage(data){
+		
+	}
 	create(props) {
 		this.props = props.props 
 		this.local = this.props.lang 

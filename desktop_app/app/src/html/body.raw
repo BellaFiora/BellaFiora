@@ -51,7 +51,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
             <div class="soft_infos">
@@ -595,7 +594,7 @@
                 <span>Overlays</span>
                 <div class="indicator"></div>
             </div>
-            <div class="btn-menu " onclick="setActiveButton(this)" data-id="DocPage">
+            <div class="btn-menu " id="endOfNav" onclick="setActiveButton(this)" data-id="DocPage">
                 <ion-icon name="book-outline"></ion-icon>
                 <span>Doc</span>
                 <div class="indicator"></div>
