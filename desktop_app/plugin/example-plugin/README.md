@@ -6,14 +6,20 @@ How to create your own plugin compatible with Bella Fiora Desktop
 `pi.js` *(Plug In)*
 
 **Structure of plugin directory**
-````
+
 └── [app-location]/  
+
 	└── plugins/ //insert your plugin inside 
+
 		└── plugin-name/ 
+
 			├── assets 
+
 			├── scripts 
+
 			└── pi.js
-````
+            
+
 ### Take into account that the plugin does not have access to all private modules of Bella Fiora.
 #### Unsupported:
  - electron 
@@ -77,7 +83,8 @@ module.exports  = {
  ### `app.PlayerData(callback)` *(await/async)*
  - Return `callback`
  
-  **Description**:
+**Description**:
+
 Get all the data about the player who connected with Osu. Find the strucure received [here](url).
 It runs in callback, wait for the answer
 
@@ -91,6 +98,7 @@ await app.PlayerData().then(callback  =>{
  - return `callback`
  
  **Description**:
+
 Retrieve when you want, all data concerning Osu via Gosumemory.
 Find the structure received [here](url).
 It runs in callback, wait for the answer
@@ -108,6 +116,7 @@ await app.Osu().then(callback  =>{
 	 - boolean:false/true exit Bella Fiora Desktop 
 
 **Description**:
+
 Display an error to the user. You have the option to force stop all processes related to the application. Specify the reason for the error to the user.
 
 **Example**:
@@ -122,6 +131,7 @@ app.Error({
 	 - string:[A-Z-a-z-0-9] [2-256] chars
 
 **Description**:
+
 Exit the application with a fatal error for the operation of the application. This function stops the entire application process no matter what. Specify the reason for the user.
 
 **Example**:
