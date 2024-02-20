@@ -1,5 +1,7 @@
 module.exports = {
-	handleRequest : (query) => {
-		return 'ma nouvelle route';
-	},
+    handleRequest: (query) => {
+
+
+      return 'ma nouvelle route';
+    },
 };

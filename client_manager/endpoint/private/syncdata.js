@@ -2,478 +2,120 @@ const db_bellafiora = require('../../src/sequelize');
 const { AppMetric, User } = require('/common/ressources/SequelizeShemas');
 const envFile = '/common/env/.env';
 const dotenv = require('dotenv');
+const FetchData = require('../../data_manager')
 const fs = require('fs')
-dotenv.config({ path : envFile });
+dotenv.config({ path: envFile });
 
-async function handleRequest(query) {
-	if (query.setter === 'set') {
-		var osu_stats = {
-			m0 : {
-				levels : [ {
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					speed : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					alt : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					jump : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					}
-				} ],
-				global_rank : 0,
-				country_rank : 0,
-				notes : {
-					ssh : 0,
-					ss : 0,
-					sh : 0,
-					s : 0,
-					a : 0,
-				},
-				accuracy : 0,
-				plays_count : 0,
-				total_score : 0,
-				ranked_score : 0,
-				clicks : 0,
-				combo_max : 0,
-				music_gender : [],
-				top_rank : [],
-				play_time : 0,
-				level : {
-					current : 0,
-					progress : 0,
-				},
-				exp : 0,
-				pp : 0,
-				history : [],
-				rank_history : []
-			},
-			m3 : {
-				levels : [ {
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					speed : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					alt : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					jump : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					}
-				} ],
-				global_rank : 0,
-				country_rank : 0,
-				notes : {
-					ssh : 0,
-					ss : 0,
-					sh : 0,
-					s : 0,
-					a : 0,
-				},
-				accuracy : 0,
-				plays_count : 0,
-				total_score : 0,
-				clicks : 0,
-				combo_max : 0,
-				music_gender : [],
-				top_rank : [],
-				play_time : 0,
-				level : {
-					current : 0,
-					progress : 0,
-				},
-				exp : 0,
-				pp : 0,
-				history : [],
-				rank_history : []
-			},
-			m2 : {
-				levels : [ {
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					speed : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					alt : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					jump : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					}
-				} ],
-				global_rank : 0,
-				country_rank : 0,
-				notes : {
-					ssh : 0,
-					ss : 0,
-					sh : 0,
-					s : 0,
-					a : 0,
-				},
-				accuracy : 0,
-				plays_count : 0,
-				total_score : 0,
-				clicks : 0,
-				combo_max : 0,
-				music_gender : [],
-				top_rank : [],
-				play_time : 0,
-				level : {
-					current : 0,
-					progress : 0,
-				},
-				exp : 0,
-				pp : 0,
-				history : [],
-				rank_history : []
-			},
-			m1 : {
-				levels : [ {
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					speed : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					tech : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					alt : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					},
-					jump : {
-						s1 : 0,
-						s1 : 0,
-						s3 : 0,
-						s4 : 0,
-						s5 : 0,
-						s6 : 0,
-						s7 : 0,
-						s8 : 0,
-						s9 : 0,
-						s10 : 0,
-					}
-				} ],
-				global_rank : 0,
-				country_rank : 0,
-				notes : {
-					ssh : 0,
-					ss : 0,
-					sh : 0,
-					s : 0,
-					a : 0,
-				},
-				accuracy : 0,
-				plays_count : 0,
-				total_score : 0,
-				clicks : 0,
-				combo_max : 0,
-				music_gender : [],
-				top_rank : [],
-				play_time : 0,
-				level : {
-					current : 0,
-					progress : 0,
-				},
-				exp : 0,
-				pp : 0,
-				history : [],
-				rank_history : []
-			}
-		};
-		var user_infos = {
+async function handleRequest(query){
+    return new Promise(async (resolve, reject) => {
+        User.findOne({
+            where: {
+                user_id: query.user_id
+            }
+        })
+        .then(async user => {
+            if (user) {
+                console.log('STDOUT: Il y a des données')
+                let player_data = {
+                    basic_informations: {
+                        is_online: user.is_online,
+                        country: user.country,
+                        username:user.username,
+                        has_supported: user.has_supported,
+                        is_supporter: user.is_supporter,
+                        is_restricted: user.is_restricted,
+                        playmode: user.playmode,
+                        is_bot: user.is_bot,
+                        avatar_url: user.avatar_url,
+                        cover_url:user.cover_url,
+                    },
+                    gameplay: {
+                        m0: JSON.parse(user.osu),
+                        m1: JSON.parse(user.ctb),
+                        m2: JSON.parse(user.taiko),
+                        m3: JSON.parse(user.mania),
+                    }
+                }
+                resolve(JSON.stringify(player_data))
+            } else {
+                console.log('STDOUT: Il n\'y a pas de données')
+                await FetchData(query).then(player_data => {
+                    console.log('STDOUT: On resolve avec les données fetchées')
+                    let p_data = JSON.parse(player_data)
+                    console.log(p_data.basic_informations)
+                    let date = new Date()
+                    let user
+                    try{
+                         user = {
+                            user_id: query.user_id,
+                            first_use: date,
+                            last_use: date,
+                            last_login: date,
+                            session_id:query.idApp,
+                            api_key: 0,
+                            api_key_sttus: 0,
+                            api_requests: 0,
+                            
+                            ip: query.ipAddress,
+                            osu_token:query.osu_token,
 
-			avatar_url : null,
-			country : null,
-			is_bot : null,
-			is_online : null,
-			is_supporter : null,
-			username : null,
-			has_supported : null,
-			cover_url : null,
-			playmode : null,
-			is_restricted : null,
+                            is_online: p_data.basic_informations.is_online,  
+                            country: p_data.basic_informations.country,
+                            username: p_data.basic_informations.username,
+                            has_supported: p_data.basic_informations.has_supported,
+                            is_supporter: p_data.basic_informations.is_supporter,
+                            is_restricted: p_data.basic_informations.is_restricted,
+                            playmode: p_data.basic_informations.playmode,
+                            is_bot: p_data.basic_informations.is_bot,
+                            avatar_url: p_data.basic_informations.avatar_url,
+                            cover_url: p_data.basic_informations.cover_url,
 
-		} try {
-			const headers = new Headers({
-				'Authorization' : `Bearer ${query.token}`,
-				'Content-Type' : 'application/json',
-				'Accept' : 'application/json'
-			});
+                            osu: JSON.stringify(p_data.gameplay.m0),
+                            ctb: JSON.stringify(p_data.gameplay.m1),
+                            taiko: JSON.stringify(p_data.gameplay.m2),
+                            mania: JSON.stringify(p_data.gameplay.m3),
 
-			const v1_endpoint_base2 = `https://osu.ppy.sh/api/get_user_best?k=${
-				process.env.osuapikey_2}&u=${query.user_id}&type=id&`;
-			const modTypes = [ '0', '3', '2', '1' ];
-			async function aFetch(mod) {
-				const pms = (mod === '0') ? 'osu' : (mod === '3') ? 'mania' : (mod === '1') ? 'fruits' : (mod === '2') ? 'taiko' : '?';
-				const u_best_data = await fetch(v1_endpoint_base2 + `m=${mod}`, {
-					method : 'GET'
-				}).then(response => response.json());
-				const v2_osu_data = await fetch(
-					`https://osu.ppy.sh/api/v2/users/${
-						query.user_id}/${pms}`,
-					{ method : 'GET', headers : headers })
-										.then(response => response.json());
-				for (const entry of u_best_data) {
-					osu_stats['m' + mod].top_rank.push(entry);
-				}
+                        }
+                        // console.log(user)
+                    } catch(e){
+                        console.log(e)
+                    }
+                    User.create(user).then(() => {
+                        resolve(player_data)
+                    }).catch(err => {
+                        console.log(err)
+                        resolve(player_data)
+                    })
 
-				// console.log(`-------------------${pms }-------------------`)
-				// console.log(v2_osu_data)
-				// console.log('----------------------------------------------')
+                    
+                })
+            }
+    
+            
+        }).catch(err => {
+           
+        });
+    })
+   
+    
 
-				osu_stats['m' + mod].global_rank = v2_osu_data.statistics.global_rank;
-				osu_stats['m' + mod].country_rank = v2_osu_data.statistics.country_rank;
-				osu_stats['m' + mod].notes.ssh = v2_osu_data.statistics.grade_counts.ssh;
-				osu_stats['m' + mod].notes.sh = v2_osu_data.statistics.grade_counts.sh;
-				osu_stats['m' + mod].notes.ss = v2_osu_data.statistics.grade_counts.ss;
-				osu_stats['m' + mod].notes.s = v2_osu_data.statistics.grade_counts.s;
-				osu_stats['m' + mod].notes.a = v2_osu_data.statistics.grade_counts.a;
-				osu_stats['m' + mod].accuracy = v2_osu_data.statistics.hit_accuracy;
-				osu_stats['m' + mod].plays_count = v2_osu_data.statistics.play_count;
-				osu_stats['m' + mod].total_score = v2_osu_data.statistics.total_score;
-				osu_stats['m' + mod].play_time = v2_osu_data.statistics.grade_counts.play_time;
-				osu_stats['m' + mod].pp = v2_osu_data.statistics.pp;
-				osu_stats['m' + mod].level.current = v2_osu_data.statistics.level.current;
-				osu_stats['m' + mod].level.progress = v2_osu_data.statistics.level.progress
-				osu_stats['m' + mod].combo_max = v2_osu_data.statistics.maximum_combo
-				osu_stats['m' + mod].clicks = v2_osu_data.statistics.total_hits
-				osu_stats['m' + mod].ranked_score = v2_osu_data.statistics.ranked_score
-				osu_stats['m' + mod].history_rank = v2_osu_data.rank_history.data
-				osu_stats['m' + mod].exp = v2_osu_data.statistics.pp_exp
-
-				user_infos.avatar_url = v2_osu_data.avatar_url
-				user_infos.country = v2_osu_data.country.code
-				user_infos.is_online = v2_osu_data.is_online
-				user_infos.is_restricted = v2_osu_data.is_restricted
-				user_infos.is_supporter = v2_osu_data.is_supporter
-				user_infos.is_bot = v2_osu_data.is_bot
-				user_infos.has_supported = v2_osu_data.has_supported
-				user_infos.playmode = v2_osu_data.playmode
-				user_infos.username = v2_osu_data.username
-				user_infos.cover_url = v2_osu_data.cover_url
-			}
-			const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-			for (const mod of modTypes) {
-				await aFetch(mod);
-				await delay(100);
-			}
-
-			const allDatas = {
-				basic_informations : user_infos,
-				gameplay : osu_stats
-			} const datas
-				= JSON.stringify(allDatas, null, 2);
-			return datas
-		} catch (error) {
-			console.error('Erreur lors de la requête:', error);
-		}
-
-	} else if (query.setter === 'get') {
-	}
 }
 
-module.exports = { handleRequest }
+
+module.exports = {handleRequest}
 
 // osu_stats.osu.global_rank = v2_osu_data.statistics_rulesets.osu.global_rank
 // osu_stats.osu.country_rank = 0
-// osu_stats.osu.notes.ssh =
-// v2_osu_data.statistics_rulesets.osu.grade_counts.ssh osu_stats.osu.notes.sh =
-// v2_osu_data.statistics_rulesets.osu.grade_counts.sh osu_stats.osu.notes.ss =
-// v2_osu_data.statistics_rulesets.osu.grade_count.ss osu_stats.osu.notes.s =
-// v2_osu_data.statistics_rulesets.osu.grade_count.s osu_stats.osu.notes.a =
-// v2_osu_data.statistics_rulesets.osu.grade_count.a osu_stats.osu.accuracy =
-// v2_osu_data.statistics_rulesets.osu.hit_accuracy osu_stats.osu.plays_count =
-// v2_osu_data.statistics_rulesets.osu.play_count osu_stats.osu.total_score =
-// v2_osu_data.statistics_rulesets.osu.total_score osu_stats.osu.combo_max =
-// v2_osu_data.statistics_rulesets.osu.maximum_combo osu_stats.osu.pp =
-// v2_osu_data.statistics_rulesets.osu.pp osu_stats.osu.exp =
-// v2_osu_data.statistics_rulesets.osu.pp_exp osu_stats.osu.level.current =
-// v2_osu_data.statistics_rulesets.osu.level.current
-// osu_stats.osu.level.progress =
-// v2_osu_data.statistics_rulesets.osu.level.progress
+// osu_stats.osu.notes.ssh = v2_osu_data.statistics_rulesets.osu.grade_counts.ssh
+// osu_stats.osu.notes.sh = v2_osu_data.statistics_rulesets.osu.grade_counts.sh
+// osu_stats.osu.notes.ss = v2_osu_data.statistics_rulesets.osu.grade_count.ss
+// osu_stats.osu.notes.s = v2_osu_data.statistics_rulesets.osu.grade_count.s
+// osu_stats.osu.notes.a = v2_osu_data.statistics_rulesets.osu.grade_count.a
+// osu_stats.osu.accuracy = v2_osu_data.statistics_rulesets.osu.hit_accuracy
+// osu_stats.osu.plays_count = v2_osu_data.statistics_rulesets.osu.play_count
+// osu_stats.osu.total_score = v2_osu_data.statistics_rulesets.osu.total_score
+// osu_stats.osu.combo_max = v2_osu_data.statistics_rulesets.osu.maximum_combo
+// osu_stats.osu.pp = v2_osu_data.statistics_rulesets.osu.pp
+// osu_stats.osu.exp = v2_osu_data.statistics_rulesets.osu.pp_exp
+// osu_stats.osu.level.current = v2_osu_data.statistics_rulesets.osu.level.current
+// osu_stats.osu.level.progress = v2_osu_data.statistics_rulesets.osu.level.progress

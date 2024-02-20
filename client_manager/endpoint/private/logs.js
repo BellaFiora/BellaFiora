@@ -1,7 +1,10 @@
 module.exports = {
-	handleRequest : (query) => {
-		console.log(`Client ${query.idApp} [LOG : ${query.logs}]`)
-
-		return 'done';
-	},
+    handleRequest: (query) => {
+      return new Promise((resolve, reject) => {
+        console.log(`Client ${query.idApp} [LOG : ${query.logs}]`)
+        
+        resolve('done');
+      })
+      
+    },
 };
