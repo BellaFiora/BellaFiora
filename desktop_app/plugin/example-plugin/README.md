@@ -36,7 +36,7 @@ Consult the rest of the documentation to see how to exploit some features of the
 
 ````JS
 module.exports  = {
-	init: (app) => {
+	void: (app) => {
 		app.Tab({
 			tabName:  'New Tab', //create tab for plugin
 			icon:  'balloon-outline'//Icon of the ion-icon library
