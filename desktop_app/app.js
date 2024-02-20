@@ -36,11 +36,10 @@ let continueExecute = true
 let isOsuLanuched
 let gmIsReady
 let player_data
+
+let pluginLogs
 // let isFirstTime = true;
-
-
 const readFile = util.promisify(fs.readFile);
-
 app.whenReady().then(async () => {
     const Conf = new conf();
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
@@ -66,21 +65,36 @@ app.whenReady().then(async () => {
         await sendCache();
         // await getOsuSession()
 
+
         // Declaring API endpoints for external plugins
         const pluginAPI = {
             //Initalisation and creation of the user interface 
-            Initialize: (obj) => {},
+            OpenLog:()=>{
+                createLogPluginWindow()
+            },
             Tab: (obj) => {},
-            
             //Error monitoring and management
-            Log:(obj)=> {
-                console.log(obj)
+            Log:(log)=> {  
+                try {
+                    throw new Error();
+                  } catch (error) {
+                    const c = error.stack.split('\n')[2].trim();
+                    const pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
+                    const j = require(`./plugin/${pi}/plugin.json`)
+                    pluginLogs.webContents.send('log', `<b>${j.pluginName}</b>:  ${log}`)
+                  }
+                 
+                // const pluginPath = path.relative(__dirname, callingModulePath); 
+                // const pluginData = require(pluginPath).pluginData;
+                // console.log(pluginData)
+
+                // console.log(log)
             },
-            FatalError:(obj)=>{
-                PluginError(mainWindow, obj, true)
+            FatalError:(fatalError)=>{
+                PluginError(mainWindow, fatalError, true)
             },
-            Error:(obj, exit = false)=>{
-                PluginError(mainWindow, obj, exit)
+            Error:(error, exit = false)=>{
+                PluginError(mainWindow, error, exit)
             }, 
 
             //Get Objetcts
@@ -105,6 +119,8 @@ app.whenReady().then(async () => {
           await loadPlugin(pluginAPI)
 
 })
+
+
 async function osuConnect() {
     if (!continueExecute) return
     // Log message for connecting Osu!Account
@@ -125,6 +141,8 @@ async function osuConnect() {
                 // Resolve if user ID exists in the response
                 if (response.data.id) 
                 // Call SyncData function
+                Log('Data Synchronization')
+
                 await SyncData();
                 resolve(true);
             }).catch(error => {
@@ -135,6 +153,7 @@ async function osuConnect() {
             // If Osu token doesn't exist, perform authentication and sync data
             console.log('auth service');
             await AuthService();
+            Log('Data Synchronization')
             await SyncData();
             resolve(true);
         };
@@ -621,15 +640,16 @@ async function loadPlugin(pluginAPI) {
             const scriptResult = script.runInNewContext(context);
             const plugin = scriptResult || require(piFilePath); 
             if(valid){
-                if (typeof plugin.init === 'function') {
-                    if (plugin.init.length > 0) {
-                        await new Promise((resolve) => plugin.init(global.pluginAPI, resolve));
-                    } else {
-                        plugin.init(global.pluginAPI);
+                if (typeof plugin.void === 'function') {
+                    if (plugin.void.length > 0) {
+                        await new Promise((resolve) => plugin.void(global.pluginAPI, Math.floor(Math.random() * 10) + 1, resolve));
+                    } else {  
+                        pluginAPI.void(global.pluginAPI);
+                        // plugin.init(global.pluginAPI);
                     }
                     return true;
                 } else {
-                    console.error('Initialization was not possible due to the absence of an initialization function');
+                    console.error('Initialization was not possible due to the absence of an void function');
                 }
             } else {
                 return false
@@ -710,3 +730,36 @@ async function getOsuSession() {
         });
     };
 };
+async function createLogPluginWindow(){
+    return new Promise((e, n) => {
+		try {
+			pluginLogs = new BrowserWindow({
+				height : 250,
+				width : 350,
+				minWidth : 360,
+				minHeight : 250,
+				aspectRatio : 1133 / 648,
+				webPreferences : {
+					nodeIntegration : true,
+					contextIsolation : false,
+					paintWhenInitiallyHidden : true
+				},
+
+				titleBarStyle : 'hidden',
+				titleBarOverlay :
+					{ color : '#ffffff00', symbolColor : '#a84a89;', height : 30 },
+				show : false
+			});
+			pluginLogs.loadFile('./app/front/log.html');
+
+			pluginLogs.on('closed', () => { e(null) });
+			pluginLogs.once('ready-to-show', () => {
+				pluginLogs.show();
+			
+			});
+			e(pluginLogs)
+		} catch (e) {
+			n(e)
+		}
+    })
+}
