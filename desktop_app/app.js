@@ -81,14 +81,11 @@ app.whenReady().then(async () => {
                     const c = error.stack.split('\n')[2].trim();
                     const pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
                     const j = require(`./plugin/${pi}/plugin.json`)
-                    pluginLogs.webContents.send('log', `<b>${j.pluginName}</b>:  ${log}`)
+                    if(pluginLogs){
+                        pluginLogs.webContents.send('log', `<b>${j.name}</b>:  ${log}`)
+                    }
+                    
                   }
-                 
-                // const pluginPath = path.relative(__dirname, callingModulePath); 
-                // const pluginData = require(pluginPath).pluginData;
-                // console.log(pluginData)
-
-                // console.log(log)
             },
             FatalError:(fatalError)=>{
                 PluginError(mainWindow, fatalError, true)
@@ -102,9 +99,18 @@ app.whenReady().then(async () => {
             Osu: async()=>{}, //Return an object
 
             //GetFile
-            LoadFile : async(Ext, file)=>{
+            LoadFile : async(filePath)=>{
                 return new Promise((resolve, reject) => {
-                    fs.readFile(`${Conf.getConf('AppPath')}/plugin/${Ext}/${file}`, 'utf8', (err, file) => {
+                    let pi
+                    try {
+                        throw new Error();
+                      } catch (error) {
+                        const c = error.stack.split('\n')[2].trim();
+                        pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
+                      }
+                 
+                      
+                    fs.readFile(`${Conf.getConf('AppPath')}/plugin/${pi}/${filePath}`, 'utf8', (err, file) => {
                         if (err) {
                             PluginError(mainWindow, `Cannot load file <b>${file}</b>`)
                         } else {
@@ -112,10 +118,25 @@ app.whenReady().then(async () => {
                         }
                     });
                 })
-               
+            },
+            WebRequest: async (url, method, headers = {}, data = null) => {
+                return new Promise((resolve, reject) => {
+                    const requestConfig = {
+                        method: method,
+                        url: url,
+                        headers: headers,
+                        data: data,
+                    };
+              
+                    axios(requestConfig).then(response => {
+                        resolve(response);
+                    }).catch(error => {
+                        resolve(error);
+                    });
+                });
+              }
             }
 
-          };
           await loadPlugin(pluginAPI)
 
 })

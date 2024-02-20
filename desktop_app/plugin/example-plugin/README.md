@@ -12,7 +12,8 @@ How to create your own plugin compatible with Bella Fiora Desktop
             └── example-plugin/ 
                 ├── assets 
                 ├── scripts 
-                └── pi.js
+                ├── pi.js
+				└── plugin.json
 
 
 ### Take into account that the plugin does not have access to all private modules of Bella Fiora.
@@ -36,12 +37,6 @@ Consult the rest of the documentation to see how to exploit some features of the
 ````JS
 module.exports  = {
 	init: (app) => {
-		app.Initialize({
-			pluginName:  'example-plugin',
-			author:  'Puparia',
-			description:  'Descript your plugin here',
-			version:  '1.0.0' 
-		});
 		app.Tab({
 			tabName:  'New Tab', //create tab for plugin
 			icon:  'balloon-outline'//Icon of the ion-icon library
@@ -53,27 +48,20 @@ module.exports  = {
 	},
 };
 ````
+
+### JSON Structure: *(required)*
+
+````JSON
+{
+    "name": "Plugin Name",
+    "author": "Puparia",
+    "description": "Descript your plugin here",
+    "version": "1.0.0'",
+    "debug": true
+}
+````
 ##  API
-### `app.Initialize()` *(required)*
 
- - `pluginName` 
-	 - string:[A-Z-a-z] [2-8] chars
- - `author`
-	 - string:[A-Z-a-z-0-9] [2-32] chars
- - `description`
-	 - string:[A-Z-a-z-0-9] [2-4096] chars
- - `version` 
-	 - float: format[xx.xx.xx]
-
----
-### `app.Tab()` *(required)*
-
- - `tabName`
-	 - string:[A-Z-a-z] [2-8] chars
- - `icon`
-	 - ion-icon librairies
- 
----
 ### `app.PlayerData(callback)` *(await/async)*
  - Return `callback`
  
@@ -141,9 +129,8 @@ app.FatalError({
 
 ### `app.LoadFile(callback)` *(await/async)*
 
- - Plugin Folder Name
  - Your File
- -  return `callback`
+ - return `callback`
 
 **Description**:
 
@@ -152,12 +139,34 @@ Recover a file in your extension folder.
 **Example**:
 
 ````JS
-await app.LoadFile('example-plugin', '/assets/data.json').then(callback  =>{
+await app.LoadFile('/assets/data.json').then(callback  =>{
     try {
         jsonObject = JSON.parse(callback)
     } catch(e) {
         app.Error(e)
     }
+})
+````
+---
+
+### `app.WebRequest(callback)` *(await/async)*
+
+ - Your File
+ - return `callback`
+
+**Description**:
+
+To fetch URL
+
+**Example**:
+
+````JS
+await app.WebRequest('https://osu.ppy.sh', 'GET').then(callback  =>{
+   if(callback.data){
+	// use a content
+   } else {
+	app.Error(callback.error)
+   }
 })
 ````
 ---
