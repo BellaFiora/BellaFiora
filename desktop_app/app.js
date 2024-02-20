@@ -127,17 +127,19 @@ app.whenReady().then(async () => {
                         headers: headers,
                         data: data,
                     };
-              
                     axios(requestConfig).then(response => {
                         resolve(response);
                     }).catch(error => {
                         resolve(error);
                     });
                 });
-              }
+            },
+            Renderer:(eventName, data = null) => {
+                mainWindow.webContents.send(eventName, data)
             }
+        }
 
-          await loadPlugin(pluginAPI)
+        await loadPlugin(pluginAPI)
 
 })
 

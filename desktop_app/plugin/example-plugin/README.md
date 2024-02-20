@@ -151,7 +151,13 @@ await app.LoadFile('/assets/data.json').then(callback  =>{
 
 ### `app.WebRequest(callback)` *(await/async)*
 
- - Your File
+ - `url`
+ - `method`
+	- get
+	- post
+
+ - `data`
+	- array
  - return `callback`
 
 **Description**:
@@ -168,6 +174,24 @@ await app.WebRequest('https://osu.ppy.sh', 'GET').then(callback  =>{
 	app.Error(callback.error)
    }
 })
+````
+---
+
+### `app.Renderer()`
+
+ - `event-name`
+	- string
+ - `data`
+	- array
+
+**Description**:
+
+Send a message to the renderer of the application
+
+**Example**:
+
+````JS
+app.Renderer('startPlaying', beatmapArray)
 ````
 ---
  
