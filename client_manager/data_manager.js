@@ -1,3 +1,6 @@
+const { AppMetric, User, Maps} = require('/common/ressources/SequelizeShemas');
+const db_bellafiora = require('./src/sequelize');
+const axios = require('axios')
 async function FetchData(query) {
     return new Promise(async (resolve, reject) => {
         console.log('on fetch')
@@ -389,6 +392,7 @@ async function FetchData(query) {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             });
+            let beatmapsIds = []
     
             const v1_endpoint_base2 = `https://osu.ppy.sh/api/get_user_best?k=${process.env.osuapikey_2}&u=${query.user_id}&type=id&`;
             const modTypes = ['0', '3', '2', '1'];
@@ -403,6 +407,8 @@ async function FetchData(query) {
                 const v2_osu_data = await fetch(`https://osu.ppy.sh/api/v2/users/${query.user_id}/${pms}`, { method: 'GET', headers: headers }).then(response => response.json());
                 for (const entry of u_best_data) {
                     osu_stats['m' + mod].top_rank.push(entry);
+                    console.log(entry.beatmap_id)
+                    beatmapsIds.push(entry.beatmap_id)
                 }
     
                 osu_stats['m'+mod].global_rank = v2_osu_data.statistics.global_rank;
@@ -442,21 +448,101 @@ async function FetchData(query) {
                 await aFetch(mod);
                 await delay(100);
             }
+            await getBeatmaps(beatmapsIds)
     
             const allDatas = {
                 basic_informations : user_infos,
                 gameplay : osu_stats
             }
             const datas = JSON.stringify(allDatas, null, 2);
-            // console.log(datas)
             resolve(datas)
         } catch (error) {
             console.error('Erreur lors de la requête:', error);
         }
         
     })
-   
-    
-    
-}
+
+    async function getBeatmaps(ids){
+        const foundMaps = [];
+        const notFoundIds = [];
+
+        for (const id of ids) {
+            const map = await Maps.findOne({
+                where: {
+                    beatmap_id: id
+                }
+            });
+
+            if (map) {
+                foundMaps.push(map);
+            } else {
+                notFoundIds.push(id);
+            }
+
+           
+        }
+        console.log('Beatmaps not found:')
+        console.table(notFoundIds.length)
+        console.log('Beatmaps founds:')
+        console.table(foundMaps.length)
+            if(notFoundIds.length > 0){
+                let response = await axios.get(`https://osu.ppy.sh/api/v2/beatmaps`, { params: {'ids[]': notFoundIds},
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json',
+                      'Authorization': `Bearer ${query.token}`
+                }})
+                const beatmapsToAdd = response.data.beatmaps;
+
+                const mapsData = beatmapsToAdd.map(beatmapData => ({
+                    beatmap_id: beatmapData.id,
+                    beatmapset_id: beatmapData.beatmapset_id,
+                    difficulty_rating: beatmapData.difficulty_rating,
+                    mode: beatmapData.mode,
+                    status: beatmapData.status,
+                    total_length: beatmapData.total_length,
+                    user_id: beatmapData.user_id,
+                    version: beatmapData.version,
+                    accuracy: beatmapData.accuracy,
+                    ar: beatmapData.ar,
+                    bpm: beatmapData.bpm,
+                    convert: beatmapData.convert,
+                    count_circles: beatmapData.count_circles,
+                    count_sliders: beatmapData.count_sliders,
+                    count_spinners: beatmapData.count_spinners,
+                    cs: beatmapData.cs,
+                    deleted_at: beatmapData.deleted_at,
+                    drain: beatmapData.drain,
+                    hit_length: beatmapData.hit_length,
+                    is_scoreable: beatmapData.is_scoreable,
+                    last_updated: beatmapData.last_updated,
+                    mode_int: beatmapData.mode_int,
+                    passcount: beatmapData.passcount,
+                    playcount: beatmapData.playcount,
+                    ranked: beatmapData.ranked,
+                    url: beatmapData.url,
+                    checksum: beatmapData.checksum,
+                    max_combo: beatmapData.max_combo
+                }));
+                try {
+                    await db_bellafiora.transaction(async (t) => {
+                        // Désactiver les déclencheurs pendant l'opération bulkCreate
+                        await db_bellafiora.query('SET foreign_key_checks = 0', { transaction: t });
+                        
+                        // Utilisez bulkCreate comme d'habitude
+                        await Maps.bulkCreate(mapsData, { transaction: t ,individualHooks: true });
+                
+                        // Réactiver les déclencheurs après l'opération bulkCreate
+                        await db_bellafiora.query('SET foreign_key_checks = 1', { transaction: t });
+                    });
+                }catch(e){
+                    console.log(e)
+                }
+               
+            }
+
+        }
+    }
+
+
 module.exports = FetchData

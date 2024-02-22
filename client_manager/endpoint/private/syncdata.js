@@ -1,7 +1,8 @@
 const db_bellafiora = require('../../src/sequelize');
-const { AppMetric, User } = require('/common/ressources/SequelizeShemas');
+const { AppMetric, User, Maps } = require('/common/ressources/SequelizeShemas');
 const envFile = '/common/env/.env';
 const dotenv = require('dotenv');
+const { Op } = require('sequelize')
 const FetchData = require('../../data_manager')
 const fs = require('fs')
 dotenv.config({ path: envFile });
@@ -14,8 +15,7 @@ async function handleRequest(query){
             }
         })
         .then(async user => {
-            if (user) {
-                console.log('STDOUT: Il y a des données')
+            if (user) {     
                 let player_data = {
                     basic_informations: {
                         is_online: user.is_online,
@@ -34,15 +34,37 @@ async function handleRequest(query){
                         m1: JSON.parse(user.ctb),
                         m2: JSON.parse(user.taiko),
                         m3: JSON.parse(user.mania),
-                    }
+                    },
+                    maps : []
+                    
+                }
+                let tri = []
+                for (let i = 0; i < 4; i++) {
+                    tri.push(player_data.gameplay[`m${i}`]?.top_rank || [].map(e=> e.beatmap_id));
+                }
+                const ma= [].concat(...tri);
+    
+                try {
+                    const md = await Maps.findAll({
+                        where: {
+                            beatmap_id: {
+                                [Op.or]: ma.map(id => parseInt(id, 10))
+                            }
+                          }
+                      });
+              
+                    md.forEach(m => {
+                      const mo = {};
+                      mo[`m${m.beatmap_id}`] = Object.assign({}, m.dataValues);
+                      player_data.maps.push(mo);
+                    });
+                } catch(e){
+                    console.log(e)
                 }
                 resolve(JSON.stringify(player_data))
             } else {
-                console.log('STDOUT: Il n\'y a pas de données')
                 await FetchData(query).then(player_data => {
-                    console.log('STDOUT: On resolve avec les données fetchées')
                     let p_data = JSON.parse(player_data)
-                    console.log(p_data.basic_informations)
                     let date = new Date()
                     let user
                     try{
@@ -76,7 +98,6 @@ async function handleRequest(query){
                             mania: JSON.stringify(p_data.gameplay.m3),
 
                         }
-                        // console.log(user)
                     } catch(e){
                         console.log(e)
                     }
@@ -85,13 +106,9 @@ async function handleRequest(query){
                     }).catch(err => {
                         console.log(err)
                         resolve(player_data)
-                    })
-
-                    
+                    })  
                 })
             }
-    
-            
         }).catch(err => {
            
         });
