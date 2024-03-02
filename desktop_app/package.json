@@ -1,6 +1,6 @@
 {
   "name": "bellafiora",
-  "version": "1.0.920",
+  "version": "1.0.929",
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -58,7 +58,7 @@
   ],
   "build": {
     "appId": "fr.techalchemy.bellafiora",
-    "productName": "Bella Fiora test",
+    "productName": "Bella Fiora Early Access v0.1.929",
     "compression": "maximum",
     "win": {
       "target": "nsis",
@@ -67,6 +67,13 @@
       "extraFiles": [
         {
           "from": "./misc/software/gosumemory.exe",
+          "to": ".",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./misc/software/tosu.exe",
           "to": ".",
           "filter": [
             "**/*"
@@ -82,6 +89,34 @@
         {
           "from": "./build/presence.conf",
           "to": ".",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/src",
+          "to": "./app/src",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/src/assets",
+          "to": "./app/assets",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/front",
+          "to": "./app/front",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/src/html",
+          "to": "./app/html",
           "filter": [
             "**/*"
           ]

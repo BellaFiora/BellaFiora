@@ -43,7 +43,7 @@ const readFile = util.promisify(fs.readFile);
 app.whenReady().then(async () => {
     const Conf = new conf();
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
-    Conf.setConf('client_version','1.0.764');
+    Conf.setConf('client_version','1.0.929');
   
 
     ipcMain.on('getMainWindow', () => mainWindow.webContents.send('mainWindow', mainWindow));
@@ -57,7 +57,8 @@ app.whenReady().then(async () => {
     }).catch((e=> {
         Log(e, true, true);
         continueExecute = false}));
-        await gLaunch();
+        // await gLaunch();
+        await tLaunch()
         await wsConnect();
         await osuConnect();
         await osuHandler();
@@ -169,6 +170,7 @@ async function osuConnect() {
                 await SyncData();
                 resolve(true);
             }).catch(error => {
+                console.log(error)
                 console.error('Error fetching data:', error.message);
                 reject(error);
             });
@@ -206,21 +208,62 @@ async function osuConnect() {
                             Conf.setConf('osu_token', queryParameters.token);
 
                             // Close the authorization window
-                            const closeWindowScript = '<script>window.close();</script>';
                             res.writeHead(200, {'content-Type':'text/html'})
                             res.write(`
                             <!DOCTYPE html>
-                            <html>
-                              <head>
-                                <title>Authorization Success</title>
-                              </head>
-                              <body>
-                                <h1>Authorization Successful!</h1>
-                                <p>Your Osu ID: ${response.data.id}</p>
-                                <p>Your Osu Token: ${queryParameters.token}</p>
-                                <!-- You can customize the HTML content as needed -->
-                              </body>
-                            </html>`)
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <title>Bella Fiora Desktop - Auth Service</title>
+                                    <style>
+                                        * {
+                                            margin:0;
+                                            padding:0;
+                                            box-sizing: border-box;
+                                            font-family:Verdana, Geneva, Tahoma, sans-serif ;
+                                        }
+                                        :root {
+                                            --background5: rgba(255, 0, 0, 0.151);
+                                        }
+                                        body {
+                                            background:linear-gradient(263deg, var(--background5) 18%, rgb(236, 236, 236) 63%);
+                                        }
+                                        .root {
+                                            width: 100vw;
+                                            height: 100vh;
+                                            display: flex;
+                                            flex-direction: column;
+                                            justify-content:space-between;
+                                            align-items: center;
+                                        }
+                                        .title {
+                                            height: 150px;
+                                            font-size: 45px;
+                                            display: flex;
+                                            align-items: end;
+                                        }
+                                        .message {
+                                            height: 120px;
+                                            font-size: 22px;
+                                        }
+                                        .v_software {
+                                            height: 20px;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                <div class="root">
+                                    <h1 class="title">Osu! Authorization granted !</h1>
+                                    <p class="message">You can return to Bella Fiora Desktop</p>
+                                    <p>If this page has not closed automatically, you can do it yourself</p>
+                                    <p class="v_software">v 0.1.929</p> 
+                                </div>
+                                </body>
+                                <script>setTimeout(()=> {window.close()}, 5000)
+                                </html>`);
+                                const closeWindowScript = '';
+                                res.end(closeWindowScript);
                             // res.end(closeWindowScript);
                             setTimeout(() => { server.close(); }, 500);
 
@@ -336,16 +379,18 @@ async function LaunchLoading() {
 };
 async function LaunchGUI(){
     if(!continueExecute) return
-    return new Promise(async (e, n) => {
-        const filePath = path.join('./app/src/html/body.raw');        
-        const rawHTML = fs.readFileSync(filePath, 'utf-8');
+    return new Promise(async (e, n) => {      
+        const rawHTML_1 = fs.readFileSync(path.join('./app/src/html/body_p1.raw'), 'utf-8');
+        const rawHTML_2 = fs.readFileSync(path.join('./app/src/html/body_p2.raw'), 'utf-8');
+
         const artisan = new Artisan();
-        let default_mode = player_data.gameplay.playmode
-        default_mode = (default_mode === 'osu') ? 'm0' :
+        let default_mode = player_data.basic_informations.playmode
+        console.log(default_mode)
+        let dm = (default_mode === 'osu') ? 'm0' :
                     (default_mode === 'mania') ? 'm3' :
                     (default_mode === 'taiko') ? 'm1' :
                     (default_mode === 'fruits') ? 'm2' : 'm0';
-        let gameplay = player_data.gameplay[default_mode]
+        let gameplay = player_data.gameplay[dm]
 
         let data = {
             windowTitle: 'Bella Fiora Desktop',
@@ -365,11 +410,32 @@ async function LaunchGUI(){
             pp:parseFloat(gameplay.pp).toFixed(2),
             avatar_url:player_data.basic_informations.avatar_url,
             country:player_data.basic_informations.country,
+        
+        }
+        const mo = {};
+        for (const mapEntry of player_data.maps) {
+            const beatmapKey = Object.keys(mapEntry)[0];
+            const beatmapData = mapEntry[beatmapKey];
+            mo[beatmapData.beatmap_id] = beatmapData;
+          }
+          let scoreHTML = []
+
+        for (let i = 0; i < 10; i++) {
+            scoreHTML.push(artisan.scoreElement(player_data.gameplay.m0.top_rank[i], mo[player_data.gameplay.m0.top_rank[i].beatmap_id],default_mode))
+        }
+        for (let i = 0; i < 10; i++) {
+            scoreHTML.push(artisan.scoreElement(player_data.gameplay.m1.top_rank[i], mo[player_data.gameplay.m1.top_rank[i].beatmap_id],default_mode))
+        }
+        for (let i = 0; i < 10; i++) {
+            scoreHTML.push(artisan.scoreElement(player_data.gameplay.m2.top_rank[i], mo[player_data.gameplay.m2.top_rank[i].beatmap_id],default_mode))
+        }
+        for (let i = 0; i < 10; i++) {
+            scoreHTML.push(artisan.scoreElement(player_data.gameplay.m3.top_rank[i], mo[player_data.gameplay.m3.top_rank[i].beatmap_id],default_mode))
         }
         artisan.create({
             props: {
-                lang: (player_data.basic_informations.country).toLowerCase(),
-                // lang: 'en',
+                // lang: (player_data.basic_informations.country).toLowerCase(),
+                lang: 'en',
                 objectType: 'document',
                 format: 'html',
                 charset: 'UTF-8', 
@@ -423,7 +489,9 @@ async function LaunchGUI(){
                 }
             }
         })
-        .addContentHTML(rawHTML, data)
+        .addContentHTML(rawHTML_1, data)
+        .addContentHTML(scoreHTML.toString().replace(/,/g, ''))
+        .addContentHTML(rawHTML_2, data)
         .construct().then(r=>{
             const tempHTMLPath = path.join('./app/front/gui2.html');
             fs.writeFile(tempHTMLPath, r, (writeErr) => {
@@ -481,23 +549,74 @@ async function ServerConnection() {
         };
     });
 };
-async function gLaunch(){
+// async function gLaunch(){
+//     if(!continueExecute) return
+//     Log('Starting Gosumemory');
+//     return new Promise(async (o, r) => {
+//         let s;
+//         try {
+//             const Conf = new conf();
+//             fs.access(path.join(Conf.getConf('AppPath'), "gosumemory.exe"), fs.constants.F_OK, e => {
+//                 if (e) {Log(`Error trying to launch Gosumemory:<br>${e}`); o(false)} 
+//                 else {
+//                     externalProcess = spawn(path.join(Conf.getConf('AppPath'), "gosumemory.exe"));
+//                     const n = new Promise(n => {
+//                         if (externalProcess) {
+//                             externalProcess.stdout.on("data", async e => {
+//                                 Log(`stdout: ${e}`, false);
+//                                 if (e.includes('Checking Updates')) isOsuLanuched = true;
+//                                 if (e.includes("Initialized successfully") || e.includes("Initialization complete")) {
+//                                     gmIsReady = true;  
+//                                     clearTimeout(s);
+//                                     new gini().set('Main', 'update',1);
+//                                     gosumemoryProcess = externalProcess;
+//                                     // gIni.set('Main', 'update',1);
+//                                     n(externalProcess);
+//                                 };
+//                             })
+//                         };
+//                     });
+//                     const t = new Promise(n => {
+//                         s = setTimeout(() => {
+//                             if (!gmIsReady) {
+//                                 if (isOsuLanuched) {
+//                                     Log("If this is the first time, start Osu!", true, true);
+//                                     setTimeout(async () => {
+//                                         o(false);
+//                                         isOsuLanuched = false;
+//                                     }, 3000);
+//                                 } else { Log("Error When Launching Gosumemory", true, true); o(false)};
+//                             } else {o(true)};
+//                         }, 10e3);
+//                     });
+//                     Promise.race([n, t]).then(e => {o(e)}).
+//                     catch(e => {
+//                         Log("Error When Launching Gosumemory", true, true);
+//                         isOsuLanuched = false;
+//                         o(e);
+//                     });
+//                 };
+//             });
+//         } catch(e){Log(`Error When Launching Gosumemory: ${e.message}`, true, true); o(e)};
+//     });
+// };
+async function tLaunch(){
     if(!continueExecute) return
-    Log('Starting Gosumemory');
+    Log('Starting Tosu');
     return new Promise(async (o, r) => {
         let s;
         try {
             const Conf = new conf();
-            fs.access(path.join(Conf.getConf('AppPath'), "gosumemory.exe"), fs.constants.F_OK, e => {
-                if (e) {Log(`Error trying to launch Gosumemory:<br>${e}`); o(false)} 
+            fs.access(path.join(Conf.getConf('AppPath'), "Tosu.exe"), fs.constants.F_OK, e => {
+                if (e) {Log(`Error trying to launch Tosu:<br>${e}`); o(false)} 
                 else {
-                    externalProcess = spawn(path.join(Conf.getConf('AppPath'), "gosumemory.exe"));
+                    externalProcess = spawn(path.join(Conf.getConf('AppPath'), "tosu.exe"));
                     const n = new Promise(n => {
                         if (externalProcess) {
                             externalProcess.stdout.on("data", async e => {
                                 Log(`stdout: ${e}`, false);
                                 if (e.includes('Checking Updates')) isOsuLanuched = true;
-                                if (e.includes("Initialized successfully") || e.includes("Initialization complete")) {
+                                if (e.includes("Web server started") || e.includes("ALL PATTERNS ARE RESOLVED")) {
                                     gmIsReady = true;  
                                     clearTimeout(s);
                                     new gini().set('Main', 'update',1);
@@ -517,19 +636,19 @@ async function gLaunch(){
                                         o(false);
                                         isOsuLanuched = false;
                                     }, 3000);
-                                } else { Log("Error When Launching Gosumemory", true, true); o(false)};
+                                } else { Log("Error When Launching Tosu", true, true); o(false)};
                             } else {o(true)};
                         }, 10e3);
                     });
                     Promise.race([n, t]).then(e => {o(e)}).
                     catch(e => {
-                        Log("Error When Launching Gosumemory", true, true);
+                        Log("Error When Launching Tosu", true, true);
                         isOsuLanuched = false;
                         o(e);
                     });
                 };
             });
-        } catch(e){Log(`Error When Launching Gosumemory: ${e.message}`, true, true); o(e)};
+        } catch(e){Log(`Error When Launching Tosu: ${e.message}`, true, true); o(e)};
     });
 };
 async function osuHandler() {

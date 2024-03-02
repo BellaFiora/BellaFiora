@@ -62,9 +62,45 @@
 // 	}
 // });
 
+
+// let socket;
+
+// const urlWebSocket = 'ws://127.0.0.1:51247';
+// function connectWebSocket() {
+// 	console.log('connect')
+// 	socket = new WebSocket(urlWebSocket);
+// 	socket.onopen = function(event) {
+// 	console.log('connect')
+// 	};
+// 	socket.onmessage = function(event) {
+// 		// Traitez les messages reçus selon vos besoins
+// 	};
+
+// 	socket.onclose = function(event) {
+// 		setTimeout(reconnect, 250);
+// 	};
+// 	socket.onerror = function(error) {
+// 		console.error('Erreur : ', error);
+// 		setTimeout(reconnect, 250);
+// 	};
+// }
+
+// function reconnect() {
+// 	console.log('Tentative de reconnexion...');
+// 	connectWebSocket();
+// }
+
+
+// alert('Ceci est un message d\'alerte depuis background.js.');
+//   setInterval(() => {
+// 	chrome.runtime.sendMessage({ fromBackground: true }, function(response) {
+// 		console.log(response.message); 
+// 	  });
+//   }, 1000);
 chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.url.startsWith('https://osu.ppy.sh/users/')) {
 		chrome.tabs.sendMessage(details.tabId, 'addElements', (response) => {
+			
 			if (chrome.runtime.lastError) {
 			}
 		});

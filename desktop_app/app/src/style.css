@@ -1661,7 +1661,9 @@ input {
     margin: 10px;
 }
 
-
+.scores_list .score-container.hidden {
+    display: none;
+}
 
 
 

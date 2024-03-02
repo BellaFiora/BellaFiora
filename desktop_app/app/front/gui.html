@@ -83,7 +83,7 @@
         </div>
     </div>
     <div class="global-contents"> 
-        <div class="main-content" id="HomePage">
+        <div class="main-content active" id="HomePage">
             <div class="home-collumn">
                 <div class="gamemode_select">
                     <span class="gamemode toggle"  data_gm_id="osu">
@@ -241,7 +241,16 @@
             <div class="home_user_profile">
                 <div class="title-categories">Your Best Scores</div>
                 <div id="best_scores" class="scores_list">
-                    <span class="loading_holder t100p h60 "></span>
+                    <div class="score-container">
+                        <div class="score-pp">0 PP</div>
+                        <div class="score-infos">
+                            <div class="score-container-top">Max Combo: ${s.maxCombo} Score: ${s.replayScore} Miss: ${s.cMiss} 300: ${s.c300} 100: ${s.c100} 50: ${s.c50}</div>
+                            <div class="score-container-bottom">${ctwtg(s.timestampWindows)} | Accuracy: ${osuUtils.acc(s.mode, s.c300, s.c100, s.c50, s.cMiss, s.cKatu, s.cGeki)} | Stars: 0 ★</div>
+                        </div>
+                        <div class="score-mods">${s.mods ? s.mods : null}</div>
+                        <div class="score-rank">X</div>
+                    </div>
+                    <!-- <span class="loading_holder t100p h60 "></span> -->
                     <span class="loading_holder t100p h60 "></span>
                     <span class="loading_holder t100p h60 "></span>
                     <span class="loading_holder t100p h60 "></span>
@@ -253,7 +262,7 @@
                 </div>
             </div>
         </div>
-        <div class="main-content row active" id="BotIgPage">
+        <div class="main-content row" id="BotIgPage">
 
           <div class="bot-content">HH</div>
           <div class="downlaod-set">
