@@ -1,4 +1,4 @@
-Bella Fiora Desktop - End User License Agreement (EULA)
+Bella Fiora Desktop Early Access v0.1.929 - End User License Agreement (EULA)
 
 This End User License Agreement (the "Agreement") is a legal agreement between you (the "User") and Techalchemy for the use of the Bella Fiora Desktop application (the "Application"). By using the Application, you agree to be bound by the terms of this Agreement.
 
@@ -24,10 +24,10 @@ This End User License Agreement (the "Agreement") is a legal agreement between y
    5.1 Techalchemy shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly.
 
 6. Governing Law
-   6.1 This Agreement shall be governed by and construed in accordance with the laws of [Jurisdiction].
+   6.1 This Agreement shall be governed by and construed in accordance with the laws of Jurisdiction.
 
 By using the Bella Fiora Desktop application, you acknowledge that you have read and understood this Agreement and agree to be bound by its terms and conditions.
 
 For any questions or concerns, please contact Techalchemy at maxime.zorloni@outlook.fr.
 
-Date: [DATE]
+Date: 29.02.2024
