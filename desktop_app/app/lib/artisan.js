@@ -1,6 +1,11 @@
+const osutils = require('./osu_utils')
+
 class Artisan {
 	constructor() {
-		this.headSection = [] this.bodySections = [] this.content = {
+		this.headSection = [] 
+		this.bodySections = [] 
+		this.Utils = new osutils()
+		this.content = {
 			construct : (content) => {
 				return this.serialize(content)
 			}
@@ -25,8 +30,32 @@ class Artisan {
 		this.bodySections.push(raw);
 		return this;
 	}
+
+	scoreElement(score, map, playmode){
+
+		console.log(`${playmode} - ${map.mode}`)
+		let contentHTML = `
+		<div class="score-container ${(playmode !== map.mode) ? 'hidden' : ''}" data-mode="${map.mode}" data-beatmapId="${map.beatmap_id}" data-beatmapSetId ="${map.beatmapset_id}">
+			<div class="score-pp">${(parseFloat(score.pp)).toFixed(0)} PP</div>
+			<div class="score-infos">
+				<div class="score-container-top">${map.title} - ${map.artist} [${map.version}] By ${map.creator}</div>
+				<div class="score-container-bottom">${new Date(score.date).toDateString()} | Accuracy: | Stars: ${(parseFloat(map.difficulty_rating)).toFixed(2)}★</div>
+			</div>
+			<div class="score-mods">${this.Utils.ModsIntToString(score.enabled_mods)}</div>
+			<div class="score-rank">${score.rank}</div>
+		</div>
+		`
+		return contentHTML
+	}
+
+
+	addPage(data){
+		
+	}
 	create(props) {
-		this.props = props.props this.local = this.props.lang this.type = props.props.objectType
+		this.props = props.props 
+		this.local = this.props.lang 
+		this.type = props.props.objectType
 		return this;
 	}
 	link(obj) {
@@ -42,7 +71,8 @@ class Artisan {
 		return this
 	}
 	meta(obj) {
-		this.props.meta.viewPort = obj.viewPort ? obj.viewPort : '' this.props.meta.charset = obj.charset ? obj.charset : ''
+		this.props.meta.viewPort = obj.viewPort ? obj.viewPort : ''
+		 this.props.meta.charset = obj.charset ? obj.charset : ''
 		return this
 	}
 	script(obj) {
@@ -64,7 +94,8 @@ class Artisan {
 	async construct() {
 		return new Promise((resolve, reject) => {
 			let page =
-				[ { Head : '', Body : '', End : '' } ] if (this.props.viewPort) {
+				[ { Head : '', Body : '', End : '' } ] 
+				if (this.props.viewPort) {
 				page[0].Head += `<meta name="viewport" content="${this.props.viewPort}"/>\n`
 			}
 			if (this.props.charset) {

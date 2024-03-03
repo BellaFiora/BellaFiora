@@ -1,6 +1,6 @@
 {
   "name": "bellafiora",
-  "version": "1.0.920",
+  "version": "1.0.929",
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "dist": "electron-builder --win ",
     "build": "pkg main.js --target win --output bellafiora --node 16"
   },
+  "license": "MIT",
   "author": "",
   "protocols": {
     "myapp": {
@@ -16,7 +17,6 @@
       ]
     }
   },
-  "license": "ISC",
   "dependencies": {
     "axios": "^1.6.7",
     "child_process": "^1.0.2",
@@ -41,6 +41,8 @@
     "uleb128": "^1.0.1",
     "url": "^0.11.3",
     "util": "^0.12.5",
+    "vm": "^0.1.0",
+    "websocket": "^1.0.34",
     "ws": "^8.16.0"
   },
   "devDependencies": {
@@ -51,9 +53,12 @@
   "win": {
     "target": "nsis"
   },
+  "files": [
+    "**/*"
+  ],
   "build": {
     "appId": "fr.techalchemy.bellafiora",
-    "productName": "Bella Fiora test",
+    "productName": "Bella Fiora Early Access v0.1.929",
     "compression": "maximum",
     "win": {
       "target": "nsis",
@@ -62,6 +67,13 @@
       "extraFiles": [
         {
           "from": "./misc/software/gosumemory.exe",
+          "to": ".",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./misc/software/tosu.exe",
           "to": ".",
           "filter": [
             "**/*"
@@ -80,10 +92,39 @@
           "filter": [
             "**/*"
           ]
+        },
+        {
+          "from": "./app/src",
+          "to": "./app/src",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/src/assets",
+          "to": "./app/assets",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/front",
+          "to": "./app/front",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "./app/src/html",
+          "to": "./app/html",
+          "filter": [
+            "**/*"
+          ]
         }
       ]
     },
     "nsis": {
+      "license": "LICENSE.txt",
       "oneClick": false,
       "perMachine": false,
       "createDesktopShortcut": true,

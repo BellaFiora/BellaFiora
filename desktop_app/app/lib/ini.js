@@ -4,9 +4,9 @@ const fs = require('fs');
 const path = require('path')
 class gini {
 	constructor() {
-		this.Conf = new conf() this.ini = ini.parse((fs.readFileSync(path.join(
-														 this.Conf.getConf('AppPath'), '/config.ini')))
-														.toString())
+		this.Conf = new conf() 
+		this.ini = ini.parse((fs.readFileSync(path.join(
+		this.Conf.getConf('AppPath'), '/config.ini'))).toString())
 	}
 
 	get(cat, key) {

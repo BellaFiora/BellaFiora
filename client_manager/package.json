@@ -9,6 +9,7 @@
   "author": "Pupariaa",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.6.7",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

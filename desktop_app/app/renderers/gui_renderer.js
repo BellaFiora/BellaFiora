@@ -1,5 +1,7 @@
 var hitErrorArrayTab
-var key1ArrayHits = [] var key2ArrayHits = [] const { ipcRenderer } = require('electron');
+var key1ArrayHits = [] 
+var key2ArrayHits = [] 
+const { ipcRenderer } = require('electron');
 const Highcharts = require('highcharts');
 require('highcharts/modules/exporting')(Highcharts);
 const BPDPC = require('osu-bpdpc');
@@ -11,14 +13,30 @@ var playing = false
 var wsData = null
 var basic_infos
 var gameplay
-var missChecker = { Miss : 0, checked : false } var sbChecker = {
+var missChecker = { Miss : 0, checked : false } 
+var sbChecker = {
 	SB : 0,
 	checked : false
-} var audioCache;
+} 
+var audioCache;
 
 ipcRenderer.on('audio-cache', (event, cache) => {
 	audioCache = cache;
 });
+
+
+ipcRenderer.on('api', (event, data) => {
+	if(data.event === 'createHTMLObject'){
+		document.getElementById('endOfNav').insertAdjacentHTML('afterend', data.HTML );
+	}
+});
+
+global.pluginInterface = {getWindow:()=>window}
+
+
+
+
+
 ipcRenderer.on('player-data', (event, data) => {
     const player_data = data
 basic_infos = player_data.basic_informations
@@ -27,6 +45,9 @@ console.log(player_data)
 
     // IntroduceDataPlayer(basic_infos.playmode)
 })
+
+
+
 	async function IntroduceDataPlayer(defaultMod = false) {
 		var defaultMod
 
@@ -474,7 +495,8 @@ document.getElementById('bmstats').classList.remove('hidden')
   ipcRenderer.on('startPlaying', (event, bm) => {
 	  hitErrorArrayTab = []
 	  key1ArrayHits = []
-	  key2ArrayHits = [] const container = document.getElementById('playing_keys');
+	  key2ArrayHits = [] 
+	  const container = document.getElementById('playing_keys');
   })
 
   // ipcRenderer.on('dataPlaying', (event, gameplay, bm) => {
@@ -542,7 +564,8 @@ document.getElementById('bmstats').classList.remove('hidden')
 			  sbChecker.checked = true
 			  // playVoice('FR', 'aim')
 		  }
-		  let lastHit = [] const gameplay = wsData.gameplay
+		  let lastHit = [] 
+		  const gameplay = wsData.gameplay
 		  if (gameplay.hits.hitErrorArray) {
 			  hitErrorArrayTab = gameplay.hits.hitErrorArray.slice(-200);
 			  lastHit = gameplay.hits.hitErrorArray.slice(-1);
@@ -822,6 +845,11 @@ document.getElementById('bmstats').classList.remove('hidden')
 	  console.log(gamemodeId)
 	  IntroduceDataPlayer(gamemodeId)
   }
+
+
+  ipcRenderer.on('getPlayerData', (event) => {
+	event.sender.send('PlayerData-reply', {basic_infos,gameplay});
+  });
 
   // var gosumemory = [
   //         settings = {

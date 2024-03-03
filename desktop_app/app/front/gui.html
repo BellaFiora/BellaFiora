@@ -13,7 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.css">
-
+    <link rel="stylesheet" href="https://demos.jquerymobile.com/1.4.2/css/themes/default/jquery.mobile-1.4.2.min.css">  
+    <script src="https://demos.jquerymobile.com/1.4.2/js/jquery.js"></script>
+    <script src="https://demos.jquerymobile.com/1.4.2/js/jquery.mobile-1.4.2.min.js"></script>
     <link rel="stylesheet" href="../src/style.css">
 </head>
 <body>
@@ -28,7 +30,7 @@
             <div class="nav-btn-action"><ion-icon name="notifications-outline"></ion-icon></div>
             <div class="nav-btn-action"><ion-icon name="settings-outline"></ion-icon></div>
         </div>
-        <div class="open-boxedit">
+        <div class="open-boxedit reply">
             <div class="boxContainer">
                 <div class="settings-container">
                     <div class="setup-handler">
@@ -239,7 +241,16 @@
             <div class="home_user_profile">
                 <div class="title-categories">Your Best Scores</div>
                 <div id="best_scores" class="scores_list">
-                    <span class="loading_holder t100p h60 "></span>
+                    <div class="score-container">
+                        <div class="score-pp">0 PP</div>
+                        <div class="score-infos">
+                            <div class="score-container-top">Max Combo: ${s.maxCombo} Score: ${s.replayScore} Miss: ${s.cMiss} 300: ${s.c300} 100: ${s.c100} 50: ${s.c50}</div>
+                            <div class="score-container-bottom">${ctwtg(s.timestampWindows)} | Accuracy: ${osuUtils.acc(s.mode, s.c300, s.c100, s.c50, s.cMiss, s.cKatu, s.cGeki)} | Stars: 0 ★</div>
+                        </div>
+                        <div class="score-mods">${s.mods ? s.mods : null}</div>
+                        <div class="score-rank">X</div>
+                    </div>
+                    <!-- <span class="loading_holder t100p h60 "></span> -->
                     <span class="loading_holder t100p h60 "></span>
                     <span class="loading_holder t100p h60 "></span>
                     <span class="loading_holder t100p h60 "></span>
@@ -251,10 +262,27 @@
                 </div>
             </div>
         </div>
-        <div class="main-content" id="BotIgPage">
-            <div class="user-welcome">
-                <span>..</span>
+        <div class="main-content row" id="BotIgPage">
+
+          <div class="bot-content">HH</div>
+          <div class="downlaod-set">
+            <span class="title">Generate New Collection</span>
+            <div class="bmset-filter">
+                <div class="filter">
+                    <label>HP Drain</label>
+                    <div>
+                        <div class="double-range-container">
+                            <label for="double-range">Double Range:</label>
+                            <input type="range" id="double-range" min="0" max="100" value="25">
+                            <output id="output1">25</output>
+                            <output id="output2">75</output>
+                    
+                            <p id="result">Valeur Plage 1: 25, Valeur Plage 2: 75</p>
+                        </div>
+                
+                    </div>
             </div>
+          </div>
         </div>
         <div class="main-content" id="GamePlayPage">
             <div class="player-music" id="musicPlayer">
@@ -407,7 +435,23 @@
             <!-- const k1 = calcAVGk1()
             const k2 = calcAVGk2() -->
         </div>
-            
+            <script>
+             document.addEventListener('DOMContentLoaded', function () {
+    const doubleRange = document.getElementById('double-range');
+    const output1 = document.getElementById('output1');
+    const output2 = document.getElementById('output2');
+    const result = document.getElementById('result');
+
+    doubleRange.addEventListener('input', updateResult);
+
+    function updateResult() {
+        const value = doubleRange.value;
+        output1.value = value;
+        output2.value = 100 - value;
+        result.textContent = `Valeur Plage 1: ${value}, Valeur Plage 2: ${100 - value}`;
+    }
+});
+            </script>
             <!-- <div id="playing_keys">
                 <div id="key1">
                     <span style="width: 1px;"></span>
@@ -584,6 +628,8 @@
                 </div>
             </div>
         </div>
+
+      
         <!-- <script>
             const colorSelector = document.getElementById('color-selector');
 
@@ -655,6 +701,6 @@
 
     <!-- <div class="body__handler_pop_up" ></div> -->
 </body>
-<script src="../renderers/gui_renderer.js" defer></script>
+<!-- <script src="../renderers/gui_renderer.js" defer></script> -->
 <!-- <script src="../renderers/main-renderer.js" defer></script> -->
 </html>
