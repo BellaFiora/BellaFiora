@@ -3,3 +3,4 @@ gen.py
 *.osu
 test.exe*
 test
+*.json
