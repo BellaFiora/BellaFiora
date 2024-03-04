@@ -28,3 +28,4 @@ dummy.txt
 client_manager/node_modules/.bin/mime
 HomeModulesSaves
 desktop_app/app/front/gui2.html
+desktop_app/app/lib/log.log
