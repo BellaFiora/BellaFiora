@@ -22,12 +22,12 @@ class LogFile {
          */
 
         this.WriteFile = function(service, log){
-            if(!fs.existsSync(path.join(__dirname, 'log.log'))){
-                fs.writeFileSync(path.join(__dirname, 'log.log'), 'utf-8')
+            if(!fs.existsSync(path.join(app.getAppPath().replace("\\resources\\app.asar"), 'log.log'))){
+                fs.writeFileSync(path.join(app.getAppPath().replace("\\resources\\app.asar"), 'log.log'), 'utf-8')
             }
             const stack = this.stackTraceToObject(new Error().stack)
             const date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            fs.appendFileSync(path.join(__dirname, 'log.log'), `${date} [${service}]: "${log}" AT ${stack.function} ${stack.file} ${stack.line} ${stack.column}\n`, 'utf-8')
+            fs.appendFileSync(path.join(app.getAppPath().replace("\\resources\\app.asar"), 'log.log'), `${date} [${service}]: "${log}" AT ${stack.function} ${stack.file} ${stack.line} ${stack.column}\n`, 'utf-8')
         }  
          /**
          * Extracts relevant information from a stack trace.
