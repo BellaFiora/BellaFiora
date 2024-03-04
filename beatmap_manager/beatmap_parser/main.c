@@ -22,7 +22,7 @@ void handle_request() {
 		fprintf(stderr, "parse_beatmap failed\n");
 		exit(1);
 	}
-	jsonify_beatmap_to_file(bm, stdout);
+	jsonify_beatmap_to_file_pretty(bm, stdout);
 	free_beatmap(bm);
 }
 
@@ -45,7 +45,10 @@ int loop() {
 #ifndef _WIN32
 
 int main(void) {
-	return loop();
+	wait_request();
+	handle_request();
+	// return loop();
+	return 0;
 }
 
 #else

@@ -10,7 +10,7 @@ void jsonify_general_pretty(const General* general, FILE* fp) {
 	fprintf(fp, "\t\t\"PreviewTime\": %d,\n", general->previewTime);
 	fprintf(fp, "\t\t\"Countdown\": %d,\n", general->countdown);
 	fprintf(fp, "\t\t\"SampleSet\": \"%s\",\n", general->sampleSet);
-	fprintf(fp, "\t\t\"StackLeniency\": %f,\n", general->stackLeniency);
+	fprintf(fp, "\t\t\"StackLeniency\": %.1f,\n", general->stackLeniency);
 	fprintf(fp, "\t\t\"Mode\": %d,\n", general->mode);
 	fprintf(fp, "\t\t\"LetterboxInBreaks\": %d,\n", general->letterboxInBreaks);
 	fprintf(fp, "\t\t\"StoryFireInFront\": %d,\n", general->storyFireInFront);
@@ -121,7 +121,7 @@ void jsonify_events_pretty(const List* events, FILE* fp) {
 #define jsonify_timingPoint_pretty                                             \
 	fprintf(fp, "\t\t{\n");                                                    \
 	fprintf(fp, "\t\t\t\"Time\": %d,\n", timingPoint->time);                   \
-	fprintf(fp, "\t\t\t\"BeatLength\": %f,\n", timingPoint->beatLength);       \
+	fprintf(fp, "\t\t\t\"BeatLength\": %.12f,\n", timingPoint->beatLength);    \
 	fprintf(fp, "\t\t\t\"Meter\": %d,\n", timingPoint->meter);                 \
 	fprintf(fp, "\t\t\t\"SampleSet\": %d,\n", timingPoint->sampleSet);         \
 	fprintf(fp, "\t\t\t\"SampleIndex\": %d,\n", timingPoint->sampleIndex);     \
@@ -306,7 +306,7 @@ void jsonify_general(const General* general, FILE* fp) {
 	fprintf(fp, "\"d\":%d,", general->previewTime);
 	fprintf(fp, "\"e\":%d,", general->countdown);
 	fprintf(fp, "\"f\":\"%s\",", general->sampleSet);
-	fprintf(fp, "\"g\":%f,", general->stackLeniency);
+	fprintf(fp, "\"g\":%.1f,", general->stackLeniency);
 	fprintf(fp, "\"h\":%d,", general->mode);
 	fprintf(fp, "\"i\":%d,", general->letterboxInBreaks);
 	fprintf(fp, "\"j\":%d,", general->storyFireInFront);
@@ -411,7 +411,7 @@ void jsonify_events(const List* events, FILE* fp) {
 #define jsonify_timingPoint                                                    \
 	fprintf(fp, "{");                                                          \
 	fprintf(fp, "\"a\":%d,", timingPoint->time);                               \
-	fprintf(fp, "\"b\":%f,", timingPoint->beatLength);                         \
+	fprintf(fp, "\"b\":%.12f,", timingPoint->beatLength);                      \
 	fprintf(fp, "\"c\":%d,", timingPoint->meter);                              \
 	fprintf(fp, "\"d\":%d,", timingPoint->sampleSet);                          \
 	fprintf(fp, "\"e\":%d,", timingPoint->sampleIndex);                        \
