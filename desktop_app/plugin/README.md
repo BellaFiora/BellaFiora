@@ -1,5 +1,5 @@
-## Plugin Example
-How to create your own plugin compatible with Bella Fiora Desktop
+## Plugin
+How to create your own plugin compatible with Bella Fiora Desktop.
 
 ### Plugin entry point *(required)*
 
@@ -7,192 +7,151 @@ How to create your own plugin compatible with Bella Fiora Desktop
 
 **Structure of plugin directory**
 
-    └── [app-location]/  
-        └── plugins/ //insert your plugin inside 
-            └── example-plugin/ 
-                ├── assets 
-                ├── scripts 
-                ├── pi.js
-		    └── plugin.json
+	└── [app-location]/  
+		└── plugins/ //insert your plugin inside 
+			└── example-plugin/ 
+				├── assets 
+				├── scripts 
+				├── pi.js
+			└── plugin.json
 
 
-### Take into account that the plugin does not have access to all private modules of Bella Fiora.
-#### Unsupported:
- - electron 
- - lib/osuFile 
- - lib/error 
- - lib/ini 
- - lib/artisan
- - lib/priv/remote-server
- - lib/local-server
- - lib/priv/credential
- - lib/db_parser
- - lib/osu_utils
+### Take into account that the plugin cannot use requires.
 
-Consult the rest of the documentation to see how to exploit some features of these libraries without requiring()
+Consult the rest of the documentation to see how to exploit some features of these libraries without require()
 
-
-### Plugin Structure: *(required)*
+### `pi.js` Structure: *(required)*
 
 ````JS
 module.exports  = {
 	void: (app) => {
 		app.Tab({
-			tabName:  'New Tab', //create tab for plugin
-			icon:  'balloon-outline'//Icon of the ion-icon library
+			tabName:  'New Tab', // Create tab for plugin
+			icon:  'balloon-outline'// Icon of the ion-icon library
 		})
 		async function Plugin() {
-			//Insert all the logic of your plugin inside
+			// Insert all the logic of your plugin inside
 		}
-		Plugin();//Run plugin
-	},
+		Plugin(); // Run plugin
+	}
 };
 ````
 
-### JSON Structure: *(required)*
+### `plugin.json` Structure: *(required)*
 
 ````JSON
 {
-    "name": "Plugin Name",
-    "author": "Puparia",
-    "description": "Descript your plugin here",
-    "version": "1.0.0'",
-    "debug": true
+	"name": "Plugin Name",
+	"author": "Puparia",
+	"description": "Descript your plugin here",
+	"version": "1.0.0'",
+	"debug": true
 }
 ````
 ##  API
 
-### `app.PlayerData(callback)` *(await/async)*
- - Return `callback`
- 
+### `async app.PlayerData()` 
 **Description**:
 
-Get all the data about the player who connected with Osu. Find the strucure received [here](url).
-It runs in callback, wait for the answer
+Get all the data about the player who connected with Osu.
+
+**Returns**:
+
+A Promise that resolves as a [`playerDatas`](#PlayerDatasStruct) struct.
 
 **Example**:
 ````JS
-await app.PlayerData().then(callback  =>{
-	(callback) //use player data after app launched
+await app.PlayerData().then(playerDatas => {
+	console.log(playerDatas.basic_informations.username);
 })
 ````
 ---
-### `app.Osu(callback)` *(await/async)*
- - return `callback`
- 
- **Description**:
-
-Retrieve when you want, all data concerning Osu via Gosumemory.
-Find the structure received [here](url).
-It runs in callback, wait for the answer
-
-**Example**:
-````JS
-await app.Osu().then(callback  =>{
-	(callback) //use Gosumemory data after app launched
-})
-````
----
-### `app.Error()`
- - `error`
-	 - string:[A-Z-a-z-0-9] [2-256] chars
- - `exit`
-	 - boolean:false/true exit Bella Fiora Desktop 
-
+### `async app.Osu()`
 **Description**:
 
-Display an error to the user. You have the option to force stop all processes related to the application. Specify the reason for the error to the user.
+Retrieve all data concerning osu! from tosu.
+
+**Returns**:
+
+A Promise that resolves as a [`tosuInfos`](	t-api-response) struct.
 
 **Example**:
 ````JS
-app.Error({
-	error: 'Error content',
-	exit: false 
+await app.Osu().then(tosuInfos => {
+	console.log(tosuInfos.beatmap.title);
 })
 ````
 ---
-### `app.FatalError()`
- - `error`
-	 - string:[A-Z-a-z-0-9] [2-256] chars
-
+### `app.Error(errorMessage, exit = false)`
 **Description**:
 
-Exit the application with a fatal error for the operation of the application. This function stops the entire application process no matter what. Specify the reason for the user.
+Display an error to the user. You have the option to force stop all processes related to the application.
 
 **Example**:
 ````JS
-app.FatalError({
-	error: 'Error content'
+app.Error('Oh shit critical error', true);
+````
+---
+
+### `async app.LoadFile(file_path)`
+**Returns**:
+
+The file content.
+
+**Example**:
+````JS
+await app.LoadFile('/assets/data.json').then(content => {
+	try {
+		jsonObject = JSON.parse(content);
+	} catch(e) {
+		app.Error(e);
+	}
 })
 ````
 ---
 
-### `app.LoadFile(callback)` *(await/async)*
-
- - Your File
- - return `callback`
-
+### `async app.WebRequest(url, method, headers = {}, data = null)`
 **Description**:
 
-Recover a file in your extension folder.
+Literally uses
+````JS
+axios({
+	method: method,
+	url: url,
+	headers: headers,
+	data: data
+})
+````
 
 **Example**:
-
 ````JS
-await app.LoadFile('/assets/data.json').then(callback  =>{
-    try {
-        jsonObject = JSON.parse(callback)
-    } catch(e) {
-        app.Error(e)
-    }
+await app.WebRequest('https://osu.ppy.sh/u/11103956', 'GET').then(res => {
+	if (res.data) {
+		console.log(res.data);
+	} else {
+		app.Error(res.error);
+	}
 })
 ````
 ---
-
-### `app.WebRequest(callback)` *(await/async)*
-
- - `url`
- - `method`
-	- get
-	- post
-
- - `data`
-	- array
- - return `callback`
-
-**Description**:
-
-To fetch URL
-
-**Example**:
-
-````JS
-await app.WebRequest('https://osu.ppy.sh', 'GET').then(callback  =>{
-   if(callback.data){
-	// use a content
-   } else {
-	app.Error(callback.error)
-   }
-})
-````
----
-
 ### `app.Renderer()`
+**Description**:
+
+Send a message to the renderer of the application.
 
  - `event-name`
 	- string
  - `data`
 	- array
 
-**Description**:
-
-Send a message to the renderer of the application
-
 **Example**:
-
 ````JS
-app.Renderer('startPlaying', beatmapArray)
+app.Renderer('startPlaying', beatmapArray);
 ````
 ---
  
+## Structures
 
+### PlayerDatasStruct {#PlayerDatasStruct}
+
+...
