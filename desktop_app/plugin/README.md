@@ -73,7 +73,7 @@ Retrieve all data concerning osu! from tosu.
 
 **Returns**:
 
-A Promise that resolves as a [`tosuInfos`](	t-api-response) struct.
+A Promise that resolves as a [`tosuInfos`](https://github.com/KotRikD/tosu/wiki/v2-websocket-api-response) struct.
 
 **Example**:
 ````JS
