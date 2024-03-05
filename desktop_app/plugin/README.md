@@ -152,6 +152,6 @@ app.Renderer('startPlaying', beatmapArray);
  
 ## Structures
 
-### PlayerDatasStruct {#PlayerDatasStruct}
+### PlayerDatasStruct
 
 ...
