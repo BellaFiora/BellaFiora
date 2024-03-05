@@ -13,7 +13,7 @@ How to create your own plugin compatible with Bella Fiora Desktop.
 				├── assets 
 				├── scripts 
 				├── pi.js
-			└── plugin.json
+				└── plugin.json
 
 
 ### Take into account that the plugin cannot use requires.
