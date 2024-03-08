@@ -45,14 +45,13 @@ Suggest a beatmap for the player.
 	- AR/BPM/CS/HP/OD/PP/SR of the desired beatmap.
 - `-mapper <mapper>`
 	- Mapper of the desired beatmap.
-	- Non-case sensitive.
 	- Multiple mappers can be specified separated by commas, example: `-mapper Sotarks,HiroSheap`.
 - `-status <status>`
 	- Ranking status of the desired beatmap.
-	- Non-case sensitive.
 	- Multiple ranking status can be specified separated by commas, example: `-status graveyard,Approved`.
 	- Valid ranking status are: `Graveyard`, `WIP`, `Ranked`, `Approved`, `Qualified`, `Loved`.
 - `-save <command_alias>`
+	- Case-sensitive.
 	- Saves the command and sets its alias to `<command_alias>`.
 	- View saved commands using `!bm saved`.
 	- Use a saved command using `!bm saved <command_alias> [options/arguments to overwrite in this command only...]`.
@@ -64,9 +63,19 @@ Suggest a beatmap for the player.
 	- Specifies whether to get an already played beatmap.
 - `-mod <mod>`
 	- Mods to be applied to the desired beatmap.
-	- Non-case sensitive.
 	- Multiple mods can be specified separated by commas, example: `-mod DT,hd`.
 	- Valid mods are: `EZ`, `NF`, `HT`, `HR`, `SD`, `DT` or `NC`, `HD`, `FL`.
+- `-tag <tag>`
+	- Music tags of the desired beatmap.
+	- Multiple tags can be specified separated by commas, example: `-tag pop,anime`.
+- `-genre <genre>`
+	- Genre of the desired beatmap.
+- `-language <language>`
+	- Language of the desired beatmap.
+- `-source <source>`
+	- Source of the desired beatmap.
+
+All options' arguments are non-case sensitive if not mentioned otherwise.
 
 For all options up to BPM, modifiers apply to ease the use. The `OD` option will be used as an example:
 
