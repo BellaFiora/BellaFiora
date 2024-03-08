@@ -1,5 +1,4 @@
 
-
 typedef struct {
 	// list of pointers of objects in the previous iteration
 	List* objects; // HitObject*

@@ -4,6 +4,7 @@
 #include "../../c_utils/src/list.h"
 
 typedef struct {
+	int version;
 	char* audioFilename;
 	int audioLeadIn;
 	char* audioHash;
@@ -42,8 +43,8 @@ typedef struct {
 	char* version;
 	char* source;
 	sList* tags;
-	int beatmapID;
-	int beatmapSetID;
+	int beatmapId;
+	int beatmapSetId;
 } Metadata;
 
 typedef struct {
@@ -51,6 +52,8 @@ typedef struct {
 	float circleSize;
 	float overallDifficulty;
 	float approachRate;
+	float preempt;
+	float fade_in;
 	float sliderMultiplier;
 	float sliderTickRate;
 } Difficulty;
@@ -171,6 +174,7 @@ typedef struct {
 	HitSound* hitSound;
 	void* object; // 0 HitCircle 1 Slider 2 Spinner 3 Hold
 	HitSample* hitSample;
+	int stackHeight;*
 } HitObject;
 
 typedef struct {
@@ -183,6 +187,14 @@ typedef struct {
 	List* beatmapColours; // BeatmapColour*
 	List* hitObjects; // HitObject*
 } Beatmap;
+
+typedef struct {
+	General general;
+	Metadata metadata;
+	Difficulty difficulty;
+	size_t nbHitObject;
+	HitObject[nbHitObject] hitObjects;
+} osubf;
 
 General* new_general();
 Editor* new_editor();
