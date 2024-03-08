@@ -770,6 +770,13 @@ Beatmap* parse_beatmap(char* osuFile) {
 			if (line[17] != '1' || line[18] != '4')
 				ereport("does not support other osu file format "
 						"than 14 (unsure yet, safety first)");
+				if (isdigit(line[18])) {
+					char versionStr[3] = {line[17], line[18], '\0'};
+					beatmap->general->version = atoi(versionStr);
+				} else {
+					char versionStr[2] = {line[17], '\0'};
+					beatmap->general->version = atoi(versionStr);
+				}
 		} else if (strncmp(line, "[General]", 9) == 0) {
 			while (fgets(line, sizeof(line), file)) {
 #ifdef DEBUG
@@ -861,5 +868,7 @@ Beatmap* parse_beatmap(char* osuFile) {
 		}
 	}
 	fclose(file);
+	beatmap->difficulty->preempt = ;
+	beatmap->difficulty->fade_in = ;
 	return beatmap;
 }
