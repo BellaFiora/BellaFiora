@@ -97,9 +97,12 @@ typedef struct {
 
 	// Patterns / Skillsets
 
-	long patterns;
+	unsigned short main_skillset;
+
+	unsigned short* patterns;
 
 	iList* patternsProportions;
+
 	iList* patternsPositions;
 
 } osubf;
