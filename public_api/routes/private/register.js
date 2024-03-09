@@ -4,9 +4,11 @@ const envFile = '/common/env/.env';
 const dotenv = require('dotenv');
 dotenv.config({ path: envFile });
 
-async function handleRequest(query){
+async function Static(req){
+    let query = req.query
     return new Promise((resolve, reject) => {
+        //next
         resolve('done')
     })
 }
-module.exports = {handleRequest}
+module.exports = {Static}
