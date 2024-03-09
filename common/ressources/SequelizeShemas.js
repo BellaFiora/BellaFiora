@@ -133,6 +133,83 @@ const User = db_bellafiora.define(
 		raw : true,
 	});
 
+
+
+const Client = db_bellafiora.define(
+	'Client', {
+		client_id: {
+			type: DataTypes.CHAR(8),
+			allowNull: false,
+			primaryKey: true,
+		},
+		ip: {
+			type: DataTypes.CHAR(64),
+			allowNull: false,
+		},
+		player_id: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
+		first_use: {
+			type: DataTypes.TIMESTAMP,
+			allowNull: false,
+		},
+		last_use: {
+			type: DataTypes.TIMESTAMP,
+			allowNull: false,
+		},
+		osu_token: {
+			type: DataTypes.CHAR(256),
+			allowNull: true,
+			defaultValue: null,
+		},
+		osu_code: {
+			type: DataTypes.CHAR(256),
+			allowNull: true,
+			defaultValue: null,
+		},
+		osu_token_dt: {
+			type: DataTypes.TIMESTAMP,
+			allowNull: true,
+			defaultValue: null,
+		},
+		is_connected: {
+			type: DataTypes.BOOLEAN,
+			allowNull: true,
+			defaultValue: null,
+		},
+		is_restricted: {
+			type: DataTypes.BOOLEAN,
+			allowNull: true,
+			defaultValue: null,
+		},
+		is_banned: {
+			type: DataTypes.BOOLEAN,
+			allowNull: true,
+			defaultValue: null,
+		},
+		localisation: {
+			type: DataTypes.STRING(128),
+			allowNull: true,
+			defaultValue: null,
+		},
+		langue: {
+			type: DataTypes.CHAR(2),
+			allowNull: true,
+			defaultValue: null,
+		},
+		client_type: {
+			type: DataTypes.SMALLINT,
+			allowNull: true,
+			defaultValue: null,
+		},
+	},
+	{
+		tableName : 'users',
+		collate : 'utf8mb4_general_ci',
+		timestamps : false,
+		raw : true,
+	});
 module.exports = {
 	AppMetric,
 	User
