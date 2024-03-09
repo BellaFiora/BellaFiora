@@ -40,14 +40,10 @@ async function ClientAPI(i, o) {
 
     // Check if the route is found
     if (routeFind) {
-        // Construct the path to the route file
-        const routePath = path.join(__dirname, 'routes', 'private', `${routeFind.name}.js`);
-        // Check if the route file exists
-        await fs.access(routePath);
-        // Require the route file
-        const route = require(routePath);
+        const route = await LoadRoute(routeFind)
         // Check if the route is private and passes the test function
         if (routeFind.type === "private" && test(i)) {
+            
             try {
                 // Call the Static function of the route for processing
                 response = await route.Static(i);
@@ -69,6 +65,7 @@ async function ClientAPI(i, o) {
                 };
             }
         } else if(routeFind.type === "public" && testKey(i)){
+            
             try {
                 // Call the Static function of the route for processing
                 response = await route.Static(i);
@@ -123,6 +120,14 @@ async function ClientAPI(i, o) {
     // await connectToDatabase();
     // logs.statusCode = statusCode;
     // await entryMetrics('public_api', startTime, elapsedTime, exitCode, JSON.stringify(logs));
+}
+
+async function LoadRoute(route){
+    const routePath = path.join(__dirname, 'routes', route.type, `${route.name}.js`);
+    // Check if the route file exists
+    await fs.access(routePath);
+    // Require and return the route file
+    return require(routePath);
 }
 // API listening on the specified port
 api.listen(port);
