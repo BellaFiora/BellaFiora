@@ -171,3 +171,7 @@ Valid actions also include `type` and take one argument:
 Example:
 
 - `!room type tournament`
+
+## `/np`
+
+Reply with beatmap informations.
