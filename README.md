@@ -28,6 +28,10 @@ and allows users to set preferences (deduced when registering):
 
 lorem ipsum.
 
+### AI Assistant
+
+lorem ipsum.
+
 ---
 
 # Desktop App
@@ -42,13 +46,18 @@ lorem ipsum.
 
 lorem ipsum.
 
-### AI Assistant
-
-lorem ipsum.
-
 ### Streaming
 
 lorem ipsum.
+
+### Beatmaps / Collections Management
+
+lorem ipsum.
+
+### Music Player
+
+Import collections as playlists.
+Import songs from Spotify.
 
 ---
 
@@ -74,7 +83,13 @@ lorem ipsum.
 
 ## Features
 
+### Player Profile Widget on Android / iOS
+
 lorem ipsum.
+
+### Music Player
+
+Same functionalities as the Desktop App Music Player.
 
 ---
 
@@ -82,11 +97,9 @@ lorem ipsum.
 
 ## Description
 
-lorem ipsum.
+Same functionalities as the Desktop App, without the machine access.
 
-## Features
-
-lorem ipsum.
+Basically a less rich version of the Desktop App.
 
 ---
 
@@ -94,11 +107,7 @@ lorem ipsum.
 
 ## Description
 
-lorem ipsum.
-
-## Features
-
-lorem ipsum.
+Access to the Bella Fiora databases.
 
 ---
 
@@ -106,10 +115,6 @@ lorem ipsum.
 
 ## Description
 
-lorem ipsum.
-
-## Features
-
-lorem ipsum.
+Entry point of Bella Fiora.
 
 ---
