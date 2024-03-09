@@ -63,8 +63,8 @@ void jsonify_metadata_pretty(const Metadata* metadata, FILE* fp) {
 		fprintf_slist(metadata->tags, fp, 2);
 		fprintf(fp, ",\n");
 	}
-	fprintf(fp, "\t\t\"BeatmapID\": %d,\n", metadata->beatmapID);
-	fprintf(fp, "\t\t\"BeatmapSetID\": %d\n", metadata->beatmapSetID);
+	fprintf(fp, "\t\t\"BeatmapID\": %d,\n", metadata->beatmapId);
+	fprintf(fp, "\t\t\"BeatmapSetID\": %d\n", metadata->beatmapSetId);
 	fprintf(fp, "\t},\n");
 }
 
@@ -356,8 +356,8 @@ void jsonify_metadata(const Metadata* metadata, FILE* fp) {
 		fprintf_slist_no_spaces(metadata->tags, fp, 2);
 		fprintf(fp, ",");
 	}
-	fprintf(fp, "\"i\":%d,", metadata->beatmapID);
-	fprintf(fp, "\"j\":%d", metadata->beatmapSetID);
+	fprintf(fp, "\"i\":%d,", metadata->beatmapId);
+	fprintf(fp, "\"j\":%d", metadata->beatmapSetId);
 	fprintf(fp, "},");
 }
 

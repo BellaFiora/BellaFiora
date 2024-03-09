@@ -52,8 +52,8 @@ Metadata* new_metadata() {
 	r->version = calloc(1, sizeof(char));
 	r->source = calloc(1, sizeof(char));
 	r->tags = new_slist(0);
-	r->beatmapID = 0;
-	r->beatmapSetID = 0;
+	r->beatmapId = 0;
+	r->beatmapSetId = 0;
 	return r;
 }
 

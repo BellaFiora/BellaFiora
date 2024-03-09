@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "../../c_utils/src/debug.h"
 
@@ -258,10 +259,10 @@ void parse_metadata(Metadata* metadata) {
 			slist_add(metadata->tags, tag);
 			tag = strtok(NULL, " ");
 		}
-	} else if (strncmp(line, "BeatmapID", 9) == 0)
-		subint(&metadata->beatmapID, line, 10, -1);
-	else if (strncmp(line, "BeatmapSetID", 12) == 0)
-		subint(&metadata->beatmapSetID, line, 13, -1);
+	} else if (strncmp(line, "BeatmapId", 9) == 0)
+		subint(&metadata->beatmapId, line, 10, -1);
+	else if (strncmp(line, "BeatmapSetId", 12) == 0)
+		subint(&metadata->beatmapSetId, line, 13, -1);
 	else {
 		ereport("impossible case reached");
 		exit(1);
@@ -767,16 +768,14 @@ Beatmap* parse_beatmap(char* osuFile) {
 		if (line[1] == '\n' || (line[0] == '/' && line[1] == '/'))
 			continue;
 		else if (strncmp(line, "osu file format v", 17) == 0) {
-			if (line[17] != '1' || line[18] != '4')
+			if (line[17] != '1' || line[18] != '4') {
 				ereport("does not support other osu file format "
 						"than 14 (unsure yet, safety first)");
-				if (isdigit(line[18])) {
-					char versionStr[3] = {line[17], line[18], '\0'};
-					beatmap->general->version = atoi(versionStr);
-				} else {
-					char versionStr[2] = {line[17], '\0'};
-					beatmap->general->version = atoi(versionStr);
-				}
+			}
+			char versionStr[3] = {line[17], line[18], '\0'};
+			if (!isdigit((int)line[18]))
+				versionStr[1] = '\0';
+			beatmap->general->version = atoi(versionStr);
 		} else if (strncmp(line, "[General]", 9) == 0) {
 			while (fgets(line, sizeof(line), file)) {
 #ifdef DEBUG
@@ -868,7 +867,16 @@ Beatmap* parse_beatmap(char* osuFile) {
 		}
 	}
 	fclose(file);
-	beatmap->difficulty->preempt = ;
-	beatmap->difficulty->fade_in = ;
+	float AR = beatmap->difficulty->approachRate;
+	beatmap->difficulty->preempt = 1200;
+	beatmap->difficulty->fade_in = 800;
+	if (AR == 5) return beatmap;
+	if (AR < 5) {
+		beatmap->difficulty->preempt += 600 * (5 - AR) / 5;
+		beatmap->difficulty->fade_in += 400 * (5 - AR) / 5;
+		return beatmap;
+	} 
+	beatmap->difficulty->preempt -= 750 * (AR - 5) / 5;
+	beatmap->difficulty->fade_in -= 500 * (AR - 5) / 5;
 	return beatmap;
 }

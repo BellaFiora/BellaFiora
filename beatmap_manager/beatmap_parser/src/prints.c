@@ -53,8 +53,8 @@ void print_metadata(const Metadata* metadata) {
 		printf("NULL\n");
 	else
 		print_slist(metadata->tags, 0);
-	printf("Beatmap ID: %d\n", metadata->beatmapID);
-	printf("Beatmap Set ID: %d\n\n", metadata->beatmapSetID);
+	printf("Beatmap Id: %d\n", metadata->beatmapId);
+	printf("Beatmap Set Id: %d\n\n", metadata->beatmapSetId);
 }
 
 void print_difficulty(const Difficulty* difficulty) {

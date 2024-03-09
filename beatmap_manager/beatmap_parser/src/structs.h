@@ -174,7 +174,7 @@ typedef struct {
 	HitSound* hitSound;
 	void* object; // 0 HitCircle 1 Slider 2 Spinner 3 Hold
 	HitSample* hitSample;
-	int stackHeight;*
+	int stackHeight;
 } HitObject;
 
 typedef struct {
@@ -187,14 +187,6 @@ typedef struct {
 	List* beatmapColours; // BeatmapColour*
 	List* hitObjects; // HitObject*
 } Beatmap;
-
-typedef struct {
-	General general;
-	Metadata metadata;
-	Difficulty difficulty;
-	size_t nbHitObject;
-	HitObject[nbHitObject] hitObjects;
-} osubf;
 
 General* new_general();
 Editor* new_editor();
