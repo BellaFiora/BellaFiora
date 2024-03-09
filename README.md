@@ -1,6 +1,27 @@
 # Bella Fiora
 
-Applications ecosystem around stable focused on players.
+Applications ecosystem around stable focused on players composed of:
+
+2 dockerized tools:
+
+- Beatmap Manager
+- Client Manager
+
+3 dockerized applications:
+
+- Osu Bot
+- Public API
+- Website Backend
+
+2 Browser applications:
+
+- Extension
+- Website Frontend
+
+2 Platform applications:
+
+- Desktop App
+- Mobile App
 
 ## Features
 
