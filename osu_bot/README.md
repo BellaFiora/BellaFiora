@@ -74,6 +74,8 @@ Suggest a beatmap for the player.
 	- Language of the desired beatmap.
 - `-source <source>`
 	- Source of the desired beatmap.
+- `-length <length>`
+	- Length in seconds of the beatmap. Can also be expressed as (MM:SS).
 
 All options' arguments are non-case sensitive if not mentioned otherwise.
 
