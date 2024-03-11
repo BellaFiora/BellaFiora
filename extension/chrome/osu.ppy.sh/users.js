@@ -387,7 +387,7 @@ async function addElements() {
 }
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-	if (msg === 'addElements') {
+	if (msg.request === 'addElements') {
 		addElements();
 	}
 });
