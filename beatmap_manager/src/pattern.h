@@ -3,7 +3,7 @@ typedef struct {
 	// list of pointers of objects in the previous iteration
 	List* objects; // HitObject*
 	List* children; // Pattern*
-	Data* data; // ???
+	Data* difficulty; // ???
 } Pattern;
 
 void merge(Pattern* a, Pattern* b) {
@@ -46,4 +46,4 @@ do {
 } while (len(working_patterns) > 1 || done);
 
 Pattern* root;
-force_merge(working_patterns, root)
+force_merge(working_patterns, root);

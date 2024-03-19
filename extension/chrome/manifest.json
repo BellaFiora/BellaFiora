@@ -21,7 +21,18 @@
 			"128": "icons/chibi-128.png"
 		}
 	},
-	"permissions": ["activeTab", "clipboardWrite", "scripting", "storage", "unlimitedStorage", "webNavigation"],
+	"host_permissions": [
+		"https://osu.ppy.sh/*"
+	],
+	"permissions": [
+		"activeTab",
+		"clipboardWrite",
+		"scripting",
+		"storage",
+		"unlimitedStorage",
+		"webNavigation",
+		"cookies"
+	],
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {
@@ -38,6 +49,11 @@
 		},
 		{
 			"js": ["osu.ppy.sh/ppy.js"],
+			"matches": ["https://osu.ppy.sh/*"],
+			"run_at": "document_start"
+		},
+		{
+			"js": ["osu.ppy.sh/cookies.js"],
 			"matches": ["https://osu.ppy.sh/*"],
 			"run_at": "document_start"
 		}

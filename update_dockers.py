@@ -37,11 +37,14 @@ if os.path.exists(commits_done_file):
 		content = f.read()
 	commits_done = content.split("\n")[:-1]
 
-docker_names = [name for name in os.listdir(".") if os.path.isdir(name)]
-docker_names.remove(".git")
-docker_names.remove("client_manager")
-docker_names.remove("common")
-docker_names.remove("desktop_app")
+docker_names = [
+	"beatmap_manager",
+	"client_manager",
+	"common",
+	"osu_bot",
+	"public_api",
+	"website"
+]
 logs = os.popen('git log --name-status --oneline --no-decorate --format="///%H"').read()
 commits = logs.split("///")[1:]
 ignored = 0

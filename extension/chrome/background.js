@@ -97,21 +97,27 @@
 // 		console.log(response.message); 
 // 	  });
 //   }, 1000);
+
 chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.url.startsWith('https://osu.ppy.sh/users/')) {
-		chrome.tabs.sendMessage(details.tabId, 'addElements', (response) => {
-			
-			if (chrome.runtime.lastError) {
-			}
+		chrome.tabs.sendMessage(details.tabId, { request:'addElements' }, (response) => {
+			if (chrome.runtime.lastError) {}
 		});
 	}
 	if (details.url.startsWith('https://osu.ppy.sh/')) {
 		chrome.tabs.sendMessage(
-			details.tabId, 'createNotifications', (response) => {
-				if (chrome.runtime.lastError) {
-				}
-			});
+			details.tabId, { request:'createNotifications' }, (response) => {
+				if (chrome.runtime.lastError) {}
+		});
 	}
+	chrome.cookies.get({
+		url: "https://osu.ppy.sh/*",
+		name: "osu_session"
+	}).then((cookie) => {
+		chrome.tabs.sendMessage(details.tabId, { request: 'saveOsuSession', payload: cookie }, (response) => {
+			if (chrome.runtime.lastError) {}
+		});
+	});
 });
 
 // chrome.webNavigation.onCommitted.addListener(function(details) {

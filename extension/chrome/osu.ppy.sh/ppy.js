@@ -82,7 +82,7 @@ function createNotifications(data) {
 }
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
-	if (msg === 'createNotifications') {
+	if (msg.request === 'createNotifications') {
 		// console.log('fgekjgne')
 		createNotifications({
 			subtitle : 'name of beatmap',
