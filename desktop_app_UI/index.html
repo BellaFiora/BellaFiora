@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="root">
+        <div id="side_left_menu">
+            <div class="user-profil">
+                <div class="avatar-img">
+                    <img src="/pupariaAvatar.png" id="playerInfo_AvatarUrl">
+                </div>
+                <div class="users_place">
+                    <span id="username" id="playerInfo_Username">Puparia</span>
+                    <span id="player_infos" id="playerInfo_GamePreference">Standard Player</span>
+                    <span id="isSupporter" id="playerInfo_isSupporter"><m class="heart soft-red s1"></m>Supporter</span>
+                </div>
+            </div>
+
+            <div class="menu-list">
+                <div class="menuBtn navigate-page" target="home_page">
+                    <m class="white home"></m><span>Home</span>
+                </div>
+                <div class="menuBtn navigate-page" target="gameplay_page">
+                    <m class="white cursor-arrow-rays"></m><span>Gameplay</span>
+                </div>
+                <div class="menuBtn navigate-page" target="" disabled="true">
+                    <m class="white play"></m><span>Player</span>
+                </div>
+                <div class="menuBtn navigate-page" target="" disabled="true">
+                    <m class="white chevron-double-right"></m><span>Bot</span>
+                </div>
+                <div class="menuBtn navigate-page" target="collections_page">
+                    <m class="white star"></m><span>Collections</span>
+                </div>
+                <div class="menuBtn navigate-page" target="" disabled="true">
+                    <m class="white table-cells"></m><span>Lobby</span>
+                </div>
+                <div class="menuBtn navigate-page" target="" disabled="true">
+                    <m class="white presentation-chart-line"></m><span>Statistics</span>
+                </div>
+                <div class="menuBtn navigate-page" target="chatbot_page" >
+                    <m class="white lifebuoy"></m><span>Chatbot IA</span>
+                </div>
+                <div class="menuBtn navigate-page" target="" disabled="true">
+                    <m class="white video-camera-slash"></m><span>Spectacle</span>
+                </div>
+            </div>
+            <div class="menu-other">
+                <div class="menuBtn navigate-page active" target="settings_page">
+                    <m class="menuBtn white cog"></m><span>Settings</span>
+                </div>
+                <div id="sofware-infos" id="software_info">v0.1.980</div>
+            </div>
+            
+        </div>
+        <div id="main-content">
+            <div class="ui-actions">
+                <img src="./12345.png">
+            </div>
+            <div id="home_page" class="page no-toggle">
+                <div class="box user-basic-infos">
+                    <div class="title">Your Game Statistics
+                        <span class="subtitle"><m class="glass-grey s1 arrow-path" id="action_RefreshDataScores"data-event="info" data-info="Refresh Datas" style="margin-top: 2px;"></m><f id="stats_refresh_dt">13/03/2024 03h05</f></span></div>
+                    <div class="btn-gamemode">
+                        <span class="modeswtichBtn active" id="modeBtnSTD" onclick="switchMode('STD')">Osu!</span>
+                        <span class="modeswtichBtn" id="modeBtnTAIKO" onclick="switchMode('TAIKO')">Taiko</span>
+                        <span class="modeswtichBtn" id="modeBtnFRUITS" onclick="switchMode('FRUITS')">Fruits</span>
+                        <span class="modeswtichBtn" id="modeBtnMANIA" onclick="switchMode('MANIA')">Mania</span>
+                    </div>
+                    <div class="user-statistics">
+                        <div class="ranking-stat">
+                            <label>Ranking</label>
+                            <div>
+                                <span data-event="info" data-info="Country Ranking"><m class="flag-fr s2"></m>
+                                    <f id="stat_CountryRank">#8 652</f>
+                                </span>
+                                <span data-event="info" data-info="Global Ranking">
+                                    <m class="globe-europe-africa glass-grey" style="margin-right: -8px;"></m>
+                                    <f id="stat_GlobalRank">#247 767</f>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="unique-stat">
+                            <label>Classed Score</label>
+                            <span id="stat_ClassedScore">2 875 825 285</span>
+                        </div>
+                        <div class="unique-stat">
+                            <label>Accuracy</label>
+                            <span id="stat_Accuracy">94.03 %</span>
+                        </div>
+                        <div class="unique-stat">
+                            <label>Play Count</label>
+                            <span id="stat_PlayCount">20 989</span>
+                        </div>
+                        <div class="unique-stat">
+                            <label>Total Score</label>
+                            <span id="stat_TotalScore">12 875 825 285</span>
+                        </div>
+                        <div class="unique-stat">
+                            <label>Clicks</label>
+                            <span id="stat_Clicks">3 450 211</span>
+                        </div>
+                        <div class="unique-stat">
+                            <label>Combo Max</label>
+                            <span id="stat_ComboMax">1 534</span>
+                        </div>
+               
+                        <div class="unique-stat">
+                            <label data-event="info" data-info="The skillets you measure best">Master Skillset</label>
+                            <span id="stat_MasterSkillset">Jump  4~5★ | DT 5~6★</span>
+                        </div>
+                        <div class="unique-stat">
+                            <label>AIM</label>
+                            <span id="stat_AIM">65 %</span>
+                        </div>
+                     
+                        <div id="graph_rank" id="stat_Graph">
+                            <img src="graph2.png"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="box transparent scores-list">
+                    <div class="title-scores">
+                        <span class="tt">Top Ranks</span>
+                        <span class="sorted-by">Sort By <m class="bars-arrow-down white"></m></span>
+                    </div>
+                    <div class="list-score">
+                        <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="a"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Suisei Melody by Oshimizu Nako (CV: Toyosaki Aki)
+                                </span>
+                                <span class="under-infos">
+                                    <l>Insane</l> - 9 March 2024 - 22h17 5.20 ★ <i>(3.74 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt" data-event="info" data-info="Double Time"></j> </div>
+                            <div class="elem accu">96.88 %</div>
+                            <div class="elem pp">157 PP</div>
+                        </div>
+                        <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="a"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Dear My Friend -Mada Minu Mirai e- (TV size) by ELISA
+                                </span>
+                                <span class="under-infos">
+                                    <l>Insane</l> - 13 October 2023 - 23h12 5.55 ★ <i>(4.09 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">93.26 %</div>
+                            <div class="elem pp">155 PP</div>
+                        </div>
+                        <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="s"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    I Did It For Love by BoA
+                                </span>
+                                <span class="under-infos">
+                                    <l>Hard</l> - 2 Febuary 2024 - 22h17 5.24 ★ <i>(3.79 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">95.40 %</div>
+                            <div class="elem pp">140 PP</div>
+                        </div>
+                        <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="s"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Apples To The Core (Remix) by Sim Gretina
+                                </span>
+                                <span class="under-infos">
+                                    <l>Insane</l> - 2 Febuary 2024 - 12h42 5.28 ★ <i>(3.84 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">93.62 %</div>
+                            <div class="elem pp">134 PP</div>
+                        </div>
+                         <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="a"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Poker Face (TV Size) by Horie Yui
+                                </span>
+                                <span class="under-infos">
+                                    <l>Insane</l> - 2 Febuary 2024 - 23h22 5.24 ★ <i>(3.89 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">95.32 %</div>
+                            <div class="elem pp">134 PP</div>
+                        </div>
+                         <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="a"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Sawakaze (TV Size) by Tanizawa Tomofumi
+                                </span>
+                                <span class="under-infos">
+                                    <l>Xenon's Insane</l> - 30 September 2023 - 20h03 5.57 ★ <i>(3.91 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">91.11 %</div>
+                            <div class="elem pp">134 PP</div>
+                        </div>
+                       
+                         <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="s"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Hello! (TV Size) by Nakajima Megumi
+                                </span>
+                                <span class="under-infos">
+                                    <l>Madoka</l> - 16 january 2024 - 22h33 5.20 ★ <i>(3.59 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">98.07 %</div>
+                            <div class="elem pp">133 PP</div>
+                        </div>
+                         <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="a"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Marshmary by MIMI feat. Hatsune Miku
+                                </span>
+                                <span class="under-infos">
+                                    <l>Horizon</l> - 23 Febuary 2024 - 04h15 5.68 ★ <i>(5.27 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="hr"></j> </div>
+                            <div class="elem accu">94.11 %</div>
+                            <div class="elem pp">130 PP</div>
+                        </div>
+                         <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="s"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Goodbye by CircusP
+                                </span>
+                                <span class="under-infos">
+                                    <l>Goodbye</l> - 2 October 2023 - 20h15 5.24 ★ <i>(3.57 ★)</i>
+                                </span>
+                            </div>             
+                            <div class="elem mods"><j class="dt"></j> </div>
+                            <div class="elem accu">96.90 %</div>
+                            <div class="elem pp">130 PP</div>
+                        </div>
+                        <!-- ------------ -->
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                            <div class="elem rank"><note class="s"></note></div>
+                            <div class="elem bm_infos">
+                                <span class="map_title">
+                                    Granat by Drop
+                                </span>
+                                <span class="under-infos">
+                                    <l>Extra</l> - 1 September 2023 - 04h26 5.08 ★
+                                </span>
+                            </div>             
+                            <div class="elem mods"></div>
+                            <div class="elem accu">96.77 %</div>
+                            <div class="elem pp">130 PP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="gameplay_page" class="page no-toggle">
+                <div class="box box transparent player-global">
+                    <div class="box player-music-bg" style="padding: 0px!important">
+                        <div class="map_background"><img src="cover.jpg"/></div>
+                    </div>
+                    <div class="box player-timeline" style="padding:0px!important"><span id="timelineProgress"></span></div>
+                    <div class="box transparent player-timestamp">
+                        <span>01:34:45</span>
+                        <span>02:20:00</span>
+                    </div>
+                </div>
+            </div> 
+            <div id="settings_page" class="page">
+                <div class="settings-menu" id="settings_menu">
+                    <div class="navigate-page active" target="settings_general">
+                        <m class="white squares-2x2"></m><span>General</span>
+                    </div> 
+                    <div class="navigate-page" target="settings_audio">
+                        <m class="white speaker-wave"></m><span>Audio</span>
+                    </div> 
+                    <div class="navigate-page" target="settings_paths">
+                        <m class="white link"></m><span>Paths</span>
+                    </div> 
+                    <div class="navigate-page" target="settings_downloads">
+                        <m class="icon white inbox-arrow-down"></m><span class="label">Downloads</span>
+                    </div> 
+                    <div class="navigate-page" target="settings_plugin">
+                        <m class="white puzzle-piece"></m><span>Plugin</span>
+                    </div> 
+                    <div class="navigate-page" target="settings_credentials"> 
+                        <m class="white finger-print"></m><span>Credentials</span>
+                    </div> 
+                    <div class="navigate-page" target="settings_advenced">
+                        <m class="white cog-6-tooth"></m><span>Advenced</span>
+                    </div>
+                    <div class="navigate-page" target="settings_about">
+                        <m class="white information-circle"></m><span>About</span>
+                    </div>
+                </div>
+                <div class="box settings-page active" id="settings_general">
+                    <div class="setting-element">
+                        <label  data-event="info" data-info="Display language">Language</label>
+                        <span>
+                            <div class="btn active" data-event="setLanguage" data-option="EN" >English</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Do not display the window in the task var when the window is minimized">Minimize window</label>
+                        <span>
+                            <div class="btn active" data-event="setMinimizeWindow" data-option="false">No</div>
+                            <div class="btn" data-event="setMinimizeWindow" data-option="true" >Yes</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Colours of application">Theme</label>
+                        <span>
+                            <div class="btn active" data-event="setTheme" data-option="0">Dark</div>
+                            <div class="btn" data-event="setTheme" data-option="1">Light</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="How the number are displayed">Display numbers</label>
+                        <span>
+                            <div class="btn active" data-event="setDisplayNumber" data-option="0">100 space</div>
+                            <div class="btn" data-event="setDisplayNumber" data-option="1">1 K space</div>
+                            <div class="btn" data-event="setDisplayNumber" data-option="2">1 M space</div>
+
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Send directly scors of beatmaps played after the end of the game">Submit scores</label>
+                        <span>
+                            <div class="btn active" data-event="setSubmitScore" data-option="0">After playing</div>
+                            <div class="btn" data-event="setSubmitScore" data-option="1">30 min</div>
+                            <div class="btn" data-event="setSubmitScore" data-option="2">1 hour</div>
+                            <div class="btn" data-event="setSubmitScore" data-option="3">After launching</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Updating Bella Fiora Desktop">Auto Update</label>
+                        <span>
+                            <div class="btn active" data-event="setAutoUpdate" data-option="0">During launch</div>
+                            <div class="btn"  data-event="setAutoUpdate" data-option="1">Manually</div>
+                            <div class="btn"  data-event="setAutoUpdate" data-option="false">Never</div>
+                        </span>
+                    </div>
+                    
+                </div>
+                <div class="box settings-page" id="settings_audio">
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Music and Coatch Volume">General volume</label>
+                        <span>
+                            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                        </span>
+                    </div>
+                </div>
+                <div class="box settings-page" id="settings_paths">
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Folder in which Osu!Stable is located" >Osu!Stable Path Folder</label>
+                        <span >
+                            <input type="text" id="folderPathStable" value="C:\Users\fareo\AppData\Local\osu!"/>
+                            <div class="btn active" data-event="setOsuFolderStable" data-option="folderPathStable">Change</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Folder in which Osu!Lazer is located">Osu!Lazer Path Folder</label>
+                        <span>
+                            <input type="text" id="folderPathLazer" value="Not setup"/>
+                            <div class="btn active" data-event="setOsuFolderLazer" data-option="folderPathLaer">Change</div>
+                        </span>
+                    </div>
+                </div>
+                <div class="box settings-page" id="settings_downloads">
+                    <div class="setting-element">
+                        <label data-event="info" data-info="When can Bella Fiora Desktop download beatmaps">Beatmaps</label>
+                        <span>
+                            <div class="btn" data-privilege="os" data-event="setDownloadMapsCollection" data-option="true">Self-Acting</div>
+                            <div class="btn active" data-event="setDownloadMapsCollection" data-option="false">Manually</div>   
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="If the beatmap is installed in Osu! during spectate">Download beatmap during spectacle</label>
+                        <span>
+                            <div class="btn active" data-event="setDownloadMapsSpectacle" data-option="false">No</div>
+                            <div class="btn" data-event="setDownloadMapsSpectacle" data-option="1">Manually</div>
+                            <div class="btn" data-privilege="os" data-event="setDownloadMapsSpectacle" data-option="true">Self-Acting</div>
+                        </span>
+                    </div>
+                </div>
+                <div class="box settings-page" id="settings_plugin">
+                </div>
+                <div class="box settings-page" id="settings_credentials">
+                    <div class="setting-element">
+                        <label data-event="info" data-info="IRC idendifiers, retrieve them in the settings on the Osu! Site, necessary to referer matchs">IRC Login</label>
+                        <span>
+                            <input class="cred" type="text" value="Username"/>
+                            <input class="cred" type="password" value="***********"/>
+                            <div class="btn active">Try Login</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Disconnect the Osu! account or IRC from Bella Fiora Desktop">Logout</label>
+                        <span>
+                            <div class="btn" data-event="logout" data-option="osu">Logout Osu!</div>
+                            <div class="btn" data-event="logout" data-option="irc">Logout IRC</div>
+
+                        </span>
+                    </div>
+                </div>
+                <div class="box settings-page" id="settings_advenced">
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Scan osu!.db and score.db at launch of Bella Fiora Desktop">Scan Osu! Files when launching</label>
+                        <span>
+                            <div class="btn active" data-event="setScanosuFiles" data-option="true">Yes</div>
+                            <div class="btn" data-event="setScanosuFiles" data-option="false">No</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Synchronization of game music of access on other clients">Music Synchronisation</label>
+                        <span>
+                            <div class="btn active" data-event="setMusicSync" data-option="true">After launching</div>
+                            <div class="btn" data-event="setMusicSync" data-option="0">Every 30 min</div>
+                            <div class="btn" data-event="setMusicSync" data-option="1">Every 1 hour</div>
+                            <div class="btn" data-event="setMusicSync" data-option="2">Every 1 day</div>
+                        </span>
+                    </div>
+                    <div class="setting-element">
+                        <label data-event="info" data-info="Bella Fiora Desktop hard reset... Nooooooo">Reset</label>
+                        <span>
+                            <div class="btn warning" data-event="Reset" data-option="true">Reset Bella Fiora Desktop</div>
+                        </span>
+                    </div>
+                </div>
+                <div class="box settings-page" id="settings_about">
+                </div>
+            </div>
+            <div id="collections_page" class="page no-toggle">
+                <div class="box collections-list" id="lcollection">
+                    <div class="title">Your Collections
+                        <span class="subtitle"><m class="soft-green s3 folder-plus" id="createCollectionBtn" data-event="info" data-info="Create a new collection" style="margin-top: 2px;"></m></span>
+                    </div>
+                    <div class="collection-name added">
+                        <span>
+                            <input type="text" disabled value="Collection Name">
+                        </span>
+                        <m class="glass-grey pencil-square" data-event="info" data-info="Edit Name"></m>
+                        <m class="soft-red folder-minus" data-event="info" data-info="Delete"></m>
+                    </div>
+                </div>
+                <div class="box transparent collection-view">
+                    <div class="title">Collection Name</div>
+                </div>
+            </div>
+            <div id="chatbot_page" class="page  no-toggle">
+                <div class="box chatbot">
+                    <div class="title">Chatbot</div>
+                    <div class="chatbot_messages">
+                        <div class="interstis">
+                            yesterday | 3h45 PM
+                        </div>
+                        <div class="message-box">
+                            <div class="message-user">
+                                <span class="message-content">Who to upload a beatmap ?</span>
+                                <span class="message-avatar"><img src="./pupariaAvatar.png"></span>
+                            </div>
+                        </div>
+                       
+                        <div class="message-box">
+                            <div class="message-bot">
+                                <span class="message-avatar"><img src="./bf_64x64-png.png"></span>
+                                <span class="message-content">Sure, Puparia! Here are the steps to upload a map on osu!:<br><br>
+
+                                    Make sure you have osu! installed on your computer.<br>
+                                    • Launch osu! and log in to your account if you haven't already.<br>
+                                    • Go to the osu! website where you can find beatmaps, such as osu.ppy.sh.<br>
+                                    • Search for the beatmap you want to download. You can use the search filters to narrow down your results.<br>
+                                    • Once you've found the desired beatmap, click on it to access its page.<br>
+                                    • On the beatmap's page, you'll see a download button. Click on it to download the beatmap file. The file will typically be in .osz format.<br>
+                                    • Once the download is complete, open the .osz file. Osu! should automatically detect the file and add it to your beatmap collection.<br>
+                                    • You can now play the beatmap by accessing the "Beatmaps" section in osu! and selecting the beatmap you just downloaded.<br><br>
+                                    That's it! You should now be able to play the beatmap you downloaded on osu!. Enjoy!</span>
+                            </div>
+                            
+                        </div>
+
+                        <div class="message-box">
+                            <div class="message-bot">
+                                <span class="message-avatar"><img src="./bf_64x64-png.png"></span>
+                                <span class="message-content">
+                                    <div class="msg-animate">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+
+
+                        
+                  
+                    </div>   
+                    <div class="chatbot_prompt">
+                        <textarea placeholder="Type a answer.."></textarea><div class="send-btn" data-event="info" data-info="Send a message"><m class="s6 chevron-up glass-grey"></m></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="context-menu">
+    </div>
+    <div class="over-info"> 
+    </div>
+    <div id="notification-box">
+        <m id="notifIcon" class=""></m>
+        <span id="notifLabel"></span> 
+    </div>
+
+
+
+
+    <script>
+
+
+    //Pages Collectors
+        var PageCollector = []
+
+    //Toggles 
+        let MenuToggle = true
+        let settings_page_toggled = "settings_general"
+        let global_page_toggled = "settings_page"
+        let GamemodeToggle = "STD"
+
+    //Global
+        var os = false
+
+    //placeholders
+        let stat_CountryRank = document.getElementById('stat_CountryRank')
+
+        let stat_GlobalRank = document.getElementById('stat_GlobalRank')
+        let stat_ClassedScore = document.getElementById('stat_ClassedScore')
+        let stat_Accuracy = document.getElementById('stat_Accuracy')
+        let stat_PlayCount = document.getElementById('stat_PlayCount')
+        let stat_TotalScore = document.getElementById('stat_TotalScore')
+        let stat_Clicks = document.getElementById('stat_Clicks')
+        let stat_MasterSkillset = document.getElementById('stat_MasterSkillset')
+        let stats_MaxCombo = document.getElementById('stat_ComboMax')
+        let stat_AIM = document.getElementById('stat_AIM')
+        let stat_Graph = document.getElementById('stat_Graph')
+        let stats_refresh_dt = document.getElementById('stats_refresh_dt')
+
+        
+        let playerInfo_Username = document.getElementById('playerInfo_Username')
+        let playerInfo_GamePreference = document.getElementById('playerInfo_GamePreference')
+        let playerInfo_AvatarUrl = document.getElementById('playerInfo_AvatarUrl')
+
+        let isSupporter = document.getElementById('playerInfo_isSupporter')
+
+        let software_info = document.getElementById('software_info')
+
+        //Gameplay Beatmaps infos
+        let ph_beatmapBg = null
+        let ph_currentTimeStamp = null
+        let ph_totalTimeStamp = null
+        let ph_ar = null
+        let ph_sr = null
+        let ph_od = null
+        let ph_hp = null
+        let ph_keycount = null
+        let ph_creator = null
+        let ph_rankedStatus = null
+        let ph_rankedDt = null
+        let ph_submitDt = null
+        let ph_skillsets = null
+        let ph_bmid = null
+        let ph_bmsetid = null
+        let ph_gamemode = null
+        let ph_author = null
+        let ph_difficultyName = null
+        let ph_rating = null
+        let ph_globalPlayCount = null
+        let ph_ratePassed = null
+        let ph_maxCombo = null
+        let ph_asSpiners = null
+
+
+        
+
+
+    //actions-btn
+        let action_RefreshDataScores = document.getElementById('action_RefreshDataScores')
+
+    //Contents Elements
+        let left_menu = document.getElementById('side_left_menu');
+        let content = document.getElementById('main-content')
+        let boxInfo = document.querySelector('.over-info');
+        let scores = document.querySelectorAll('.toprank-element')
+        let notificationBox = document.getElementById('notification-box')
+       
+    //Dynamic Events
+
+
+        //Create Collection
+        document.getElementById('createCollectionBtn').addEventListener('click', function(){
+            let CollectionList = document.getElementById('lcollection')
+
+            let collectionElement = document.createElement('div');
+            collectionElement.classList.add('collection-name');
+            collectionElement.classList.add('added')
+
+            let span = document.createElement('span');
+            let input = document.createElement('input');
+            input.setAttribute('type', 'text');
+            input.setAttribute('placeholder', 'Enter a collection name');
+            span.appendChild(input);
+
+            let m1 = document.createElement('m');
+            let m2 = document.createElement('m');
+
+            m1.classList.add('check');
+            m1.classList.add('soft-green');
+            m2.classList.add('arrow-uturn-left');
+            m2.classList.add('soft-red');
+
+            m1.setAttribute('data-event', 'info');
+            m2.setAttribute('data-event', 'info');
+            m1.setAttribute('data-info', 'Save');
+            m2.setAttribute('data-info', 'Cancel');
+
+            collectionElement.appendChild(span)
+            collectionElement.appendChild(m1)
+            collectionElement.appendChild(m2)
+
+            CollectionList.insertBefore(collectionElement, (CollectionList.children[1]));
+            setTimeout(() => {
+                collectionElement.classList.remove('added')
+                
+            }, 40);
+            input.focus();
+
+            input.addEventListener('blur', function() {
+                m1.classList.add('pencil-square');
+                m1.classList.remove('soft-green');
+                m1.classList.add('glass-grey');
+                m2.classList.add('folder-minus');
+                m2.classList.add('soft-red');
+            });
+
+            function SaveNewCollection(){
+                m1.setAttribute('data-info', 'Edit name');
+                m2.setAttribute('data-info', 'Delete');
+                input.disabled = true
+                //Write Collection in collection.db
+            }
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    SaveNewCollection()
+                    document.removeEventListener('keydown');
+                }
+            })
+
+            m1.addEventListener('click', function() {
+                SaveNewCollection()
+            });
+
+            m2.addEventListener('click', function(event) {
+                CollectionList.removeChild(collectionElement);
+                boxInfo.classList.remove('show');
+            });
+            m1.addEventListener('mouseover', function(event) {
+                handleMouseOver(event, m1);
+            });
+            m1.addEventListener('mouseout', handleMouseOut);
+
+            m2.addEventListener('mouseover', function(event) {
+                handleMouseOver(event, m2);
+            });
+            m2.addEventListener('mouseout', handleMouseOut);
+        })
+
+        document.querySelectorAll('.btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                let siblings = btn.closest('.setting-element').querySelectorAll('.btn');
+                if(!btn.getAttribute('data-privilege')){
+                    siblings.forEach(function(sibling) {
+                        sibling.classList.remove('active');
+                    });
+                    btn.classList.add('active');
+
+                    let value = btn.getAttribute('data-option')
+                    let event = btn.getAttribute('data-event')
+                    console.log(`event: ${event} = ${value}`)
+                    switch (event) {
+                        case 'setLanguage':
+                            //EN = EN
+
+                            break;
+                        case 'setMinimizeWindow':
+                            //true = yes
+                            //false = no
+
+                            break;
+                        case 'setTheme':
+                            //0 = dark
+                            //1 = light
+
+                            break;
+                        case 'setDisplayNumber':
+                            //0 = 100 space
+                            //1 = 1000 space
+                            //2 = 1000000 space
+
+                            break;
+                        case 'setSubmitScore':
+                            //0 = after playing
+                            //1 = 30 min
+                            //2 = 1h
+                            //3 = after launching
+
+                            break;
+                        case 'setAutoUpdate':
+                            //0 = during launching
+                            //1 = manually
+                            //false = never
+
+                            break;
+                        case 'setOsuFolderStable':
+                            
+                            break;
+                        case 'setOsuFolderLazer':
+                            
+                            break;
+                        case 'setDownloadMapsCollection':
+                            //true = self-acting
+                            //false = manually
+
+                            break;
+                        case 'setDownloadMapsSpectacle':
+                            //false = no
+                            //1 = manually
+                            //true = self-acting
+
+                            break;
+
+                      
+                        case 'logout':
+                            //  osu or irc
+
+                            break;
+                        case 'setScanosuFiles':
+                            //true = yes
+                            //False = no
+
+                            break;
+                        case 'setMusicSync':
+                            //true = after launching
+                            //0 = every 30 min
+                            //1 = every 1h
+                            //2 = every 1d
+
+                            break;
+                        case 'Reset':
+                            
+                            break;
+                        
+                        default:
+                            break;
+                    }
+                } else {
+                    showNotificationBox('Please subscribe Osu!Supporter for enable this option', 'info')
+                }
+                
+            });
+        });
+
+
+    //Dynamic UI
+        //Show a notification
+        function showNotificationBox(content, type){
+            
+            notificationBox.style.left = '1145px';
+            let icon = null
+            let color = null
+            switch (type){
+                case 'warning':
+                    icon = "exclamation-triangle"
+                    color = "soft-red"
+                break; 
+                case 'dl':
+                    icon = "document-arrow-down"
+                    color = "soft-green"
+                break;
+                case 'info':
+                    icon = "information-circle"
+                    color = "white"
+                break;
+            }
+
+            document.getElementById('notifIcon').classList.add(icon)
+            document.getElementById('notifIcon').classList.add(color)
+
+            document.getElementById('notifLabel').innerText = content
+            setTimeout(() => {
+                notificationBox.style.left = '1400px';
+            }, 5000);
+        }
+
+        //Settings Menu 
+        left_menu.addEventListener('click', function(event) {
+            if (event.target.getAttribute('id') == 'side_left_menu' &&
+                event.offsetX >= left_menu.offsetWidth - 12) {
+                if(MenuToggle){
+                    left_menu.classList.add('hide');
+                    content.classList.add('full')
+                    left_menu.style.setProperty('--after-content', '""')
+                    setTimeout(() => {
+                        left_menu.style.setProperty('--after-content', '"❭"')
+                        left_menu.style.setProperty('--after-content-width-left', '1%')
+                        left_menuToggle = false
+                    }, 150);
+                } else {
+                    left_menu.classList.remove('hide');
+                    content.classList.remove('full')
+                    left_menu.style.setProperty('--after-content', '""')
+                    setTimeout(() => {
+                        left_menu.style.setProperty('--after-content', '"❬"')
+                        left_menu.style.setProperty('--after-content-width-left', '13.4%')
+                        MenuToggle = true
+                    }, 150)
+                }
+            }
+        });
+        document.getElementById("settings_menu").addEventListener("click", function(event) {
+            if (event.target.classList.contains("navigate-page")) {
+                console.log(event.target.getAttribute('target'))
+                console.log(settings_page_toggled)
+                if(!event.target.classList.contains('active')){
+                    let target = event.target.getAttribute('target')
+                    
+                    let oldToggle = settings_page_toggled
+                    settings_page_toggled = target
+                    setTimeout(() => {
+                        document.querySelector(`div[target=${oldToggle}]`).classList.remove('active')
+                        document.getElementById(oldToggle).classList.remove('active')
+                        document.getElementById(target).classList.add('active')
+                        event.target.classList.add('active')
+                    }, 50);
+                }
+            }
+        });
+    
+        //Global Menu 
+        document.querySelectorAll('.menuBtn').forEach(function(element) {
+            element.addEventListener('click', function(event) {
+                if(element.getAttribute('disabled')){
+                    showNotificationBox('This page is not available', 'warning')
+                    return
+                }
+                if(!element.classList.contains('active')){
+                    
+                    let target = element.getAttribute('target')
+                    let oldToggle = global_page_toggled
+                    global_page_toggled = target
+                    setTimeout(() => {
+                        document.querySelector(`div[target=${oldToggle}]`).classList.remove('active')
+                        element.classList.add('active')
+                        document.getElementById(oldToggle).classList.add('no-toggle')
+                        document.getElementById(target).classList.remove('no-toggle')
+                    }, 50);
+                }
+            })
+
+        });
+        
+        //Show context Menu
+        function showScoreContextMenu(element){
+            document.querySelector('.context-menu').classList.add('show')
+            function createBtn(label, action, targetID){
+              
+                let div = document.createElement('div')
+                div.classList.add('button-context')
+                div.textContent = label
+                if(action === "cancel"){
+                    div.onclick = function(){
+                        document.querySelector('.context-menu').classList.remove('show')
+                        document.querySelector('.context-menu').innerHTML = ""
+                    }
+                } else {
+                    div.onclick = function(){
+                        window.open(`${action}/${targetID}`, '_blank');
+                    }
+                }
+               
+                document.querySelector('.context-menu').appendChild(div)
+            }
+
+            createBtn('View Thread','https://osu.ppy.sh/beatmaps', element.getAttribute('data-bmid'))
+            createBtn('Open in Osu!','osu://b', element.getAttribute('data-bmid'))
+            createBtn('View Score','https://osu.ppy.sh/scores', element.getAttribute('data-scoreid'))
+            createBtn('Share Score','', element.getAttribute('data-scoreid'))
+            createBtn('Cancel','cancel', null)
+
+        }
+        scores.forEach(function (element) {
+            element.addEventListener('click', function () {
+                showScoreContextMenu(element);
+            });
+        });
+    
+        //MiniBox Info
+        function calcHeight(text){
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.font = `16px sans-serif`;
+            context.letterSpacing = 1;
+            const coefficient =  context.measureText(text).width / 250;
+            return 35 * coefficient+'px';
+        }
+        function handleMouseOver(event, element) {
+            boxInfo.innerHTML = element.getAttribute('data-info')
+            updateBoxInfoPosition(event.clientX, event.clientY, calcHeight(element.getAttribute('data-info')));
+            boxInfo.classList.add('show')
+            
+           
+            
+            element.addEventListener('mousemove', function(event) {
+                handleMouseMove(event, calcHeight(element.getAttribute('data-info')));
+            });
+            
+        }
+        function handleMouseMove(event, height) { updateBoxInfoPosition(event.clientX, event.clientY, height); }
+        function handleMouseOut(event) {
+            boxInfo.classList.remove('show')
+            console.log('quit')
+        }
+        function updateBoxInfoPosition(x, y, estimatedHeight) {
+            boxInfo.style.height = estimatedHeight
+            const boxInfoWidth = boxInfo.offsetWidth;
+            boxInfo.style.left = (x - boxInfoWidth - 10) + 'px';
+            boxInfo.style.top = y + 'px';
+        }
+        document.querySelectorAll('[data-event="info"]').forEach(function(element) {
+            element.addEventListener('mouseover', function(event) {
+                handleMouseOver(event, element);
+            });
+            element.addEventListener('mouseout', handleMouseOut);
+        });
+        function handleMouseOut(event) { boxInfo.classList.remove('show');}
+      
+
+        function switchMode(mode){
+            document.querySelectorAll('.modeswtichBtn').forEach( function(element) {
+                element.classList.remove('active')
+                document.getElementById(`modeBtn${mode}`).classList.add('active')
+
+                stat_CountryRank.innerText = ''
+                stat_GlobalRank.innerText  =  ''
+                stat_ClassedScore.innerText  =  ''
+                stat_Accuracy.innerText  =  ''
+                stat_PlayCount.innerText  =  ''
+                stat_TotalScore.innerText  =  ''
+                stat_Clicks.innerText  =  ''
+                stat_MasterSkillset.innerText  =  ''
+                stat_AIM.innerText  =  ''
+                stats_MaxCombo.innerText = ''
+                // stat_Graph = null
+            })
+        }
+        
+        
+        // setTimeout(() => {
+        //     let homepage = document.getElementById('home_page');
+        //     if(homepage.classList.contains('no-toggle')){
+        //         let memCollector = {
+        //             page : 'home_page',
+        //             html : homepage.innerHTML
+        //         }
+        //         memCollector.push(memCollector)
+        //         homepage.innerHTML = ''
+        //     }
+        //     let gameplaypage = document.getElementById('home_page');
+        //     if(gameplaypage.classList.contains('no-toggle')){
+        //         gameplay_page = gameplaypage.innerHTML
+        //         gameplaypage.innerHTML = ''
+        //     }
+        //     let settingspage = document.getElementById('home_page');
+        //     if(homepage.classList.contains('no-toggle')){
+        //         settings_page = settingspage.innerHTML
+        //         settingspage.innerHTML = ''
+        //     }
+        //     let collectionspage = document.getElementById('home_page');
+        //     if(collectionspage.classList.contains('no-toggle')){
+        //         collections_page = collectionspage.innerHTML
+        //         collectionspage.innerHTML = ''
+        //     }
+        //     let chatbotpage = document.getElementById('home_page');
+        //     if(chatbotpage.classList.contains('no-toggle')){
+        //         chatbot_page = chatbotpage.innerHTML
+        //         chatbotpage.innerHTML = ''
+        //     }
+
+        // }, 1000);
+    </script>
+</body>
+</html>
