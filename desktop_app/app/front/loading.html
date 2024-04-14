@@ -1,62 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
         :root {
-        --color1 : #a84a89;
-        --color2 : linear-gradient(263deg, rgba(240,151,236,1) 18%, rgba(197,94,252,1) 63%);
-        --color6 : linear-gradient(263deg, rgb(197, 94, 252) 18%, rgba(158, 23, 151, 0.788) 63%);
-        --color7 : linear-gradient(263deg, rgb(197, 101, 248) 18%, rgba(158, 23, 151, 0.788) 63%);
-        --background4: rgba(203, 128, 243, 0.555);
-        --background5: rgba(255, 0, 0, 0.151);
-        --color8: rgb(197, 94, 252);
-        --color3 : #da8bf6;
-        --color4 : #ffffff;
-        --color5 : #82DDF0;
-        /* --color1 : #F7B267;
+            --color1: #a84a89;
+            --color2: linear-gradient(263deg, rgba(240, 151, 236, 1) 18%, rgba(197, 94, 252, 1) 63%);
+            --color6: linear-gradient(263deg, rgb(197, 94, 252) 18%, rgba(158, 23, 151, 0.788) 63%);
+            --color7: linear-gradient(263deg, rgb(197, 101, 248) 18%, rgba(158, 23, 151, 0.788) 63%);
+            --background4: rgba(203, 128, 243, 0.555);
+            --background5: rgba(255, 0, 0, 0.151);
+            --color8: rgb(197, 94, 252);
+            --color3: #da8bf6;
+            --color4: #ffffff;
+            --color5: #82DDF0;
+            /* --color1 : #F7B267;
         --color2 : #F79D65;
         --color3 : #F4845F;
         --color4: #F27059;
         --color5: #F25C54; */
-    }
+        }
+
         @font-face {
-            font-family: 'Typo_Round_Light'; 
-            src: url('../../src/fonts/Typo_Round_Regular_Demo.otf') format('opentype'); 
-            font-weight: normal; 
+            font-family: 'Typo_Round_Light';
+            src: url('../../src/fonts/Typo_Round_Regular_Demo.otf') format('opentype');
+            font-weight: normal;
             font-style: normal;
         }
 
+        html {
+            background: transparent;
+            border-radius: 20px;
+        }
+
         body {
-        background:linear-gradient(263deg, var(--background5) 18%, rgb(236, 236, 236) 63%);
-        display: flex;
-        flex-direction: column;
-        font-family: 'Typo_Round_Light', sans-serif;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
+            background: #212141;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Typo_Round_Light', sans-serif;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .loading {
             position: relative;
-            border-bottom: 6px solid rgba(0, 0, 0, .1);
-            border-left: 6px solid rgba(0, 0, 0, .1);
-            border-right: 6px solid rgba(0, 0, 0, .1);
-            border-top: 6px solid rgba(0, 0, 0, .4);
+            border-bottom: 6px solid rgba(214, 214, 214, 0.1);
+            border-left: 6px solid  rgba(214, 214, 214, 0.1);
+            border-right: 6px solid  rgba(214, 214, 214, 0.1);
+            border-top: 6px solid  rgba(214, 214, 214, 0.4);
             border-radius: 100%;
             height: 15px;
             width: 15px;
             animation: rot .6s infinite linear;
         }
+
         @keyframes rot {
-            from {transform: rotate(0deg);}
-            to {transform: rotate(359deg);}
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(359deg);
+            }
         }
 
-        #progress_loading{
+        #progress_loading {
             position: absolute;
             margin: -50px 0 0 -74px;
             top: 46%;
@@ -73,7 +87,7 @@
             overflow: hidden;
 
         }
-        
+
         #loading_error {
             position: absolute;
             margin: -50px 0 0 -74px;
@@ -121,8 +135,9 @@
             text-align: center;
             font-size: 22px;
             z-index: 999;
-            
+
         }
+
         .ok {
             color: green;
             display: flex;
@@ -134,19 +149,21 @@
             from {
                 opacity: 1;
             }
+
             to {
                 opacity: 0;
             }
         }
 
         .fadOut {
-            animation: fadOut 0.5s ease-in-out forwards; 
+            animation: fadOut 0.5s ease-in-out forwards;
         }
 
         @keyframes fanIn {
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -156,50 +173,42 @@
             animation: fanIn 0.5s ease-in-out forwards;
         }
 
-        .🤚 {
+        .reduce {
+            height: 20px;
+            font-size: 12px;
+
+        }
+
+        .step_message {
+            width: 100%;
+            display: flex;
+            height: 40px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+            transition: opacity 0.5s ease;
+            color: white;
+
+        }
+
+        .nav-window {
+            display: flex;
             position: absolute;
-            top: 40px;
-            right: -80px;
-            z-index: -999;
+            top: 0;
+            width: 100%;
+            height: 45px;
+            -webkit-app-region: drag;
         }
-        
-        .🤚 img{
-           width: 500px;
-        }
-     
-            .reduce{
-                height: 20px;
-                font-size: 12px;
-
-            }
-            .step_message {
-                width: 100%;
-                display: flex;
-                height: 40px;
-                justify-content: center;
-                align-items: center;
-                gap: 10px;
-                z-index: 2;
-                transition: opacity 0.5s ease;
-
-            }
-      
-         
-
     </style>
 </head>
+
 <body>
-    <div id="welcomeMessage">Thank you for downloading Bella Fiora! The first launch can be long, make sure you have launched Osu! and have no other instances of Gosumemory launched. 
-        <br>Prepare your Osu indendifiers! To connect later
-    </div>
-    <div class="🤚">
-        <img src="../src/bf_loading.png">
-    </div>
-    <div id="progress_loading">
-     
-    </div>
+    <div class="nav-window"></div>
+    <div id="progress_loading"></div>
     <div id="loading_error"></div>
     <div id="client_informations"></div>
 </body>
 <script src="../renderers/loading_renderer.js" defer></script>
+
 </html>
