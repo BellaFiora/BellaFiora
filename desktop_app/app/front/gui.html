@@ -23,7 +23,7 @@
                 <div class="users_place">
                     <span id="username" id="playerInfo_Username">Puparia</span>
                     <span id="player_infos" id="playerInfo_GamePreference">
-                        <trs>Standard Player</trs>
+                        <trs key="Standard Player"></trs>
                     </span>
                     <span id="isSupporter" id="playerInfo_isSupporter">
                         <m class="heart soft-red s1"></m>Supporter
@@ -34,52 +34,52 @@
             <div class="menu-list">
                 <div class="menuBtn navigate-page" target="home_page">
                     <m class="white home"></m><span>
-                        <trs>Home</trs>
+                        <trs key="Home">Home</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page active" target="gameplay_page">
                     <m class="white cursor-arrow-rays"></m><span>
-                        <trs>Gameplay</trs>
+                        <trs key="Gameplay">Gameplay</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
                     <m class="white play"></m><span>
-                        <trs>Player</trs>
+                        <trs key="Player">Player</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
                     <m class="white chevron-double-right"></m><span>
-                        <trs>Bot</trs>
+                        <trs key="Bot">Bot</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="collections_page">
                     <m class="white star"></m><span>
-                        <trs>Collections</trs>
+                        <trs key="Collections">Collections</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
                     <m class="white table-cells"></m><span>
-                        <trs>Lobby</trs>
+                        <trs key="Lobby">Lobby</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
                     <m class="white presentation-chart-line"></m><span>
-                        <trs>Statistics</trs>
+                        <trs key="Statistics">Statistics</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="chatbot_page">
                     <m class="white lifebuoy"></m><span>
-                        <trs>Chatbot IA</trs>
+                        <trs key="Chatbot IA">Chatbot IA</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
                     <m class="white video-camera-slash"></m><span>
-                        <trs>Spectacle</trs>
+                        <trs key="Spectacle">Spectacle</trs>
                     </span>
                 </div>
                 <div class="menuBtn navigate-page" target="devices_page">
                     <m class="white inbox"></m><span>
-                        <trs>Devices</trs>
+                        <trs key="Devices">Devices</trs>
                     </span>
                 </div>
 
@@ -87,7 +87,7 @@
             <div class="menu-other">
                 <div class="menuBtn navigate-page" target="settings_page">
                     <m class="menuBtn white cog"></m><span>
-                        <trs>Settings</trs>
+                        <trs key="Settings">Settings</trs>
                     </span>
                 </div>
                 <div id="sofware-infos" id="software_info">v0.1.980</div>
@@ -425,88 +425,100 @@
                 <div class="settings-menu" id="settings_menu">
                     <div class="navigate-page active" target="settings_general">
                         <m class="white squares-2x2"></m><span>
-                            <trs>General</trs>
+                            <trs key="General">General</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_audio">
                         <m class="white speaker-wave"></m><span>
-                            <trs>Audio</trs>
+                            <trs key="Audio">Audio</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_paths">
                         <m class="white link"></m><span>
-                            <trs>Path</trs>
+                            <trs key="Path">Path</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_downloads">
                         <m class="icon white inbox-arrow-down"></m><span class="label">
-                            <trs>Downloads</trs>
+                            <trs key="Downloads">Downloads</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_plugin">
                         <m class="white puzzle-piece"></m><span>
-                            <trs>Plugin</trs>
+                            <trs key="Plugin">Plugin</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_credentials">
                         <m class="white finger-print"></m><span>
-                            <trs>Credentials</trs>
+                            <trs key="Credentials">Credentials</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_advenced">
                         <m class="white cog-6-tooth"></m><span>
-                            <trs>Advanced</trs>
+                            <trs key="Advanced">Advanced</trs>
                         </span>
                     </div>
                     <div class="navigate-page" target="settings_about">
                         <m class="white information-circle"></m><span>
-                            <trs>About</trs>
+                            <trs key="About">About</trs>
                         </span>
                     </div>
                 </div>
                 <div class="box settings-page active" id="settings_general">
                     <div class="setting-element">
                         <label data-event="info" data-info="Display language">
-                            <trs>Language</trs>
+                            <trs key="Language">Language</trs>
                         </label>
                         <span>
-                            <div class="btn" data-event="setLanguage" data-option="EN">English</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="en-EN">English</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="fr-FR">French</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="es-ES">Spanish</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="de-DE">German</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="ru-RU">Russia</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="jpn-JPN">Japan</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="zh-ZH">China</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="it-IT">Italian</div>
+                            <div class="btn lgn" data-event="setLanguage" data-option="tr-TR">Turk</div>
+
+
+
+
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info"
                             data-info="Do not display the window in the task var when the window is minimized">
-                            <trs>Minimize Window</trs>
+                            <trs key="Minimize Window">Minimize Window</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setMinimizeWindow" data-option="no">
-                                <trs>No</trs>
+                                <trs key="No">No</trs>
                             </div>
                             <div class="btn" data-event="setMinimizeWindow" data-option="yes">
-                                <trs>Yes</trs>
+                                <trs key="Yes">Yes</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="Colours of application">
-                            <trs>Theme</trs>
+                            <trs key="Theme">Theme</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setTheme" data-option="dark">
-                                <trs>Dark</trs>
+                                <trs key="Dark">Dark</trs>
                             </div>
                             <div class="btn" data-event="setTheme" data-option="light">
-                                <trs>Light</trs>
+                                <trs key="Light">Light</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="How the number are displayed">
-                            <trs>Display number</trs>
+                            <trs key="Display number">Display number</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setDisplayNumber" data-option="100s">
-                                <trs>Space</trs>
+                                <trs key="Space">Space</trs>
                             </div>
                             <div class="btn" data-event="setDisplayNumber" data-option="1ks">k</div>
                             <div class="btn" data-event="setDisplayNumber" data-option="1ms">M</div>
@@ -516,36 +528,36 @@
                     <div class="setting-element">
                         <label data-event="info"
                             data-info="Send directly scors of beatmaps played after the end of the game">
-                            <trs>Submit Scores</trs>
+                            <trs key="Submit Scores">Submit Scores</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setSubmitScore" data-option="ap">
-                                <trs>After playing</trs>
+                                <trs key="After playing">After playing</trs>
                             </div>
                             <div class="btn" data-event="setSubmitScore" data-option="30m">
-                                <trs>30 min</trs>
+                                <trs key="30 min">30 min</trs>
                             </div>
                             <div class="btn" data-event="setSubmitScore" data-option="1h">
-                                <trs>1 hour</trs>
+                                <trs key="1 hour">1 hour</trs>
                             </div>
                             <div class="btn" data-event="setSubmitScore" data-option="al">
-                                <trs>After launching</trs>
+                                <trs  key="After launching">After launching</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="Updating Bella Fiora Desktop">
-                            <trs>Auto Update</trs>
+                            <trs key="Auto Update">Auto Update</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setAutoUpdate" data-option="dl">
-                                <trs>During launch</trs>
+                                <trs key="During launch">During launch</trs>
                             </div>
                             <div class="btn" data-event="setAutoUpdate" data-option="manually">
-                                <trs>Manually</trs>
+                                <trs key="Manually">Manually</trs>
                             </div>
                             <div class="btn" data-event="setAutoUpdate" data-option="never">
-                                <trs>Never</trs>
+                                <trs key="Never">Never</trs>
                             </div>
                         </span>
                     </div>
@@ -554,7 +566,7 @@
                 <div class="box settings-page" id="settings_audio">
                     <div class="setting-element">
                         <label data-event="info" data-info="Music and Coatch Volume">
-                            <trs>general volume</trs>
+                            <trs key="general volume">general volume</trs>
                         </label>
                         <span>
                             <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
@@ -564,23 +576,23 @@
                 <div class="box settings-page" id="settings_paths">
                     <div class="setting-element">
                         <label data-event="info" data-info="Folder in which Osu!Stable is located">
-                            <trs>Osu!Stable Path Folder</trs>
+                            <trs  key="Osu!Stable Path Folder">Osu!Stable Path Folder</trs>
                         </label>
                         <span>
                             <input type="text" id="folderPathStable" value="C:\Users\fareo\AppData\Local\osu!" />
                             <div class="btn active" data-event="setOsuFolderStable" data-option="folderPathStable">
-                                <trs>Change</trs>
+                                <trs key="Change">Change</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="Folder in which Osu!Lazer is located">
-                            <trs>Osu!Lazer Path Folder</trs>
+                            <trs key="Osu!Lazer Path Folder">Osu!Lazer Path Folder</trs>
                         </label>
                         <span>
                             <input type="text" id="folderPathLazer" value="Not setup" />
                             <div class="btn active" data-event="setOsuFolderLazer" data-option="folderPathLaer">
-                                <trs>Change</trs>
+                                <trs key="Change">Change</trs>
                             </div>
                         </span>
                     </div>
@@ -588,31 +600,31 @@
                 <div class="box settings-page" id="settings_downloads">
                     <div class="setting-element">
                         <label data-event="info" data-info="When can Bella Fiora Desktop download beatmaps">
-                            <trs>Beatmaps</trs>
+                            <trs key="Beatmaps">Beatmaps</trs>
                         </label>
                         <span>
                             <div class="btn" data-privilege="os" data-event="setDownloadMapsCollection"
                                 data-option="sa">
-                                <trs>Self-Acting</trs>
+                                <trs key="Self-Acting">Self-Acting</trs>
                             </div>
                             <div class="btn" data-event="setDownloadMapsCollection" data-option="manually">
-                                <trs>Manually</trs>
+                                <trs key="Manually">Manually</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="If the beatmap is installed in Osu! during spectate">
-                            <trs>Download beatmap during spectacle</trs>
+                            <trs key="Download beatmap during spectacle">Download beatmap during spectacle</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setDownloadMapsSpectacle" data-option="no">
-                                <trs>No</trs>
+                                <trs key="No">No</trs>
                             </div>
                             <div class="btn" data-event="setDownloadMapsSpectacle" data-option="manually">
-                                <trs>Manually</trs>
+                                <trs key="Manually">Manually</trs>
                             </div>
                             <div class="btn" data-privilege="os" data-event="setDownloadMapsSpectacle" data-option="sa">
-                                <trs>Self-Acting</trs>
+                                <trs key="Self-Acting">Self-Acting</trs>
                             </div>
                         </span>
                     </div>
@@ -627,14 +639,14 @@
                             <input class="cred" id="IRCUsername" type="text" value="Username" />
                             <input class="cred" id="IRCPassword" type="password" value="***********" />
                             <div class="btn active">
-                                <trs>Try Login</trs>
+                                <trs key="Try Login">Try Login</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info"
                             data-info="Disconnect the Osu! account or IRC from Bella Fiora Desktop">
-                            <trs>Logout</trs>
+                            <trs key="Logout">Logout</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="logout" data-option="osu">
@@ -650,43 +662,43 @@
                 <div class="box settings-page" id="settings_advenced">
                     <div class="setting-element">
                         <label data-event="info" data-info="Scan osu!.db and score.db at launch of Bella Fiora Desktop">
-                            <trs>Scan Osu! Files when launching</trs>
+                            <trs key="Scan Osu! Files when launching">Scan Osu! Files when launching</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setScanosuFiles" data-option="yes">
-                                <trs>Yes</trs>
+                                <trs key="Yes">Yes</trs>
                             </div>
                             <div class="btn" data-event="setScanosuFiles" data-option="no">
-                                <trs>No</trs>
+                                <trs key="No">No</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="Synchronization of game music of access on other clients">
-                            <trs>Music Synchronisation</trs>
+                            <trs key="Music Synchronisation">Music Synchronisation</trs>
                         </label>
                         <span>
                             <div class="btn" data-event="setMusicSync" data-option="al">
-                                <trs>After launching</trs>
+                                <trs key="After launching">After launching</trs>
                             </div>
                             <div class="btn" data-event="setMusicSync" data-option="manually">
-                                <trs>Manually</trs>
+                                <trs key="Manually">Manually</trs>
                             </div>
                             <div class="btn" data-event="setMusicSync" data-option="1h">
-                                <trs>Every 1 hour</trs>
+                                <trs key="Every 1 hour">Every 1 hour</trs>
                             </div>
                             <div class="btn" data-event="setMusicSync" data-option="1d">
-                                <trs>Every 1 day</trs>
+                                <trs  key="Every 1 day">Every 1 day</trs>
                             </div>
                         </span>
                     </div>
                     <div class="setting-element">
                         <label data-event="info" data-info="Bella Fiora Desktop hard reset... Nooooooo">
-                            <trs>Reset</trs>
+                            <trs key="Reset">Reset</trs>
                         </label>
                         <span>
                             <div class="btn warning" data-event="Reset" data-option="true">
-                                <trs>Reset</trs> Bella Fiora Desktop
+                                <trs key="Reset">Reset</trs> Bella Fiora Desktop
                             </div>
                         </span>
                     </div>

@@ -104,6 +104,8 @@ var basic_infos
 var gameplay
 var missChecker = {Miss: 0, checked: false}
 var sbChecker = {SB: 0, checked: false}
+let translations = {};
+let newTranslations = {};
 
 ipcRenderer.on('settings', (event, data)=>{
 	loadSettings(data)
@@ -376,9 +378,11 @@ document.querySelectorAll('.btn').forEach(function (btn) {
 			let event = btn.getAttribute('data-event')
 			switch (event) {
 				case 'setLanguage':
-					console.log('test')
-					//EN = EN
-
+					ipcRenderer.send('getLang', value)
+					ipcRenderer.on('lang', (lg, dictionnary) => {
+						newTranslations = JSON.parse(dictionnary)
+						updateTranslations()
+					})
 					break;
 				case 'setMinimizeWindow':
 					//yes = yes
@@ -834,23 +838,51 @@ global.pluginInterface = { getWindow: () => window }
 /*
 *  Pages translations
 */
-	let translations = {};
+	
 	document.addEventListener('DOMContentLoaded', async () => {
-		ipcRenderer.send('getLang')
+		ipcRenderer.send('getLang', null)
 		ipcRenderer.on('lang', (lg, dictionnary) => {
 			translations = JSON.parse(dictionnary)
-			updateTranslations()
+			setTranslations()
 		})
 	});
-	function updateTranslations() {
+
+	function setTranslations(newDictionnary = null) {
+		document.querySelectorAll('trs').forEach(elem => {
+			const key = elem.innerHTML
+			if(newDictionnary){
+				elem.innerHTML = tr(key, newDictionnary);
+			} else {
+				elem.innerHTML = tr(key);
+			}
+		});
+	}
+
+	function setTranslations() {
 		document.querySelectorAll('trs').forEach(elem => {
 			const key = elem.innerHTML
 			elem.innerHTML = tr(key);
 		});
 	}
-	function tr(key) {
+
+	function updateTranslations() {
+		document.querySelectorAll('trs').forEach(elem => {
+			const key = elem.getAttribute('key')
+			elem.innerHTML = tr(key, true);
+		});
+	}
+
+
+	function tr(key, ifUpdate) {
+		console.log(ifUpdate)
+		if(ifUpdate){
+			console.log(newTranslations)
+			return newTranslations[key] || key
+		} else {
+			return translations[key] || key
+		}
 		// return translations[key] || "<err>"+key+"</err>"
-		return translations[key] || key
+		
 
 	}
 

@@ -61,7 +61,17 @@ app.whenReady().then(async () => {
     Conf.setConf('client_version', '1.0.932');
     Conf.setConf('lang', settings.get('General', 'language'));
     // Conf.setConf('osu_token', null)
-    ipcMain.on('getLang', () => mainWindow.webContents.send('lang', dictionnary));
+    ipcMain.on('getLang', async (event, lang) => {
+        console.log('test: '+lang)
+        let TempDictionnary = await loadTranslation(lang)
+        if(lang){
+            mainWindow.webContents.send('lang', TempDictionnary)
+        } else {
+            mainWindow.webContents.send('lang', dictionnary)
+
+        }
+        
+    });
 
     ipcMain.on('keypadSend', async (color) => {
         try {
@@ -1024,15 +1034,19 @@ async function createLogPluginWindow() {
             n(e)
         }
     })
-}
-async function loadTranslation() {
-    const e = fs.readFileSync(`${Conf.getConf('AppPath')}/app/locales/${settings.get('General', 'language')}.json`, "utf-8");
+};
+async function loadTranslation(lang = null) {
+    let setLang = await settings.get('General', 'setLanguage')
+    
+    if(lang){setLang = lang;console.log('ya une lang')}
+    const e = fs.readFileSync(`${Conf.getConf('AppPath')}/app/locales/${setLang}.json`, "utf-8");
     translations = JSON.parse(e)
     dictionnary = e
-}
+    return e
+};
 function tr(key) {
     return `${translations[key] || key}`
-}
+};
 async function getInformations(port, mainWindow) {
     return new Promise((resolve, reject) => {
         try {
@@ -1109,7 +1123,7 @@ async function getInformations(port, mainWindow) {
             resolve()
         }
     })
-}
+};
 
 ipcMain.on('open-directory-dialog', (event, pathId) => {
     const window = BrowserWindow.getFocusedWindow();
