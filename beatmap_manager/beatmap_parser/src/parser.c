@@ -237,21 +237,14 @@ void parse_editor(Editor* editor) {
 }
 
 void parse_metadata(Metadata* metadata) {
-	if (strncmp(line, "Title:", 6) == 0)
-		substring(&(metadata->title), line, 6, -1);
-	else if (strncmp(line, "TitleUnicode:", 13) == 0)
-		substring(&(metadata->titleUnicode), line, 13, -1);
-	else if (strncmp(line, "Artist:", 7) == 0)
-		substring(&(metadata->artist), line, 7, -1);
-	else if (strncmp(line, "ArtistUnicode:", 14) == 0)
-		substring(&(metadata->artistUnicode), line, 14, -1);
-	else if (strncmp(line, "Creator", 7) == 0)
-		substring(&(metadata->creator), line, 8, -1);
-	else if (strncmp(line, "Version", 7) == 0)
-		substring(&(metadata->version), line, 8, -1);
-	else if (strncmp(line, "Source", 6) == 0)
-		substring(&(metadata->source), line, 7, -1);
-	else if (strncmp(line, "Tags", 4) == 0) {
+	if (strncmp(line, "TitleUnicode:", 13) == 0) { substring(&(metadata->titleUnicode), line, 13, -1); }
+	else if (strncmp(line, "Title:", 6) == 0) { substring(&(metadata->title), line, 6, -1); }
+	else if (strncmp(line, "ArtistUnicode:", 14) == 0) { substring(&(metadata->artistUnicode), line, 14, -1); }
+	else if (strncmp(line, "Artist:", 7) == 0) { substring(&(metadata->artist), line, 7, -1); }
+	else if (strncmp(line, "Creator:", 8) == 0) { substring(&(metadata->creator), line, 8, -1); }
+	else if (strncmp(line, "Version:", 8) == 0) { substring(&(metadata->version), line, 8, -1); }
+	else if (strncmp(line, "Source:", 7) == 0) { substring(&(metadata->source), line, 7, -1); }
+	else if (strncmp(line, "Tags:", 5) == 0) {
 		subvec(line, line, 5, -1);
 		char* tag;
 		tag = strtok(line, " ");
@@ -259,14 +252,10 @@ void parse_metadata(Metadata* metadata) {
 			slist_add(metadata->tags, tag);
 			tag = strtok(NULL, " ");
 		}
-	} else if (strncmp(line, "BeatmapId", 9) == 0)
-		subint(&metadata->beatmapId, line, 10, -1);
-	else if (strncmp(line, "BeatmapSetId", 12) == 0)
-		subint(&metadata->beatmapSetId, line, 13, -1);
-	else {
-		ereport("impossible case reached");
-		exit(1);
 	}
+	else if (strncmp(line, "BeatmapID:", 10) == 0) { subint(&metadata->beatmapId, line, 10, -1); }
+	else if (strncmp(line, "BeatmapSetID:", 13) == 0) { subint(&metadata->beatmapSetId, line, 13, -1); }
+	else { ereport("impossible case reached"); exit(1); }
 }
 
 void parse_difficulty(Difficulty* difficulty) {
