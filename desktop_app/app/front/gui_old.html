@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BellaFiora</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.css">
+    <link rel="stylesheet" href="https://demos.jquerymobile.com/1.4.2/css/themes/default/jquery.mobile-1.4.2.min.css">  
+    <script src="https://demos.jquerymobile.com/1.4.2/js/jquery.js"></script>
+    <script src="https://demos.jquerymobile.com/1.4.2/js/jquery.mobile-1.4.2.min.js"></script>
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+    <div class="windows-nav">Bella Fiora - App</div>
+    <div class="nav-top">
+        <div class="search-tools">
+            <div class="search-bar">Search..</div>
+            <div class="search-btn"><ion-icon name="search-outline"></ion-icon></div>
+        </div>
+        <div class="users-tools">
+            <div class="nav-btn-action"><ion-icon name="person-outline"></ion-icon></div>
+            <div class="nav-btn-action"><ion-icon name="notifications-outline"></ion-icon></div>
+            <div class="nav-btn-action"><ion-icon name="settings-outline"></ion-icon></div>
+        </div>
+        <div class="open-boxedit reply">
+            <div class="boxContainer">
+                <div class="settings-container">
+                    <div class="setup-handler">
+                        <label>Refresh Rate</label>
+                        <div class="btn-row">
+                          <div class="rr-btn toggle">Low</div>
+                          <div class="rr-btn">Moderate</div>
+                          <div class="rr-btn">High</div>
+                          <div class="rr-btn">Extrem</div>
+                        </div>
+                    </div>
+                    <div class="setup-handler">
+                        <label>Notifications</label>
+                        <div>
+                            <div class="slide-btn">
+                                <div class="mod-btn">
+                                    <div class="cursor">On</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setup-handler">
+                        <label>Update scores when Launch</label>
+                        <div>
+                            <div class="slide-btn">
+                                <div class="mod-btn">
+                                    <div class="cursor">On</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setup-handler">
+                        <label>Update BM db when Launch</label>
+                        <div>
+                            <div class="slide-btn">
+                                <div class="mod-btn">
+                                    <div class="cursor">On</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="soft_infos">
+                <span id="software_version"><span class="loading_holder t3 h6 "></span></span>
+                <p>&nbsp;|&nbsp;</p>
+                <span id="application_id"><span class="loading_holder t3 h6 "></span></span>
+            </div>
+        </div>
+    </div>
+    <div class="global-contents"> 
+        <div class="main-content active" id="HomePage">
+            <div class="home-collumn">
+                <div class="gamemode_select">
+                    <span class="gamemode toggle"  data_gm_id="osu">
+                        <svg version="1.0" class="gamemode_icon" xmlns="http://www.w3.org/2000/svg"
+                        width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
+                        preserveAspectRatio="xMidYMid meet">
+                       
+                       <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+                       fill="#000000" class="gamemode_icon" id="gm_osu_btn" stroke="none">
+                       <path d="M488 1221 c-273 -74 -458 -313 -458 -591 0 -207 123 -417 303 -518
+                       104 -58 171 -75 297 -76 94 -1 128 3 186 22 138 44 249 129 329 252 61 94 87
+                       176 93 295 5 119 -10 193 -65 305 -45 92 -159 210 -248 257 -136 71 -299 91
+                       -437 54z m321 -111 c349 -138 443 -569 182 -831 -198 -198 -508 -201 -705 -6
+                       -170 169 -204 404 -89 613 58 105 200 214 319 243 65 17 231 6 293 -19z"/>
+                       <path d="M550 1011 c-100 -22 -216 -114 -259 -206 -92 -195 -17 -417 172 -510
+                       322 -159 656 150 527 487 -30 80 -105 160 -185 198 -69 33 -184 47 -255 31z"/>
+                       </g>
+                       </svg></span>
+                    <span class="gamemode" data_gm_id="taiko">
+                        <svg version="1.0" class="gamemode_icon" xmlns="http://www.w3.org/2000/svg"
+                        width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
+                        preserveAspectRatio="xMidYMid meet">
+
+                        <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+                        fill="#000000"  class="gamemode_icon" id="gm_taiko_btn" stroke="none">
+                        <path d="M560 1230 c-232 -29 -414 -181 -497 -412 -38 -107 -38 -251 0 -363
+                        103 -304 408 -475 717 -400 200 48 354 190 426 393 20 55 24 87 24 183 0 164
+                        -32 259 -127 380 -125 160 -337 245 -543 219z m193 -105 c254 -66 417 -309
+                        379 -564 -33 -215 -202 -385 -420 -423 -253 -43 -507 128 -567 383 -62 264
+                        100 532 365 603 72 19 172 20 243 1z"/>
+                        <path d="M547 1010 c-192 -49 -325 -249 -288 -434 35 -175 149 -289 313 -315
+                        175 -28 336 57 411 217 27 59 31 78 31 157 1 84 -2 95 -36 166 -44 89 -94 139
+                        -182 180 -69 32 -183 45 -249 29z m41 -373 c3 -301 5 -293 -70 -259 -65 29
+                        -104 66 -137 134 -44 87 -44 167 1 250 43 81 132 152 183 145 19 -2 20 -10 23
+                        -270z m189 243 c163 -94 191 -311 58 -445 -42 -41 -118 -80 -141 -71 -12 4
+                        -14 50 -14 269 0 145 3 267 7 270 13 13 38 7 90 -23z"/>
+                        </g>
+                        </svg>
+                    </span>
+                    <span class="gamemode" data_gm_id="ctb" >
+                        <svg version="1.0" class="gamemode_icon" xmlns="http://www.w3.org/2000/svg"
+                        width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
+                        preserveAspectRatio="xMidYMid meet">
+
+                        <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+                        fill="#000000" class="gamemode_icon" id="gm_ctb_btn" stroke="none">
+                        <path d="M475 1211 c-195 -57 -349 -204 -412 -394 -51 -156 -31 -342 54 -486
+                        33 -57 124 -153 179 -191 344 -232 811 -53 919 352 22 82 16 257 -10 328 -73
+                        198 -238 350 -426 395 -86 20 -228 18 -304 -4z m278 -86 c379 -99 512 -569
+                        238 -842 -203 -204 -509 -205 -712 -3 -201 201 -201 510 1 710 129 127 307
+                        178 473 135z"/>
+                        <path d="M502 902 c-15 -12 -25 -33 -29 -60 -5 -36 -2 -45 25 -72 41 -40 83
+                        -41 123 -1 38 39 40 88 3 125 -32 31 -87 35 -122 8z"/>
+                        <path d="M731 705 c-16 -14 -33 -35 -36 -46 -10 -32 14 -88 45 -104 36 -19 54
+                        -19 89 0 60 30 61 123 2 158 -40 23 -64 21 -100 -8z"/>
+                        <path d="M499 501 c-60 -61 -24 -151 61 -151 52 0 90 36 90 87 0 46 -46 93
+                        -90 93 -22 0 -41 -9 -61 -29z"/>
+                        </g>
+                        </svg>
+                    </span>
+                    <span class="gamemode" data_gm_id="mania">
+                        <svg version="1.0" class="gamemode_icon" xmlns="http://www.w3.org/2000/svg"
+                        width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
+                        preserveAspectRatio="xMidYMid meet">
+
+                        <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+                        fill="#000000" class="gamemode_icon" id="gm_mania_btn" stroke="none">
+                        <path d="M496 1209 c-113 -28 -189 -71 -277 -159 -82 -82 -115 -133 -150 -237
+                        -32 -95 -33 -257 -2 -358 71 -227 282 -393 521 -412 235 -18 471 114 574 322
+                        49 98 62 154 62 265 0 178 -49 295 -174 420 -89 89 -185 141 -302 165 -99 19
+                        -154 18 -252 -6z m286 -99 c298 -92 435 -429 290 -715 -34 -68 -143 -174 -214
+                        -208 -84 -40 -181 -60 -259 -53 -241 22 -427 197 -461 435 -20 141 27 290 124
+                        397 61 66 114 103 188 132 74 28 82 30 181 31 61 1 106 -5 151 -19z"/>
+                        <path d="M596 994 c-14 -13 -16 -60 -16 -363 0 -256 3 -350 12 -359 17 -17 64
+                        -15 82 4 14 13 16 60 16 358 0 320 -1 344 -18 359 -23 21 -56 22 -76 1z"/>
+                        <path d="M380 810 c-18 -18 -20 -33 -20 -178 0 -141 2 -161 18 -175 36 -33 85
+                        -14 98 38 3 12 4 84 2 158 -3 116 -6 138 -22 156 -24 26 -50 27 -76 1z"/>
+                        <path d="M810 808 c-18 -20 -20 -35 -20 -175 0 -140 2 -155 20 -173 25 -25 55
+                        -25 80 0 18 18 20 33 20 175 0 142 -2 157 -20 175 -26 26 -54 25 -80 -2z"/>
+                        </g>
+                        </svg>
+                    </span>
+                </div>
+                <div class="user-welcome">
+                    <div class="avatar" ><img src="" id="userAvatar"/></div>
+                    <div class="user_informations">
+                        <span id="welcomePseudo"><span class="loading_holder t100p h6 left right"></span></span>
+                        <span id="welcomeRank"><span class="loading_holder t100p h6 left right"></span></span>
+                        <span id="welcomePP"><span class="loading_holder t100p h6 left right"></span></span>
+                    </div>
+                </div>
+    
+                <div class="user-stats">
+                    <!-- <div class="stat-container">
+                        <span  class="stat-label">Classed Score</span>
+                        <span class="stat-info" id="userStat_classedScore"><span class="loading_holder t10 h6 "></span></span>
+                    </div> -->
+
+                    <div class="stat-container">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-info" id="userStat_Accuracy" ><span class="loading_holder t10 h6 "></span></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span  class="stat-label">Plays</span>
+                        <span class="stat-info" id="userStat_classedPlays"><span class="loading_holder t10 h6 "></span></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span  class="stat-label">Total Score</span>
+                        <span class="stat-info" id="userStat_TotalScore"><span class="loading_holder t10 h6 "></span></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span  class="stat-label">Clicks</span>
+                        <span class="stat-info" id="userStat_nbClick"><span class="loading_holder t10 h6 "></span></span>
+                    </div>
+
+                    <div class="stat-container">
+                        <span id="userStat_classedScore" class="stat-label">Combo Max</span>
+                        <span class="stat-info" id="userStat_maxCombo"> <span class="loading_holder t10 h6 "></span></span>
+                    </div>
+
+                    <div class="rank-highligh" id="rank_highligh"><span class="loading_holder t100p h90 left right"></div>
+
+                    <div class="rank-notations">
+                        <div class="rank-note">
+                            <label>SSH</label>
+                            <span id="userStat_nb_ssh"><span class="loading_holder t3 h6 "></span></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>SS</label>
+                            <span id="userStat_nb_ss"><span class="loading_holder t3 h6 "></span></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>SH</label>
+                            <span id="userStat_nb_sh"><span class="loading_holder t3 h6 "></span></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>S</label>
+                            <span id="userStat_nb_s"><span class="loading_holder t3 h6 "></span></span>
+                        </div>
+
+                        <div class="rank-note">
+                            <label>A</label>
+                            <span id="userStat_nb_a"><span class="loading_holder t3 h6 "></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home_user_profile">
+                <div class="title-categories">Your Best Scores</div>
+                <div id="best_scores" class="scores_list">
+                    <div class="score-container">
+                        <div class="score-pp">0 PP</div>
+                        <div class="score-infos">
+                            <div class="score-container-top">Max Combo: ${s.maxCombo} Score: ${s.replayScore} Miss: ${s.cMiss} 300: ${s.c300} 100: ${s.c100} 50: ${s.c50}</div>
+                            <div class="score-container-bottom">${ctwtg(s.timestampWindows)} | Accuracy: ${osuUtils.acc(s.mode, s.c300, s.c100, s.c50, s.cMiss, s.cKatu, s.cGeki)} | Stars: 0 ★</div>
+                        </div>
+                        <div class="score-mods">${s.mods ? s.mods : null}</div>
+                        <div class="score-rank">X</div>
+                    </div>
+                    <!-- <span class="loading_holder t100p h60 "></span> -->
+                    <span class="loading_holder t100p h60 "></span>
+                    <span class="loading_holder t100p h60 "></span>
+                    <span class="loading_holder t100p h60 "></span>
+                    <span class="loading_holder t100p h60 "></span>
+                    <span class="loading_holder t100p h60 "></span>
+                    <span class="loading_holder t100p h60 "></span>
+                    <span class="loading_holder t100p h60 "></span>
+                   
+                </div>
+            </div>
+        </div>
+        <div class="main-content row" id="BotIgPage">
+
+          <div class="bot-content">HH</div>
+          <div class="downlaod-set">
+            <span class="title">Generate New Collection</span>
+            <div class="bmset-filter">
+                <div class="filter">
+                    <label>HP Drain</label>
+                    <div>
+                        <div class="double-range-container">
+                            <label for="double-range">Double Range:</label>
+                            <input type="range" id="double-range" min="0" max="100" value="25">
+                            <output id="output1">25</output>
+                            <output id="output2">75</output>
+                    
+                            <p id="result">Valeur Plage 1: 25, Valeur Plage 2: 75</p>
+                        </div>
+                
+                    </div>
+            </div>
+          </div>
+        </div>
+        <div class="main-content" id="GamePlayPage">
+            <div class="player-music" id="musicPlayer">
+                <div class="player-music-backdrop"></div>
+                <div class="player-content">
+                    <div class="gameplay-player">
+                        <div class="timestamp">
+                            <div class="timeElapsed" id="timeElapsed"><span class="loading_holder t10 h6 "></span></div>
+                            <div class="timeElapsed" id="MusictimeElapsed"><span class="loading_holder t5 h4 "></span></div>
+                        </div>
+                        
+                    </div>
+                    <div class="music-informations">
+                        <span id="music_info_title"><span class="loading_holder t20 h6 "></span></span>
+                        <span id="music_info_diff"><span class="loading_holder t10 h6 "></span></span>
+                        <span id="music_info_author"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+                    <div class="beatmap-informations">
+                        <div id="bm_status"><span class="loading_holder t10 h15 "></span></div>
+                    </div>
+                </div>
+                <div class="music-progressbar" id="progressBarHolder">
+                    <div class="bar" id="progressbar"></div>
+                </div>
+            </div>
+            <div class="home-collumn ai-l player" id="bmstats" style="width: 30%;">
+                <div class="bm_statistics_handler" id="bm_stats_handler_hp">
+                    <span>HP Drain</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_hp"></div>
+                    </div>
+                   
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_cs">
+                    <span>Cercle Size</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_cs"></div>
+
+                    </div>
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_od">
+                    <span>Overall Difficulty</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_od"></div>
+                    </div>
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_ar">
+                    <span>Approach Rate</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_ar"></div>
+                    </div>
+
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_sr">
+                    <span>Star Rating</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_sr"></div>
+                    </div>
+                </div>
+                <div class="bm_statistics_handler"  id="bm_stats_handler_kc">
+                    <span>Key Count</span>
+                    <div class="bm_h">
+                        <div class="bm_statistics" id="bm_stats_kc"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="home_user_profile" id="topranks" style="width: 60%;height: 200px;">
+                <div class="title-categories">Your Scores</div>
+                <div id="specificsMap" class="scores_list">
+                    <span class="loading_holder t100p h60 "></span>
+                    
+                    <!-- <div class="score-container">
+                        <div class="score-pp">0 PP</div>
+                        <div class="score-infos">
+                            <div class="score-container-top">Max Combo: ${s.maxCombo} Score: ${s.replayScore} Miss: ${s.cMiss} 300: ${s.c300} 100: ${s.c100} 50: ${s.c50}</div>
+                            <div class="score-container-bottom">${ctwtg(s.timestampWindows)} | Accuracy: ${osuUtils.acc(s.mode, s.c300, s.c100, s.c50, s.cMiss, s.cKatu, s.cGeki)} | Stars: 0 ★</div>
+                        </div>
+                        <div class="score-mods">${s.mods ? s.mods : null}</div>
+                        <div class="score-rank">X</div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="gameplayCurrent">
+                <div class="highligh">
+                    <span>Hits Errors (ms)</span>
+                    <div class="rank-highligh" id="HitArrErr_highligh"></div>
+                </div>
+                <div class="keyBing">
+                    <div id="urStat">UR</div>
+                    <div id="keyPressed1"><span>K1</span><span id="k1avg"></span><span id="k1avg2"></span></div>
+                    <div id="keyPressed2"><span>K2</span><span id="k2avg"></span><span id="k2avg2"></span></div>
+                </div>
+                <div class="rank-notations mapStats">
+                    <div class="rank-note">
+                        <label>300g</label>
+                        <span id="gameplayStat_300_g"></span>
+                    </div>
+
+                    <div class="rank-note">
+                        <label>300</label>
+                        <span id="gameplayStat_300"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+
+                    <div class="rank-note">
+                        <label>200</label>
+                        <span id="gameplayStat_200"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+
+                    <div class="rank-note">
+                        <label>100</label>
+                        <span id="gameplayStat_100"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+
+                    <div class="rank-note">
+                        <label>50</label>
+                        <span id="gameplayStat_50"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+                    <div class="rank-note">
+                        <label>Miss</label>
+                        <span id="gameplayStat_miss"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+                    <div class="rank-note">
+                        <label>SB</label>
+                        <span id="gameplayStat_sb"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+                  
+                    <div class="rank-note">
+                        <label>Acc</label>
+                        <span id="gameplayStat_acc"><span class="loading_holder t3 h6 right"></span></span>
+                    </div>
+                    <div class="rank-note">
+                        <label>Rank</label>
+                        <span id="gameplayStat_rank"><span class="loading_holder t5 h6 right"></span></span>
+                    </div>
+                 
+                    <div class="rank-note large">
+                        <label>Score</label>
+                        <span id="gameplayStat_score"><span class="loading_holder t5 h6 "></span></span>
+                    </div>
+                    <div class="rank-note large">
+                        <label>Combo</label>
+                        <span id="gameplayStat_combo"><span class="loading_holder t3 h6 right "></span></span>
+                    </div>
+                    <div class="rank-note large">
+                        <label>MaxCombo</label>
+                        <span id="gameplayStat_mcombo"><span class="loading_holder t3 h6 right"></span></span>
+                    </div>
+                </div>
+            </div>
+            <!-- const k1 = calcAVGk1()
+            const k2 = calcAVGk2() -->
+        </div>
+            <script>
+             document.addEventListener('DOMContentLoaded', function () {
+    const doubleRange = document.getElementById('double-range');
+    const output1 = document.getElementById('output1');
+    const output2 = document.getElementById('output2');
+    const result = document.getElementById('result');
+
+    doubleRange.addEventListener('input', updateResult);
+
+    function updateResult() {
+        const value = doubleRange.value;
+        output1.value = value;
+        output2.value = 100 - value;
+        result.textContent = `Valeur Plage 1: ${value}, Valeur Plage 2: ${100 - value}`;
+    }
+});
+            </script>
+            <!-- <div id="playing_keys">
+                <div id="key1">
+                    <span style="width: 1px;"></span>
+                </div>
+                <div id="key2"></div>
+
+            </div> -->
+            <!-- <div id="graph_ms"></div>
+            <div id="graph_percent"></div> -->
+            <!-- <div class="playing-highligh" id="currentMap_highligh"> -->
+        </div>
+        <div class="main-content" id="RefHelperPage">
+            <div class="ref-helper-main">
+                <div class="refHelper-tab">
+                    <div class="ref-tab">
+                        <span>Tab Name</span>
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                </div>
+                <div class="slots-body">
+                    <div class="slot">
+                        <span class="num-slot">1</span>
+                        <span class="player-name">Pupariaa</span>
+                        <span class="action-slot">
+                            <ion-icon name="color-wand-outline"></ion-icon>
+                        </span>
+                    </div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+                <div class="room-edits">
+                    <div class="map-handler">
+                        <div class="btn-change-map">Change</div>
+                    </div>
+                    <div class="room-editor">
+
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">DT</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">HD</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">FL</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">EZ</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">SD</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">RL</div>
+                            </div>
+                        </div>
+                        <div class="mods-checkers">
+                            <div class="mod-btn">
+                                <div class="cursor">NF</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="room-chat">
+                        <div class="chat">
+                            <div class="chat-message">
+                                <span>Pseudo</span>
+                                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aliquid alias labore, maxime consequuntur </p>
+                            </div>
+                        </div>
+                        <div class="prompt-chat">
+                            <input type="text" placeholder="Type a message">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- <div class="main-content" id="StatsPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+        <!-- <div class="main-content" id="HistoryPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+        <!-- <div class="main-content" id="PromptGenPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+       
+        <!-- <div class="main-content" id="DocPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+         <div class="main-content" id="Overlays">
+            <div class="home-collumn ai-l">
+                <div class="overlay-item active">PP Counter</div>
+                <div class="overlay-item">Beatmap</div>
+                <div class="overlay-item">Statistics</div>
+                <div class="overlay-item">Player</div>
+                <div class="overlay-item">Unstable Rate</div>
+                <div class="overlay-item">Stream Overlays</div>
+                <div class="overlay-item">Chat Streams</div>
+            </div>
+            <div class="overlay-edit">
+                <span class="overlay-cat-title">Preview</span>
+                <div class="overlay-preview">
+                    <div class="__pp_counter">
+                        <div class="__overlay __pp_counter">
+                            <span>145 PP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="overlay-settings-up">
+                    <select id="overlays_ppcounter-styleselect" name="Style Select">
+                        <option value="option1">Bella Fiora Theme</option>
+                        <option value="option2">Option 2</option>
+                        <option value="option3">Option 3</option>
+                        <option value="option4">Option 4</option>
+                    </select>
+                    <div class="set-up-element palet-color">
+                        <span>Text Color</span>
+                        <input type="color" id="overlays_ppcounter-text-color"value="#ffffff" />
+                    </div>
+                    <div class="set-up-element palet-color">
+                        <span>BG Color</span>
+                        <input type="color" id="overlays_ppcounter-text-color" value="#a84a89"/>
+                    </div>
+                    <div class="set-up-element">
+                        <span>Width (px)</span>
+                        <input type="number" placeholder="1000">
+                        
+                    </div>
+                    <div class="set-up-element">
+                        <span>Height (px)</span>
+                        <input type="number" placeholder="1000">
+
+                    </div>
+                    <div class="overlay-apply-btns">
+                        <div class="overlay-btn">Save</div>
+                        <div class="overlay-btn">Reset</div>
+                        <div class="overlay-btn">Open Server</div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+
+      
+        <!-- <script>
+            const colorSelector = document.getElementById('color-selector');
+
+            colorSelector.addEventListener('input', (event) => {
+                const selectedColor = event.target.value;
+                console.log(`Selected Color: ${selectedColor}`);
+            });
+        </script> -->
+       
+         <!-- <div class="main-content" id="DocPage">
+            <div class="user-welcome">
+                <span>Welcome, Pupariaa !</span>
+            </div>
+        </div> -->
+    </div>
+        
+
+    </div>
+
+    <div class="nav-bottom">
+        <div class="nav-menu">
+            <div class="btn-menu active" onclick="setActiveButton(this)" data-id="HomePage">
+                <ion-icon name="radio-button-off-outline"></ion-icon>
+                <span>Home</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="BotIgPage">
+                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                <span>Bot IG</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="GamePlayPage">
+                <ion-icon name="game-controller-outline"></ion-icon>
+                <span>Gameplay</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="StatsPage">
+                <ion-icon name="pulse-outline"></ion-icon>
+                <span>Stats</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="HistoryPage">
+                <ion-icon name="receipt-outline"></ion-icon>
+                <span>History</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" data-id="PromptGenPage">
+                <ion-icon name="terminal-outline"></ion-icon>
+                <span>Prompt Gen.</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" id="refHelperHandler" data-id="RefHelperPage">
+                <ion-icon name="browsers-outline"></ion-icon>
+                <span>Ref helper</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu" onclick="setActiveButton(this)" id="overlays" data-id="OverlaysPage">
+                <ion-icon name="copy-outline"></ion-icon>
+                <span>Overlays</span>
+                <div class="indicator"></div>
+            </div>
+            <div class="btn-menu " onclick="setActiveButton(this)" data-id="DocPage">
+                <ion-icon name="book-outline"></ion-icon>
+                <span>Doc</span>
+                <div class="indicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="body__handler_pop_up" ></div> -->
+</body>
+<!-- <script src="../renderers/gui_renderer.js" defer></script> -->
+<!-- <script src="../renderers/main-renderer.js" defer></script> -->
+</html>
