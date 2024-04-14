@@ -18,6 +18,7 @@
     }
   },
   "dependencies": {
+    "@serialport/parser-readline": "^12.0.0",
     "axios": "^1.6.7",
     "child_process": "^1.0.2",
     "credentials": "file:../../credentials",
@@ -32,11 +33,13 @@
     "http": "^0.0.1-security",
     "ini": "^4.1.1",
     "long": "^5.2.3",
+    "node-usb-detection": "^1.0.2",
     "os": "^0.1.2",
     "osu-bpdpc": "^0.3.0",
     "osudb": "^2.0.0",
     "path": "^0.12.7",
     "remote-server": "file:../../remote-server",
+    "serialport": "^12.0.0",
     "tmp": "^0.2.1",
     "uleb128": "^1.0.1",
     "url": "^0.11.3",

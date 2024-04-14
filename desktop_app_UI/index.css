@@ -21,6 +21,23 @@ body {
     --link-infos : #ecc74c;
     /* --link-infos : #ff66ab; */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .context-menu {
     position: absolute;
     z-index: 999;
@@ -87,7 +104,9 @@ body {
     display: flex;
     opacity: 1;
 }
-
+err {
+    color: red;
+}
 #root {
     border-radius: 20px;
     overflow: hidden;
@@ -97,7 +116,9 @@ body {
     
 }
 
-
+.white-text {
+    color: white;
+}
 
 #side_left_menu {
     height: 100%;
@@ -458,14 +479,35 @@ margin-top: 6px;
     padding-left: 45px;
 }
 #graph_rank {
-    height: 170px;
+    width: calc(100% - 10px);
+    height: 160px;
     background-color: var(--background-infos);
     border-radius: 5px;
     overflow: hidden;
+    
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    /* background-color: red; */
 }
+#graph_rank span{
+    height: 45px;
+    color: white;
+}
+#graphRanKArea {
+    width: 100%;
+    height: calc(100% - 10px);
+    display: flex;
+    /* margin-left: -5.1px; */
+    margin-top: -6px;
+    /* background-color: red; */
+}
+
+
+
 #graph_rank img {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 45px);
 
 
 }

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="translation.js"></script>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -15,43 +17,43 @@
                 </div>
                 <div class="users_place">
                     <span id="username" id="playerInfo_Username">Puparia</span>
-                    <span id="player_infos" id="playerInfo_GamePreference">Standard Player</span>
+                    <span id="player_infos" id="playerInfo_GamePreference"><trs>Standard Player</trs></span>
                     <span id="isSupporter" id="playerInfo_isSupporter"><m class="heart soft-red s1"></m>Supporter</span>
                 </div>
             </div>
 
             <div class="menu-list">
-                <div class="menuBtn navigate-page" target="home_page">
-                    <m class="white home"></m><span>Home</span>
+                <div class="menuBtn navigate-page active" target="home_page">
+                    <m class="white home"></m><span><trs>Home</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="gameplay_page">
-                    <m class="white cursor-arrow-rays"></m><span>Gameplay</span>
+                    <m class="white cursor-arrow-rays"></m><span><trs>Gameplay</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
-                    <m class="white play"></m><span>Player</span>
+                    <m class="white play"></m><span><trs>Player</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
-                    <m class="white chevron-double-right"></m><span>Bot</span>
+                    <m class="white chevron-double-right"></m><span><trs>Bot</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="collections_page">
-                    <m class="white star"></m><span>Collections</span>
+                    <m class="white star"></m><span><trs>Collections</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
-                    <m class="white table-cells"></m><span>Lobby</span>
+                    <m class="white table-cells"></m><span><trs>Lobby</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
-                    <m class="white presentation-chart-line"></m><span>Statistics</span>
+                    <m class="white presentation-chart-line"></m><span><trs>Statistics</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="chatbot_page" >
-                    <m class="white lifebuoy"></m><span>Chatbot IA</span>
+                    <m class="white lifebuoy"></m><span><trs>Chatbot IA</trs></span>
                 </div>
                 <div class="menuBtn navigate-page" target="" disabled="true">
-                    <m class="white video-camera-slash"></m><span>Spectacle</span>
+                    <m class="white video-camera-slash"></m><span><trs>Spectacle</trs></span>
                 </div>
             </div>
             <div class="menu-other">
-                <div class="menuBtn navigate-page active" target="settings_page">
-                    <m class="menuBtn white cog"></m><span>Settings</span>
+                <div class="menuBtn navigate-page" target="settings_page">
+                    <m class="menuBtn white cog"></m><span><trs>Settings</trs></span>
                 </div>
                 <div id="sofware-infos" id="software_info">v0.1.980</div>
             </div>
@@ -61,9 +63,9 @@
             <div class="ui-actions">
                 <img src="./12345.png">
             </div>
-            <div id="home_page" class="page no-toggle">
+            <div id="home_page" class="page">
                 <div class="box user-basic-infos">
-                    <div class="title">Your Game Statistics
+                    <div class="title"><trs>Your Game Statistics</trs>
                         <span class="subtitle"><m class="glass-grey s1 arrow-path" id="action_RefreshDataScores"data-event="info" data-info="Refresh Datas" style="margin-top: 2px;"></m><f id="stats_refresh_dt">13/03/2024 03h05</f></span></div>
                     <div class="btn-gamemode">
                         <span class="modeswtichBtn active" id="modeBtnSTD" onclick="switchMode('STD')">Osu!</span>
@@ -73,44 +75,44 @@
                     </div>
                     <div class="user-statistics">
                         <div class="ranking-stat">
-                            <label>Ranking</label>
+                            <label><trs>Ranking</trs></label>
                             <div>
                                 <span data-event="info" data-info="Country Ranking"><m class="flag-fr s2"></m>
-                                    <f id="stat_CountryRank">#8 652</f>
+                                    <f id="stat_CountryRank" >8 652</f>
                                 </span>
                                 <span data-event="info" data-info="Global Ranking">
                                     <m class="globe-europe-africa glass-grey" style="margin-right: -8px;"></m>
-                                    <f id="stat_GlobalRank">#247 767</f>
+                                    <f id="stat_GlobalRank" >247 767</f>
                                 </span>
                             </div>
                         </div>
                         <div class="unique-stat">
-                            <label>Classed Score</label>
-                            <span id="stat_ClassedScore">2 875 825 285</span>
+                            <label><trs>Classed Score</trs></label>
+                            <span id="stat_ClassedScore" class="number" data-value="2875825285">2875825285</span>
                         </div>
                         <div class="unique-stat">
-                            <label>Accuracy</label>
+                            <label><trs>Accuracy</trs></label>
                             <span id="stat_Accuracy">94.03 %</span>
                         </div>
                         <div class="unique-stat">
-                            <label>Play Count</label>
+                            <label><trs>Play Count</trs></label>
                             <span id="stat_PlayCount">20 989</span>
                         </div>
                         <div class="unique-stat">
-                            <label>Total Score</label>
-                            <span id="stat_TotalScore">12 875 825 285</span>
+                            <label><trs>Total Score</trs></label>
+                            <span id="stat_TotalScore" class="number" data-value="12875825285">12875825285</span>
                         </div>
                         <div class="unique-stat">
-                            <label>Clicks</label>
-                            <span id="stat_Clicks">3 450 211</span>
+                            <label><trs>Clicks</trs></label>
+                            <span id="stat_Clicks" class="number" data-value="3450211">3450211</span>
                         </div>
                         <div class="unique-stat">
-                            <label>Combo Max</label>
+                            <label><trs>Combo Max</trs></label>
                             <span id="stat_ComboMax">1 534</span>
                         </div>
                
                         <div class="unique-stat">
-                            <label data-event="info" data-info="The skillets you measure best">Master Skillset</label>
+                            <label data-event="info" data-info="The skillets you measure best"><trs>Master Skillset</trs></label>
                             <span id="stat_MasterSkillset">Jump  4~5★ | DT 5~6★</span>
                         </div>
                         <div class="unique-stat">
@@ -118,26 +120,29 @@
                             <span id="stat_AIM">65 %</span>
                         </div>
                      
-                        <div id="graph_rank" id="stat_Graph">
-                            <img src="graph2.png"/>
+                        <div id="graph_rank">
+                            <span><trs>Rank History</trs></span>
+                           <div id="graphRanKArea">
+
+                           </div>
                         </div>
                     </div>
                 </div>
                 <div class="box transparent scores-list">
                     <div class="title-scores">
-                        <span class="tt">Top Ranks</span>
-                        <span class="sorted-by">Sort By <m class="bars-arrow-down white"></m></span>
+                        <span class="tt"><trs>Top Rank</trs></span>
+                        <span class="sorted-by">Sort By PP<m class="bars-arrow-down white"></m></span>
                     </div>
                     <div class="list-score">
                         <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1710022620" data-pp="157" data-accuracy="96.88" data-difficulty="5.20" data-note="4">
                             <div class="elem rank"><note class="a"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Suisei Melody by Oshimizu Nako (CV: Toyosaki Aki)
                                 </span>
                                 <span class="under-infos">
-                                    <l>Insane</l> - 9 March 2024 - 22h17 5.20 ★ <i>(3.74 ★)</i>
+                                    <l>Insane</l> - <d>9 March 2024 22h17</d> - 5.20 ★ <i>(3.74 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt" data-event="info" data-info="Double Time"></j> </div>
@@ -145,14 +150,14 @@
                             <div class="elem pp">157 PP</div>
                         </div>
                         <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1697238720" data-pp="155" data-accuracy="93.26" data-difficulty="5.55" data-note="4">
                             <div class="elem rank"><note class="a"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Dear My Friend -Mada Minu Mirai e- (TV size) by ELISA
                                 </span>
                                 <span class="under-infos">
-                                    <l>Insane</l> - 13 October 2023 - 23h12 5.55 ★ <i>(4.09 ★)</i>
+                                    <l>Insane</l> - <d>13 October 2023 23h12</d> - 5.55 ★ <i>(4.09 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -160,14 +165,14 @@
                             <div class="elem pp">155 PP</div>
                         </div>
                         <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1706912220" data-pp="140" data-accuracy="95.40" data-difficulty="5.24" data-note="3">
                             <div class="elem rank"><note class="s"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     I Did It For Love by BoA
                                 </span>
                                 <span class="under-infos">
-                                    <l>Hard</l> - 2 Febuary 2024 - 22h17 5.24 ★ <i>(3.79 ★)</i>
+                                    <l>Hard</l> - <d>2 Febuary 2024 22h17</d> - 5.24 ★ <i>(3.79 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -175,14 +180,14 @@
                             <div class="elem pp">140 PP</div>
                         </div>
                         <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1706877720" data-pp="134" data-accuracy="93.62" data-difficulty="5.28" data-note="3">
                             <div class="elem rank"><note class="s"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Apples To The Core (Remix) by Sim Gretina
                                 </span>
                                 <span class="under-infos">
-                                    <l>Insane</l> - 2 Febuary 2024 - 12h42 5.28 ★ <i>(3.84 ★)</i>
+                                    <l>Insane</l> - <d>2 Febuary 2024 12h42</d> - 5.28 ★ <i>(3.84 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -190,14 +195,14 @@
                             <div class="elem pp">134 PP</div>
                         </div>
                          <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1706916120" data-pp="134" data-accuracy="95.32" data-difficulty="5.24" data-note="4">
                             <div class="elem rank"><note class="a"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Poker Face (TV Size) by Horie Yui
                                 </span>
                                 <span class="under-infos">
-                                    <l>Insane</l> - 2 Febuary 2024 - 23h22 5.24 ★ <i>(3.89 ★)</i>
+                                    <l>Insane</l> - <d>2 Febuary 2024 23h22</d> - 5.24 ★ <i>(3.89 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -205,14 +210,14 @@
                             <div class="elem pp">134 PP</div>
                         </div>
                          <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1696104180" data-pp="134" data-accuracy="91.11" data-difficulty="5.57" data-note="4">
                             <div class="elem rank"><note class="a"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Sawakaze (TV Size) by Tanizawa Tomofumi
                                 </span>
                                 <span class="under-infos">
-                                    <l>Xenon's Insane</l> - 30 September 2023 - 20h03 5.57 ★ <i>(3.91 ★)</i>
+                                    <l>Xenon's Insane</l> - <d>30 September 2023 20h03</d> - 5.57 ★ <i>(3.91 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -221,14 +226,14 @@
                         </div>
                        
                          <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1705444380" data-pp="133" data-accuracy="98.07" data-difficulty="5.20" data-note="3">
                             <div class="elem rank"><note class="s"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Hello! (TV Size) by Nakajima Megumi
                                 </span>
                                 <span class="under-infos">
-                                    <l>Madoka</l> - 16 january 2024 - 22h33 5.20 ★ <i>(3.59 ★)</i>
+                                    <l>Madoka</l> - <d>16 january 2024 22h33</d> <i> - 5.20 ★(3.59 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -236,14 +241,14 @@
                             <div class="elem pp">133 PP</div>
                         </div>
                          <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1708661700" data-pp="130" data-accuracy="94.11" data-difficulty="5.68" data-note="4">
                             <div class="elem rank"><note class="a"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Marshmary by MIMI feat. Hatsune Miku
                                 </span>
                                 <span class="under-infos">
-                                    <l>Horizon</l> - 23 Febuary 2024 - 04h15 5.68 ★ <i>(5.27 ★)</i>
+                                    <l>Horizon</l> - <d>23 Febuary 2024 04h15</d> - 5.68 ★ <i>(5.27 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="hr"></j> </div>
@@ -251,14 +256,14 @@
                             <div class="elem pp">130 PP</div>
                         </div>
                          <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1696277700" data-pp="130" data-accuracy="96.90" data-difficulty="5.24" data-note="3">
                             <div class="elem rank"><note class="s"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Goodbye by CircusP
                                 </span>
                                 <span class="under-infos">
-                                    <l>Goodbye</l> - 2 October 2023 - 20h15 5.24 ★ <i>(3.57 ★)</i>
+                                    <l>Goodbye</l> - <d>2 October 2023 20h15</d> - 5.24 ★ <i>(3.57 ★)</i>
                                 </span>
                             </div>             
                             <div class="elem mods"><j class="dt"></j> </div>
@@ -266,14 +271,14 @@
                             <div class="elem pp">130 PP</div>
                         </div>
                         <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123">
+                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123" data-timestamp="1693542360" data-pp="130" data-accuracy="96.77" data-difficulty="5.08" data-note="3">
                             <div class="elem rank"><note class="s"></note></div>
                             <div class="elem bm_infos">
                                 <span class="map_title">
                                     Granat by Drop
                                 </span>
                                 <span class="under-infos">
-                                    <l>Extra</l> - 1 September 2023 - 04h26 5.08 ★
+                                    <l>Extra</l> - <d>1 September 2023 04h26 </d> - 5.08 ★
                                 </span>
                             </div>             
                             <div class="elem mods"></div>
@@ -295,85 +300,85 @@
                     </div>
                 </div>
             </div> 
-            <div id="settings_page" class="page">
+            <div id="settings_page" class="page no-toggle">
                 <div class="settings-menu" id="settings_menu">
                     <div class="navigate-page active" target="settings_general">
-                        <m class="white squares-2x2"></m><span>General</span>
+                        <m class="white squares-2x2"></m><span><trs>General</trs></span>
                     </div> 
                     <div class="navigate-page" target="settings_audio">
-                        <m class="white speaker-wave"></m><span>Audio</span>
+                        <m class="white speaker-wave"></m><span><trs>Audio</trs></span>
                     </div> 
                     <div class="navigate-page" target="settings_paths">
-                        <m class="white link"></m><span>Paths</span>
+                        <m class="white link"></m><span><trs>Path</trs></span>
                     </div> 
                     <div class="navigate-page" target="settings_downloads">
-                        <m class="icon white inbox-arrow-down"></m><span class="label">Downloads</span>
+                        <m class="icon white inbox-arrow-down"></m><span class="label"><trs>Downloads</trs></span>
                     </div> 
                     <div class="navigate-page" target="settings_plugin">
-                        <m class="white puzzle-piece"></m><span>Plugin</span>
+                        <m class="white puzzle-piece"></m><span><trs>Plugin</trs></span>
                     </div> 
                     <div class="navigate-page" target="settings_credentials"> 
-                        <m class="white finger-print"></m><span>Credentials</span>
+                        <m class="white finger-print"></m><span><trs>Credentials</trs></span>
                     </div> 
                     <div class="navigate-page" target="settings_advenced">
-                        <m class="white cog-6-tooth"></m><span>Advenced</span>
+                        <m class="white cog-6-tooth"></m><span><trs>Advanced</trs></span>
                     </div>
                     <div class="navigate-page" target="settings_about">
-                        <m class="white information-circle"></m><span>About</span>
+                        <m class="white information-circle"></m><span><trs>About</trs></span>
                     </div>
                 </div>
                 <div class="box settings-page active" id="settings_general">
                     <div class="setting-element">
-                        <label  data-event="info" data-info="Display language">Language</label>
+                        <label  data-event="info" data-info="Display language"><trs>Language</trs></label>
                         <span>
-                            <div class="btn active" data-event="setLanguage" data-option="EN" >English</div>
+                            <div class="btn" data-event="setLanguage" data-option="EN" >English</div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Do not display the window in the task var when the window is minimized">Minimize window</label>
+                        <label data-event="info" data-info="Do not display the window in the task var when the window is minimized"><trs>Minimize Window</trs></label>
                         <span>
-                            <div class="btn active" data-event="setMinimizeWindow" data-option="false">No</div>
-                            <div class="btn" data-event="setMinimizeWindow" data-option="true" >Yes</div>
+                            <div class="btn" data-event="setMinimizeWindow" data-option="no"><trs>No</trs></div>
+                            <div class="btn" data-event="setMinimizeWindow" data-option="yes" ><trs>Yes</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Colours of application">Theme</label>
+                        <label data-event="info" data-info="Colours of application"><trs>Theme</trs></label>
                         <span>
-                            <div class="btn active" data-event="setTheme" data-option="0">Dark</div>
-                            <div class="btn" data-event="setTheme" data-option="1">Light</div>
+                            <div class="btn" data-event="setTheme" data-option="dark"><trs>Dark</trs></div>
+                            <div class="btn" data-event="setTheme" data-option="light"><trs>Light</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="How the number are displayed">Display numbers</label>
+                        <label data-event="info" data-info="How the number are displayed"><trs>Display number</trs></label>
                         <span>
-                            <div class="btn active" data-event="setDisplayNumber" data-option="0">100 space</div>
-                            <div class="btn" data-event="setDisplayNumber" data-option="1">1 K space</div>
-                            <div class="btn" data-event="setDisplayNumber" data-option="2">1 M space</div>
-
+                            <div class="btn" data-event="setDisplayNumber" data-option="100s"><trs>Space</trs></div>
+                            <div class="btn" data-event="setDisplayNumber" data-option="1ks">k</div>
+                            <div class="btn" data-event="setDisplayNumber" data-option="1ms">M</div>
+                            <span class="number white-text" data-value="10020989">10020989</span>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Send directly scors of beatmaps played after the end of the game">Submit scores</label>
+                        <label data-event="info" data-info="Send directly scors of beatmaps played after the end of the game"><trs>Submit Scores</trs></label>
                         <span>
-                            <div class="btn active" data-event="setSubmitScore" data-option="0">After playing</div>
-                            <div class="btn" data-event="setSubmitScore" data-option="1">30 min</div>
-                            <div class="btn" data-event="setSubmitScore" data-option="2">1 hour</div>
-                            <div class="btn" data-event="setSubmitScore" data-option="3">After launching</div>
+                            <div class="btn" data-event="setSubmitScore" data-option="ap"><trs>After playing</trs></div>
+                            <div class="btn" data-event="setSubmitScore" data-option="30m"><trs>30 min</trs></div>
+                            <div class="btn" data-event="setSubmitScore" data-option="1h"><trs>1 hour</trs></div>
+                            <div class="btn" data-event="setSubmitScore" data-option="al"><trs>After launching</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Updating Bella Fiora Desktop">Auto Update</label>
+                        <label data-event="info" data-info="Updating Bella Fiora Desktop"><trs>Auto Update</trs></label>
                         <span>
-                            <div class="btn active" data-event="setAutoUpdate" data-option="0">During launch</div>
-                            <div class="btn"  data-event="setAutoUpdate" data-option="1">Manually</div>
-                            <div class="btn"  data-event="setAutoUpdate" data-option="false">Never</div>
+                            <div class="btn" data-event="setAutoUpdate" data-option="dl"><trs>During launch</trs></div>
+                            <div class="btn"  data-event="setAutoUpdate" data-option="manually"><trs>Manually</trs></div>
+                            <div class="btn"  data-event="setAutoUpdate" data-option="never"><trs>Never</trs></div>
                         </span>
                     </div>
                     
                 </div>
                 <div class="box settings-page" id="settings_audio">
                     <div class="setting-element">
-                        <label data-event="info" data-info="Music and Coatch Volume">General volume</label>
+                        <label data-event="info" data-info="Music and Coatch Volume"><trs>general volume</trs></label>
                         <span>
                             <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
                         </span>
@@ -381,34 +386,34 @@
                 </div>
                 <div class="box settings-page" id="settings_paths">
                     <div class="setting-element">
-                        <label data-event="info" data-info="Folder in which Osu!Stable is located" >Osu!Stable Path Folder</label>
+                        <label data-event="info" data-info="Folder in which Osu!Stable is located" ><trs>Osu!Stable Path Folder</trs></label>
                         <span >
                             <input type="text" id="folderPathStable" value="C:\Users\fareo\AppData\Local\osu!"/>
-                            <div class="btn active" data-event="setOsuFolderStable" data-option="folderPathStable">Change</div>
+                            <div class="btn active" data-event="setOsuFolderStable" data-option="folderPathStable"><trs>Change</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Folder in which Osu!Lazer is located">Osu!Lazer Path Folder</label>
+                        <label data-event="info" data-info="Folder in which Osu!Lazer is located"><trs>Osu!Lazer Path Folder</trs></label>
                         <span>
                             <input type="text" id="folderPathLazer" value="Not setup"/>
-                            <div class="btn active" data-event="setOsuFolderLazer" data-option="folderPathLaer">Change</div>
+                            <div class="btn active" data-event="setOsuFolderLazer" data-option="folderPathLaer"><trs>Change</trs></div>
                         </span>
                     </div>
                 </div>
                 <div class="box settings-page" id="settings_downloads">
                     <div class="setting-element">
-                        <label data-event="info" data-info="When can Bella Fiora Desktop download beatmaps">Beatmaps</label>
+                        <label data-event="info" data-info="When can Bella Fiora Desktop download beatmaps"><trs>Beatmaps</trs></label>
                         <span>
-                            <div class="btn" data-privilege="os" data-event="setDownloadMapsCollection" data-option="true">Self-Acting</div>
-                            <div class="btn active" data-event="setDownloadMapsCollection" data-option="false">Manually</div>   
+                            <div class="btn" data-privilege="os" data-event="setDownloadMapsCollection" data-option="sa"><trs>Self-Acting</trs></div>
+                            <div class="btn" data-event="setDownloadMapsCollection" data-option="manually"><trs>Manually</trs></div>   
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="If the beatmap is installed in Osu! during spectate">Download beatmap during spectacle</label>
+                        <label data-event="info" data-info="If the beatmap is installed in Osu! during spectate"><trs>Download beatmap during spectacle</trs></label>
                         <span>
-                            <div class="btn active" data-event="setDownloadMapsSpectacle" data-option="false">No</div>
-                            <div class="btn" data-event="setDownloadMapsSpectacle" data-option="1">Manually</div>
-                            <div class="btn" data-privilege="os" data-event="setDownloadMapsSpectacle" data-option="true">Self-Acting</div>
+                            <div class="btn" data-event="setDownloadMapsSpectacle" data-option="no"><trs>No</trs></div>
+                            <div class="btn" data-event="setDownloadMapsSpectacle" data-option="manually"><trs>Manually</trs></div>
+                            <div class="btn" data-privilege="os" data-event="setDownloadMapsSpectacle" data-option="sa"><trs>Self-Acting</trs></div>
                         </span>
                     </div>
                 </div>
@@ -416,43 +421,43 @@
                 </div>
                 <div class="box settings-page" id="settings_credentials">
                     <div class="setting-element">
-                        <label data-event="info" data-info="IRC idendifiers, retrieve them in the settings on the Osu! Site, necessary to referer matchs">IRC Login</label>
+                        <label data-event="info" data-info="IRC idendifiers, retrieve them in the settings on the Osu! Site, necessary to referer matchs">IRC <trs>Login</trs></label>
                         <span>
-                            <input class="cred" type="text" value="Username"/>
-                            <input class="cred" type="password" value="***********"/>
-                            <div class="btn active">Try Login</div>
+                            <input class="cred" id="IRCUsername" type="text" value="Username"/>
+                            <input class="cred" id="IRCPassword" type="password" value="***********"/>
+                            <div class="btn active"><trs>Try Login</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Disconnect the Osu! account or IRC from Bella Fiora Desktop">Logout</label>
+                        <label data-event="info" data-info="Disconnect the Osu! account or IRC from Bella Fiora Desktop"><trs>Logout</trs></label>
                         <span>
-                            <div class="btn" data-event="logout" data-option="osu">Logout Osu!</div>
-                            <div class="btn" data-event="logout" data-option="irc">Logout IRC</div>
+                            <div class="btn" data-event="logout" data-option="osu"><trs>Logout</trs> Osu!</div>
+                            <div class="btn" data-event="logout" data-option="irc"><trs>Login</trs> IRC</div>
 
                         </span>
                     </div>
                 </div>
                 <div class="box settings-page" id="settings_advenced">
                     <div class="setting-element">
-                        <label data-event="info" data-info="Scan osu!.db and score.db at launch of Bella Fiora Desktop">Scan Osu! Files when launching</label>
+                        <label data-event="info" data-info="Scan osu!.db and score.db at launch of Bella Fiora Desktop"><trs>Scan Osu! Files when launching</trs></label>
                         <span>
-                            <div class="btn active" data-event="setScanosuFiles" data-option="true">Yes</div>
-                            <div class="btn" data-event="setScanosuFiles" data-option="false">No</div>
+                            <div class="btn" data-event="setScanosuFiles" data-option="yes"><trs>Yes</trs></div>
+                            <div class="btn" data-event="setScanosuFiles" data-option="no"><trs>No</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Synchronization of game music of access on other clients">Music Synchronisation</label>
+                        <label data-event="info" data-info="Synchronization of game music of access on other clients"><trs>Music Synchronisation</trs></label>
                         <span>
-                            <div class="btn active" data-event="setMusicSync" data-option="true">After launching</div>
-                            <div class="btn" data-event="setMusicSync" data-option="0">Every 30 min</div>
-                            <div class="btn" data-event="setMusicSync" data-option="1">Every 1 hour</div>
-                            <div class="btn" data-event="setMusicSync" data-option="2">Every 1 day</div>
+                            <div class="btn" data-event="setMusicSync" data-option="al"><trs>After launching</trs></div>
+                            <div class="btn" data-event="setMusicSync" data-option="30m"><trs>Every 30 min</trs></div>
+                            <div class="btn" data-event="setMusicSync" data-option="1h"><trs>Every 1 hour</trs></div>
+                            <div class="btn" data-event="setMusicSync" data-option="1d"><trs>Every 1 day</trs></div>
                         </span>
                     </div>
                     <div class="setting-element">
-                        <label data-event="info" data-info="Bella Fiora Desktop hard reset... Nooooooo">Reset</label>
+                        <label data-event="info" data-info="Bella Fiora Desktop hard reset... Nooooooo"><trs>Reset</trs></label>
                         <span>
-                            <div class="btn warning" data-event="Reset" data-option="true">Reset Bella Fiora Desktop</div>
+                            <div class="btn warning" data-event="Reset" data-option="true"><trs>Reset</trs> Bella Fiora Desktop</div>
                         </span>
                     </div>
                 </div>
@@ -544,18 +549,177 @@
     </div>
 
 
-
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+      </script>
 
     <script>
 
+
+  
+        google.charts.setOnLoadCallback(drawChart);
+        
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', 'Index');
+            data.addColumn('number', 'Rank');
+            data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
+            var yourData = [263250,263331,263420,263472,263558,263574,263660,263751,263826,263913,264008,264106,264198,264273,264360,264439,263954,264046,264142,264125,264210,264295,264372,264444,264557,264643,264672,264732,264816,264232,264321,264403,264483,264549,264597,264677,264760,264862,264768,264842,262692,262771,261927,262031,258845,258792,258847,258846,258344,258433,258519,258595,258580,258629,259011,259302,259497,254535,254664,254408,254542,254668,254754,254831,254905,255048,255147,255258,255374,255473,255570,255690,255810,255910,256021,255732,255826,254786,254916,255046,255134,253778,253864,253900,253980,254056,254157,254257,253502,253502];
+
+            yourData.forEach(function(value, index) {
+            var tooltipContent = `You were ${value} there  ${90 - index} ${(90-index) > 1 ? 'days' : 'yesterday'} `;
+            data.addRow([index, value, tooltipContent]);
+            });
+
+            var options = {
+                chartArea: {width: '100%', height: '100%'},
+                colors: ['#ecc74c'],
+                legend: 'none',
+                hAxis: {textPosition: 'none', gridlines: {color: 'transparent'}, baselineColor: 'transparent'},
+                vAxis: {textPosition: 'none', gridlines: {color: 'transparent'}, direction: -1},
+                backgroundColor: 'transparent',
+                lineWidth: 3, 
+                annotations: {
+                    alwaysOutside: true,
+                    textStyle: {
+                    fontSize: 12,
+                    color: 'black',
+                    }
+                }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('graphRanKArea'));
+            chart.draw(data, options);
+        }
+
+
+        var sortOrders = [
+            {
+                balise : "PP",
+                icon: "bars-arrow-down",
+                order: "desc",
+                name: "PP"
+
+            },
+            {
+                balise : "PP",
+                icon: "bars-arrow-up",
+                order: "asc",
+                name: "PP"
+
+            },
+            {
+                balise : "accuracy",
+                icon: "bars-arrow-down",
+                order: "desc",
+                name: "Accuracy"
+
+            },
+            {
+                balise : "accuracy",
+                icon: "bars-arrow-up",
+                order: "asc",
+                name: "Accuracy"
+
+            },
+            {
+                balise : "date",
+                icon: "bars-arrow-down",
+                order: "desc",
+                name: "Date"
+
+            },
+            {
+                balise : "date",
+                icon: "bars-arrow-up",
+                order: "asc",
+                name: "Date"
+
+            },
+            {
+                balise : "note",
+                icon: "bars-arrow-down",
+                order: "desc",
+                name: "Note"
+
+            },
+            {
+                balise : "note",
+                icon: "bars-arrow-up",
+                order: "asc",
+                name: "Note"
+
+            },
+        ]
+        let currentIndex = 0;
+        function sortScoreList() {
+            const listContainer = document.querySelector('.list-score');
+            const sortedBySpan = document.querySelector('.sorted-by');
+            const icon = sortedBySpan.querySelector('m');
+
+            currentIndex = (currentIndex + 1) % sortOrders.length;
+            const sortOrder = sortOrders[currentIndex];
+
+            let itemsArray = Array.from(listContainer.getElementsByClassName('toprank-element'));
+            itemsArray.sort((a, b) => {
+                let c, d;
+                switch(sortOrder.balise) {
+                case "PP":
+                    c = parseFloat(a.dataset.pp);
+                    d = parseFloat(b.dataset.pp);
+                    break;
+                case "accuracy":
+                    c = parseFloat(a.dataset.accuracy);
+                    d = parseFloat(b.dataset.accuracy);
+                    break;
+                case "date":
+                    c = parseFloat(a.dataset.timestamp);
+                    d = parseFloat(b.dataset.timestamp);
+                    break;
+                case "note":
+                    c = parseInt(a.dataset.note, 10);
+                    d = parseInt(b.dataset.note, 10);
+                    break;
+                }
+                if(sortOrder.balise === "note") {
+
+                return sortOrder.order === "desc" ? c - d : d - c;
+                } else {
+                return sortOrder.order === "asc" ? c - d : d - c;
+                }
+            });
+
+            itemsArray.forEach(item => listContainer.appendChild(item));
+
+            // Mise à jour du texte et de l'icône du bouton
+            sortedBySpan.innerHTML = `Sort By ${sortOrder.name} <m class="${sortOrder.icon} white"></m>`;
+        }
+        document.querySelector('.sorted-by').addEventListener('click', sortScoreList);
+
+        let settings = {
+            setLanguage: 'EN',
+            setMinimizeWindow : "yes",
+            setTheme: 'dark',
+            setDisplayNumber: '1ms',
+            setSubmitScore: 'ap',
+            setAutoUpdate: 'dl',
+            folderPathStable: 'C:\Users\fareo\AppData\Local\osu!',
+            folderPathLazer: 'Not Setup',
+            setDownloadMapsCollection: 'sa',
+            setDownloadMapsSpectacle: 'sa',
+            IRCUsername: null,
+            IRCPassword: null,
+            setScanosuFiles: 'yes',
+            setMusicSync: 'al',
+        }
 
     //Pages Collectors
         var PageCollector = []
 
     //Toggles 
-        let MenuToggle = true
+        let left_menuToggle = true
         let settings_page_toggled = "settings_general"
-        let global_page_toggled = "settings_page"
+        let global_page_toggled = "home_page"
         let GamemodeToggle = "STD"
 
     //Global
@@ -611,9 +775,6 @@
         let ph_asSpiners = null
 
 
-        
-
-
     //actions-btn
         let action_RefreshDataScores = document.getElementById('action_RefreshDataScores')
 
@@ -626,6 +787,23 @@
        
     //Dynamic Events
 
+        function loadSettings(){
+                console.log('test')
+                Object.entries(settings).forEach(([key, value]) => {
+                    let settingBtn = document.querySelectorAll(`[data-event="${key}"]`);
+                    settingBtn.forEach(function(element) {
+                        if(element.getAttribute('data-option') === value) {
+                            element.classList.add('active');
+        
+                        } else {
+                            element.classList.remove('active');
+                        }
+                    });
+                })
+
+                
+            }
+        loadSettings()
 
         //Create Collection
         document.getElementById('createCollectionBtn').addEventListener('click', function(){
@@ -705,9 +883,28 @@
             });
             m2.addEventListener('mouseout', handleMouseOut);
         })
+        function switchMode(mode){
+            document.querySelectorAll('.modeswtichBtn').forEach( function(element) {
+                element.classList.remove('active')
+                document.getElementById(`modeBtn${mode}`).classList.add('active')
+
+                stat_CountryRank.innerText = ''
+                stat_GlobalRank.innerText  =  ''
+                stat_ClassedScore.innerText  =  ''
+                stat_Accuracy.innerText  =  ''
+                stat_PlayCount.innerText  =  ''
+                stat_TotalScore.innerText  =  ''
+                stat_Clicks.innerText  =  ''
+                stat_MasterSkillset.innerText  =  ''
+                stat_AIM.innerText  =  ''
+                stats_MaxCombo.innerText = ''
+                // stat_Graph = null
+            })
+        }
 
         document.querySelectorAll('.btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
+                loadSettings()
                 let siblings = btn.closest('.setting-element').querySelectorAll('.btn');
                 if(!btn.getAttribute('data-privilege')){
                     siblings.forEach(function(sibling) {
@@ -717,39 +914,68 @@
 
                     let value = btn.getAttribute('data-option')
                     let event = btn.getAttribute('data-event')
-                    console.log(`event: ${event} = ${value}`)
                     switch (event) {
                         case 'setLanguage':
                             //EN = EN
 
                             break;
                         case 'setMinimizeWindow':
-                            //true = yes
-                            //false = no
+                            //yes = yes
+                            //no = no
 
                             break;
                         case 'setTheme':
-                            //0 = dark
-                            //1 = light
+                            //dark = dark
+                            //light = light
 
                             break;
                         case 'setDisplayNumber':
-                            //0 = 100 space
-                            //1 = 1000 space
-                            //2 = 1000000 space
+                            //100s = 100 space
+                            //1ks = 1000 space
+                            //1ms = 1000000 space
+                            document.querySelectorAll('.number').forEach(function(element) {
+                            let number = parseFloat(element.getAttribute('data-value').replace(/\s/g, ''));
+
+                            let formattedNumber = '';
+                            console.log(btn.getAttribute('data-option'))
+                            switch (btn.getAttribute('data-option')) {
+                                case '100s':
+                                    formattedNumber = number.toLocaleString('fr-FR');
+                                    break;
+                                case '1ks':
+                                    if(number <= 9999){
+                                        formattedNumber = number.toLocaleString('fr-FR');
+                                    } else {
+                                        formattedNumber = ((number / 1000).toFixed(0)).toLocaleString('fr-FR', { maximumFractionDigits: 0, minimumFractionDigits: 1 }).replace(' ', ',');
+                                        let ks = parseFloat(formattedNumber)
+                                        ks = ks.toLocaleString('fr-FR');
+                                        formattedNumber = ks + " k"
+                                    }
+                                    break;
+                                case '1ms':      
+                                    formattedNumber = (number / 1000000).toLocaleString('fr-FR') + " M";
+                                    break;
+                                default:
+                                    console.log('default')
+                                    formattedNumber = number.toString();
+                            }
+
+                            element.innerText = formattedNumber
+                        });
+
 
                             break;
                         case 'setSubmitScore':
-                            //0 = after playing
-                            //1 = 30 min
-                            //2 = 1h
-                            //3 = after launching
+                            //ap = after playing
+                            //30m = 30 min
+                            //1h = 1h
+                            //al = after launching
 
                             break;
                         case 'setAutoUpdate':
-                            //0 = during launching
-                            //1 = manually
-                            //false = never
+                            //dl = during launching
+                            //manually = manually
+                            //never = never
 
                             break;
                         case 'setOsuFolderStable':
@@ -759,14 +985,14 @@
                             
                             break;
                         case 'setDownloadMapsCollection':
-                            //true = self-acting
-                            //false = manually
+                            //sa = self-acting
+                            //manually = manually
 
                             break;
                         case 'setDownloadMapsSpectacle':
-                            //false = no
-                            //1 = manually
-                            //true = self-acting
+                            //no = no
+                            //manually = manually
+                            //sa = self-acting
 
                             break;
 
@@ -776,15 +1002,15 @@
 
                             break;
                         case 'setScanosuFiles':
-                            //true = yes
-                            //False = no
+                            //yes = yes
+                            //no = no
 
                             break;
                         case 'setMusicSync':
-                            //true = after launching
-                            //0 = every 30 min
-                            //1 = every 1h
-                            //2 = every 1d
+                            //al = after launching
+                            //30m = every 30 min
+                            //1h = every 1h
+                            //1d = every 1d
 
                             break;
                         case 'Reset':
@@ -798,7 +1024,9 @@
                     showNotificationBox('Please subscribe Osu!Supporter for enable this option', 'info')
                 }
                 
+                
             });
+            
         });
 
 
@@ -837,7 +1065,7 @@
         left_menu.addEventListener('click', function(event) {
             if (event.target.getAttribute('id') == 'side_left_menu' &&
                 event.offsetX >= left_menu.offsetWidth - 12) {
-                if(MenuToggle){
+                if(left_menuToggle){
                     left_menu.classList.add('hide');
                     content.classList.add('full')
                     left_menu.style.setProperty('--after-content', '""')
@@ -853,15 +1081,13 @@
                     setTimeout(() => {
                         left_menu.style.setProperty('--after-content', '"❬"')
                         left_menu.style.setProperty('--after-content-width-left', '13.4%')
-                        MenuToggle = true
+                        left_menuToggle = true
                     }, 150)
                 }
             }
         });
         document.getElementById("settings_menu").addEventListener("click", function(event) {
             if (event.target.classList.contains("navigate-page")) {
-                console.log(event.target.getAttribute('target'))
-                console.log(settings_page_toggled)
                 if(!event.target.classList.contains('active')){
                     let target = event.target.getAttribute('target')
                     
@@ -975,27 +1201,8 @@
         });
         function handleMouseOut(event) { boxInfo.classList.remove('show');}
       
-
-        function switchMode(mode){
-            document.querySelectorAll('.modeswtichBtn').forEach( function(element) {
-                element.classList.remove('active')
-                document.getElementById(`modeBtn${mode}`).classList.add('active')
-
-                stat_CountryRank.innerText = ''
-                stat_GlobalRank.innerText  =  ''
-                stat_ClassedScore.innerText  =  ''
-                stat_Accuracy.innerText  =  ''
-                stat_PlayCount.innerText  =  ''
-                stat_TotalScore.innerText  =  ''
-                stat_Clicks.innerText  =  ''
-                stat_MasterSkillset.innerText  =  ''
-                stat_AIM.innerText  =  ''
-                stats_MaxCombo.innerText = ''
-                // stat_Graph = null
-            })
-        }
         
-        
+      
         // setTimeout(() => {
         //     let homepage = document.getElementById('home_page');
         //     if(homepage.classList.contains('no-toggle')){
