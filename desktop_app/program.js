@@ -1,5 +1,4 @@
-// *** Node Modules *** // 
-const { app, BrowserWindow, dialog, ipcMain, shell, Notification, remote, ipcRenderer, protocol, session } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, Notification} = require('electron');
 const { spawn } = require('child_process');
 const axios = require('axios');
 const tmp = require('tmp');
@@ -28,13 +27,12 @@ const LocalServer = require('./app/lib/local_server');
 const { logFile } = require('./app/lib/log')
 const Settings = require('./app/lib/settings')
 const Serial = require('./app/lib/devices')
+const files = require('./app/lib/files')
 
 // const OsuDBReader = require('./app/lib/db_parser');
 // const osuutils = require('./app/lib/osu_utils');
 
-// First Configs 
-require('dotenv').config();
-let mainWindow //Main view Window Application
+let mainWindow 
 let cookieCheckWindow
 let continueExecute = true
 let isOsuLanuched
@@ -52,24 +50,38 @@ let isFirstTime = true;
 
 const readFile = util.promisify(fs.readFile);
 const Conf = new conf();
-const settings = new Settings()
+const File = new files()
 
-loadTranslation()
 
 app.whenReady().then(async () => {
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
     Conf.setConf('client_version', '1.0.932');
-    Conf.setConf('lang', settings.get('General', 'language'));
+    // Conf.setConf('AlreadyInstalled', null)
+    await (async () =>{
+        return new Promise(async (resolve, reject) => {
+            if (!Conf.getConf('AlreadyInstalled')) {
+                let userPreferencesBase = require('./app/common/arrays/array_userPreference')
+                await File.createIni("userPreferences", userPreferencesBase)
+                Conf.setConf('AlreadyInstalled',"true")
+                fs.mkdir('static', (e) => {if (!e) {return true }})
+                resolve()
+            } else {
+                resolve()
+            }
+
+            
+
+            let settings = new Settings()
+            Conf.setConf('lang', settings.get('General', 'setLanguage'));
+            loadTranslation()
+        })
+    })();
+    
+    
+    
     // Conf.setConf('osu_token', null)
     ipcMain.on('getLang', async (event, lang) => {
-        console.log('test: '+lang)
-        let TempDictionnary = await loadTranslation(lang)
-        if(lang){
-            mainWindow.webContents.send('lang', TempDictionnary)
-        } else {
-            mainWindow.webContents.send('lang', dictionnary)
-        }
-        
+        mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary);
     });
 
     ipcMain.on('keypadSend', async (color) => {
@@ -118,27 +130,12 @@ app.whenReady().then(async () => {
         setTimeout(checkPorts, 1200);
     }
 
-    if (!Conf.getConf('AlreadyInstalled')) {
-        fs.mkdir('static', (e) => {
-            if (!e) {
-                Conf.setConf('AlreadyInstalled', true)
-                return true
-            }
-        })
-    }
+    
 
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
     await LaunchLoading();
-    await ServerConnection().then(resp => {
-        if (resp.err) {
-            Log(resp.err, true, true);
-            continueExecute = false
-        }
-    }).catch((e => {
-        Log(e, true, true);
-        continueExecute = false
-    }));
-
+    await ServerConnection().then(resp => { if (resp.err) { Log(resp.err, true, true);  continueExecute = false}})
+    .catch((e => { Log(e, true, true); continueExecute = CSSFontFeatureValuesRule}));
 
     // await gLaunch();
     await tLaunch()
@@ -666,57 +663,6 @@ async function ServerConnection() {
         };
     });
 };
-async function gLaunch() {
-    if (!continueExecute) return
-    Log(tr('Starting Tosu'));
-    return new Promise(async (o, r) => {
-        let s;
-        try {
-            const Conf = new conf();
-            fs.access(path.join(Conf.getConf('AppPath'), "tosu.exe"), fs.constants.F_OK, e => {
-                if (e) { Log(`Error trying to launch Tosu:<br>${e}`); o(false) }
-                else {
-                    externalProcess = spawn(path.join(Conf.getConf('AppPath'), "tosu.exe"));
-                    const n = new Promise(n => {
-                        if (externalProcess) {
-                            externalProcess.stdout.on("data", async e => {
-                                Log(`stdout: ${e}`, false);
-                                if (e.includes('Checking Updates')) isOsuLanuched = true;
-                                if (e.includes("Initialized successfully") || e.includes("Initialization complete")) {
-                                    gmIsReady = true;
-                                    clearTimeout(s);
-                                    new gini().set('Main', 'update', 1);
-                                    gosumemoryProcess = externalProcess;
-                                    // gIni.set('Main', 'update',1);
-                                    n(externalProcess);
-                                };
-                            })
-                        };
-                    });
-                    const t = new Promise(n => {
-                        s = setTimeout(() => {
-                            if (!gmIsReady) {
-                                if (isOsuLanuched) {
-                                    Log("If this is the first time, start Osu!", true, true);
-                                    setTimeout(async () => {
-                                        o(false);
-                                        isOsuLanuched = false;
-                                    }, 3000);
-                                } else { Log("Error When Launching Gosumemory", true, true); o(false) };
-                            } else { o(true) };
-                        }, 10e3);
-                    });
-                    Promise.race([n, t]).then(e => { o(e) }).
-                        catch(e => {
-                            Log("Error When Launching Gosumemory", true, true);
-                            isOsuLanuched = false;
-                            o(e);
-                        });
-                };
-            });
-        } catch (e) { Log(`Error When Launching Gosumemory: ${e.message}`, true, true); o(e) };
-    });
-};
 async function tLaunch() {
     if (!continueExecute) return
 
@@ -866,11 +812,9 @@ async function sendCache() {
     if (!continueExecute) return
     return new Promise((e, n) => {
         setTimeout(async () => {
-            console.log(player_data.basic_informations)
-
+            let settings = new Settings()
             mainWindow.webContents.send('player-data', player_data);
             mainWindow.webContents.send('settings', settings.getAll());
-
             e(true);
         }, 1000);
     });
@@ -1032,8 +976,8 @@ async function createLogPluginWindow() {
     })
 };
 async function loadTranslation(lang = null) {
+    let settings = new Settings()
     let setLang = await settings.get('General', 'setLanguage')
-    
     if(lang){setLang = lang;console.log('ya une lang')}
     const e = fs.readFileSync(`${Conf.getConf('AppPath')}/app/locales/${setLang}.json`, "utf-8");
     translations = JSON.parse(e)
