@@ -59,16 +59,20 @@ app.whenReady().then(async () => {
     // Conf.setConf('AlreadyInstalled', null)
     await (async () =>{
         return new Promise(async (resolve, reject) => {
+            let userPreferencesBase = require('./app/common/arrays/array_userPreference')
             if (!Conf.getConf('AlreadyInstalled')) {
-                let userPreferencesBase = require('./app/common/arrays/array_userPreference')
                 await File.createIni("userPreferences", userPreferencesBase)
                 Conf.setConf('AlreadyInstalled',"true")
                 fs.mkdir('static', (e) => {if (!e) {return true }})
                 resolve()
+            }
+            console.log(File.check(path.join(Conf.getConf('AppPath'), 'userPreferences.ini')))
+            if(!await File.check(path.join(Conf.getConf('AppPath'), 'userPreferences.ini'))){
+                await File.createIni("userPreferences", userPreferencesBase)
+                resolve()
             } else {
                 resolve()
             }
-
             
 
             let settings = new Settings()

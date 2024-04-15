@@ -16,17 +16,15 @@ class files {
         }
         fs.writeFile(path.join(Conf.getConf('AppPath'),`${name}.ini`), iniString, (err) => {
             if (err) {
-                console.error('Error writing INI file:', err);
-            } else {
-                console.log('INI file created successfully');
-            }
+                return false
+            } 
         });
     }
     async check(filePath){
         if (fs.existsSync(filePath)) {
-            console.log('Le fichier existe.');
+            return true
         } else {
-            console.log('Le fichier n\'existe pas.');
+            return false
         }
     }
 }
