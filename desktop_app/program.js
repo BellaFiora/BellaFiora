@@ -68,7 +68,6 @@ app.whenReady().then(async () => {
             mainWindow.webContents.send('lang', TempDictionnary)
         } else {
             mainWindow.webContents.send('lang', dictionnary)
-
         }
         
     });
