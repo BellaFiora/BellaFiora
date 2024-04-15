@@ -109,9 +109,6 @@ app.whenReady().then(async () => {
             const removedDevices = devicesDetects.filter(device => device.comPath === port.path);
             removedDevices.forEach(device => {
                 mainWindow.webContents.send('deviceDisconnected', device.model)
-                // if (device.device && device.device.isOpen) {
-                //     device.device.close();
-                // }
             });
 
             console.log(`Port removed: ${port.path}`);
@@ -1123,7 +1120,6 @@ async function getInformations(port, mainWindow) {
         }
     })
 };
-
 ipcMain.on('open-directory-dialog', (event, pathId) => {
     const window = BrowserWindow.getFocusedWindow();
     const defaultPath = path.join(process.env.LOCALAPPDATA);
