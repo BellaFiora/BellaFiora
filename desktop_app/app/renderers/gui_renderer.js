@@ -1,97 +1,17 @@
-var sortOrders = [
-	{
-		balise: "PP",
-		icon: "bars-arrow-down",
-		order: "desc",
-		name: "PP"
+var sortOrders = require('../common/arrays/array_sort_order')
+var bindKeys  = require('../common/arrays/array_key_binds')
 
-	},
-	{
-		balise: "PP",
-		icon: "bars-arrow-up",
-		order: "asc",
-		name: "PP"
-
-	},
-	{
-		balise: "accuracy",
-		icon: "bars-arrow-down",
-		order: "desc",
-		name: "Accuracy"
-
-	},
-	{
-		balise: "accuracy",
-		icon: "bars-arrow-up",
-		order: "asc",
-		name: "Accuracy"
-
-	},
-	{
-		balise: "date",
-		icon: "bars-arrow-down",
-		order: "desc",
-		name: "Date"
-
-	},
-	{
-		balise: "date",
-		icon: "bars-arrow-up",
-		order: "asc",
-		name: "Date"
-
-	},
-	{
-		balise: "note",
-		icon: "bars-arrow-down",
-		order: "desc",
-		name: "Note"
-
-	},
-	{
-		balise: "note",
-		icon: "bars-arrow-up",
-		order: "asc",
-		name: "Note"
-
-	},
-]
-var bindKeys = {
-	"TAB": "⇥",
-	"CAPSLOCK": "⇪",
-	"SHIFT": "⇧",
-	"CONTROL": "CTRL",
-	"ARROWUP": "⮝",
-	"ARROWDOWN": "⮟",
-	"ARROWLEFT": "⮜",
-	"ARROWRIGHT": "⮞",
-	"DELETE": "DLT",
-	"INSERT": "INS",
-	"PAGEDOWN": "⇟",
-	"PAGEUP": "⇞",
-	"SPACE": "⎵",
-	"ALTGRAPH": "ALTGR",
-	"ESCAPE": "ESC"
-}
-let previousValues = {
-	"0": 0,
-	"50": 0,
-	"100": 0,
-	"300": 0,
-	"geki": 0,
-	"katu": 0,
-	"sliderBreaks": 0,
-}
+const { ctm } = require('../front/utils/ctm')
+const { calcHeight } = require('../front/utils/calcHeight')
 
 const ReconnectingWebSocket = require('../server/gosumemory_handler');
 const Highcharts = require('highcharts');
 require('highcharts/modules/exporting')(Highcharts);
 const { ipcRenderer } = require('electron');
-const BPDPC = require('osu-bpdpc');
-const { json } = require('express');
-
 
 let currentIndex = 0;
+let currentBeatmapId = null;
+
 var hitErrorArrayTab
 var key1ArrayHits = []
 var key2ArrayHits = []
@@ -106,6 +26,26 @@ var missChecker = {Miss: 0, checked: false}
 var sbChecker = {SB: 0, checked: false}
 let translations = {};
 let newTranslations = {};
+let previousValues = {
+	"0": 0,
+	"50": 0,
+	"100": 0,
+	"300": 0,
+	"geki": 0,
+	"katu": 0,
+	"sliderBreaks": 0,
+}
+const bg = document.getElementById('root');
+const windowWidth = window.innerWidth / 5;
+const windowHeight = window.innerHeight / 5 ;
+
+bg.addEventListener('mousemove', (e) => {
+  const mouseX = e.clientX / windowWidth;
+  const mouseY = e.clientY / windowHeight;
+  
+  bg.style.backgroundPositionX = `${mouseX}%`;
+  bg.style.backgroundPositionY = `${mouseY + 20}%`;
+});
 
 ipcRenderer.on('settings', (event, data)=>{
 	loadSettings(data)
@@ -156,29 +96,6 @@ function sortScoreList() {
 }
 document.querySelector('.sorted-by').addEventListener('click', sortScoreList);
 
-let settings = {
-	setLanguage: 'EN',
-	setMinimizeWindow: "yes",
-	setTheme: 'dark',
-	setDisplayNumber: '1ms',
-	setSubmitScore: 'ap',
-	setAutoUpdate: 'dl',
-	folderPathStable: 'C:\Users\fareo\AppData\Local\osu!',
-	folderPathLazer: 'Not Setup',
-	setDownloadMapsCollection: 'sa',
-	setDownloadMapsSpectacle: 'sa',
-	IRCUsername: null,
-	IRCPassword: null,
-	setScanosuFiles: 'yes',
-	setMusicSync: 'al',
-}
-
-console.log(settings)
-
-
-//Pages Collectors
-var PageCollector = []
-
 //Toggles 
 let left_menuToggle = true
 let settings_page_toggled = "settings_general"
@@ -212,31 +129,6 @@ let isSupporter = document.getElementById('playerInfo_isSupporter')
 
 let software_info = document.getElementById('software_info')
 
-//Gameplay Beatmaps infos
-let ph_beatmapBg = null
-let ph_currentTimeStamp = null
-let ph_totalTimeStamp = null
-let ph_ar = null
-let ph_sr = null
-let ph_od = null
-let ph_hp = null
-let ph_keycount = null
-let ph_creator = null
-let ph_rankedStatus = null
-let ph_rankedDt = null
-let ph_submitDt = null
-let ph_skillsets = null
-let ph_bmid = null
-let ph_bmsetid = null
-let ph_gamemode = null
-let ph_author = null
-let ph_difficultyName = null
-let ph_rating = null
-let ph_globalPlayCount = null
-let ph_ratePassed = null
-let ph_maxCombo = null
-let ph_asSpiners = null
-
 
 //Actions-btn
 let action_RefreshDataScores = document.getElementById('action_RefreshDataScores')
@@ -249,7 +141,6 @@ let scores = document.querySelectorAll('.toprank-element')
 let notificationBox = document.getElementById('notification-box')
 
 //Dynamic Events
-
 function loadSettings(data) {
 	Object.entries(data).forEach(([key, value]) => {
 		let settingBtn = document.querySelectorAll(`[data-event="${key}"]`);
@@ -263,7 +154,6 @@ function loadSettings(data) {
 		});
 	})
 }
-
 
 //Create Collection
 document.getElementById('createCollectionBtn').addEventListener('click', function () {
@@ -361,9 +251,6 @@ function switchMode(mode) {
 		// stat_Graph = null
 	})
 }
-
-
-
 document.querySelectorAll('.btn').forEach(function (btn) {
 	btn.addEventListener('click', function () {
 		// loadSettings()
@@ -524,7 +411,6 @@ function showNotificationBox(content, type) {
 		notificationBox.style.left = '1400px';
 	}, 5000);
 }
-
 //Settings Menu 
 left_menu.addEventListener('click', function (event) {
 	if (event.target.getAttribute('id') == 'side_left_menu' &&
@@ -634,14 +520,7 @@ scores.forEach(function (element) {
 });
 
 //MiniBox Info
-function calcHeight(text) {
-	const canvas = document.createElement('canvas');
-	const context = canvas.getContext('2d');
-	context.font = `16px sans-serif`;
-	context.letterSpacing = 1;
-	const coefficient = context.measureText(text).width / 250;
-	return 35 * coefficient + 'px';
-}
+
 function handleMouseOver(event, element) {
 	boxInfo.innerHTML = element.getAttribute('data-info')
 	updateBoxInfoPosition(event.clientX, event.clientY, calcHeight(element.getAttribute('data-info')));
@@ -672,9 +551,6 @@ document.querySelectorAll('[data-event="info"]').forEach(function (element) {
 	element.addEventListener('mouseout', handleMouseOut);
 });
 function handleMouseOut(event) { boxInfo.classList.remove('show'); }
-
-
-
 
 
 //Dynamic Bella Fiora with backend
@@ -725,7 +601,6 @@ global.pluginInterface = { getWindow: () => window }
 		document.getElementById('noDevice').classList.remove('noshow')
 		document.getElementById('deviceInfos').classList.add('noshow')
 	})
-
 	function setInputKey(keyNumber) {
 		document.getElementById(`keySelect`).innerText = document.getElementById(`key${keyNumber}`).innerHTML
 		console.log(keyNumber);
@@ -769,7 +644,6 @@ global.pluginInterface = { getWindow: () => window }
 		gameplay = player_data.gameplay
 		// IntroduceDataPlayer(basic_infos.playmode)
 	})
-
 	async function IntroduceDataPlayer(defaultMod = false) {
 		var defaultMod
 
@@ -799,7 +673,6 @@ global.pluginInterface = { getWindow: () => window }
 		rankHistoryUpdate(gameplay['m' + defaultMod].history_rank)
 	}
 
-
 /*
 *  Declaration by the websockets 
 */
@@ -808,7 +681,6 @@ global.pluginInterface = { getWindow: () => window }
 	tosuWebSocket.onopen = (event) => console.log(event);
 	tosuWebSocketKeys.onopen = (event) => console.log(event);
 
-
 /*
 *  Events of websockets
 */
@@ -816,7 +688,6 @@ global.pluginInterface = { getWindow: () => window }
 	tosuWebSocketKeys.onclose = event => {tosuWebSocket.send('Client Closed!');};
 	tosuWebSocket.onerror = error => console.log('Socket Error: ', error);
 	tosuWebSocketKeys.onerror = error => console.log('Socket Error: ', error);
-
 
 /*
 *  Recovery of data from websockets
@@ -834,7 +705,6 @@ global.pluginInterface = { getWindow: () => window }
 		// console.log(playing)
 	}
 
-
 /*
 *  Pages translations
 */
@@ -846,7 +716,6 @@ global.pluginInterface = { getWindow: () => window }
 			setTranslations()
 		})
 	});
-
 	function setTranslations(newDictionnary = null) {
 		document.querySelectorAll('trs').forEach(elem => {
 			const key = elem.innerHTML
@@ -857,22 +726,18 @@ global.pluginInterface = { getWindow: () => window }
 			}
 		});
 	}
-
 	function setTranslations() {
 		document.querySelectorAll('trs').forEach(elem => {
 			const key = elem.innerHTML
 			elem.innerHTML = tr(key);
 		});
 	}
-
 	function updateTranslations() {
 		document.querySelectorAll('trs').forEach(elem => {
 			const key = elem.getAttribute('key')
 			elem.innerHTML = tr(key, true);
 		});
 	}
-
-
 	function tr(key, ifUpdate) {
 		console.log(ifUpdate)
 		if(ifUpdate){
@@ -886,16 +751,6 @@ global.pluginInterface = { getWindow: () => window }
 
 	}
 
-
-
-
-
-// 		let hp = document.getElementById('bm_stats_hp')
-// 		let od = document.getElementById('bm_stats_od')
-// 		let cs = document.getElementById('bm_stats_cs')
-// 		let sr = document.getElementById('bm_stats_sr')
-// 		let ar = document.getElementById('bm_stats_ar')
-// 		let kc = document.getElementById('bm_stats_kc')
 
 // 		switch (bm.gameMode) {
 // 		case 0:
@@ -1018,6 +873,22 @@ global.pluginInterface = { getWindow: () => window }
 
 
 
+
+
+let hp = document.getElementById('bm_stats_hp')
+let od = document.getElementById('bm_stats_od')
+let cs = document.getElementById('bm_stats_cs')
+let sr = document.getElementById('bm_stats_sr')
+let ar = document.getElementById('bm_stats_ar')
+let kc = document.getElementById('bm_stats_kc')
+let fc95 = document.getElementById('bm_stats_fc95')
+let fc98 = document.getElementById('bm_stats_fc98')
+let fc100 = document.getElementById('bm_stats_fc100')
+let difficulty = document.getElementById('bm_stats_difficulty')
+let bpm = document.getElementById('bm_stats_bpm')
+let mapStatus = document.getElementById('bm_stats_status')
+
+
 setTimeout(() => {
 	setInterval(async () => {
 
@@ -1058,6 +929,51 @@ setTimeout(() => {
 		document.getElementById('totalTimeMusic').innerText = ctm(wsData.menu.bm.time.full, wsData.menu.bm.time.full)
 		
 		let backgroundCurrentMap = document.getElementById('backgroundCurrentMap')
+
+		if(currentBeatmapId !== wsData.menu.bm.id){
+			
+			document.getElementById('musicAuthor').innerText = wsData.menu.bm.metadata.artist
+			document.getElementById('musicMapper').innerText = wsData.menu.bm.metadata.mapper
+			document.getElementById('musicTitle').innerText = wsData.menu.bm.metadata.title
+			let rs = (wsData.menu.bm.rankedStatus).toString()
+			
+			switch (rs) {
+				case "6":
+					rs = "Qualified"
+					break;
+				case "2":
+					rs = "WIP/Graveyard"
+					break;
+				case "4":
+					rs = "Ranked"
+					break;
+				case "1":
+					rs = "Graveyard"
+					break;
+				case "6":
+					rs = "Qualified"
+					break;
+				case "7":
+					rs = "Loved"
+					break;
+				default:
+					break;
+			}
+			hp.innerText = wsData.menu.bm.stats.HP
+			od.innerText = wsData.menu.bm.stats.OD
+			cs.innerText = wsData.menu.bm.stats.CS
+			ar.innerText = wsData.menu.bm.stats.AR
+			sr.innerText = wsData.menu.bm.stats.fullSR
+			bpm.innerText = wsData.menu.bm.stats.BPM.common
+			difficulty.innerText = wsData.menu.bm.metadata.difficulty
+			fc95.innerText =  (parseInt(wsData.menu.pp['95'])).toFixed(2)+" PP"
+			fc98.innerText = (parseInt(wsData.menu.pp['98'])).toFixed(2)+" PP"
+			fc100.innerText = (parseInt(wsData.menu.pp['100'])).toFixed(2)+" PP"
+			mapStatus.innerText = rs
+			currentBeatmapId = wsData.menu.bm.id
+
+		}
+	
 
 		if(backgroundCurrentMap.getAttribute('src') !== `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`){
 			backgroundCurrentMap.setAttribute('src', `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`)
@@ -1382,26 +1298,3 @@ setTimeout(() => {
 
 
 
-
-function ctm(ms, totms) {
-	const totalSeconds = Math.floor(totms / 1000);
-	const totalMinutes = Math.floor(totalSeconds / 60);
-	const totalHours = Math.floor(totalMinutes / 60);
-
-	const currentSeconds = Math.floor(ms / 1000);
-	const currentMinutes = Math.floor(currentSeconds / 60);
-	const currentHours = Math.floor(currentMinutes / 60);
-
-	const remainingSeconds = currentSeconds % 60;
-	const remainingMinutes = currentMinutes % 60;
-
-	const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
-	const formattedMinutes = remainingMinutes.toString().padStart(2, '0');
-	const formattedHours = totalHours > 0 ? currentHours.toString().padStart(2, '0') : '';
-
-	if (totalHours > 0) {
-		return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-	} else {
-		return `${formattedMinutes}:${formattedSeconds}`;
-	}
-}
