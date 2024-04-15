@@ -22,8 +22,12 @@ class files {
             }
         });
     }
-    async check(){
-
+    async check(filePath){
+        if (fs.existsSync(filePath)) {
+            console.log('Le fichier existe.');
+        } else {
+            console.log('Le fichier n\'existe pas.');
+        }
     }
 }
 
