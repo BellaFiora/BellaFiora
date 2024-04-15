@@ -2,11 +2,11 @@
   "name": "bellafiora",
   "version": "1.0.929",
   "description": "",
-  "main": "app.js",
+  "main": "program.js",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder --win ",
-    "build": "pkg main.js --target win --output bellafiora --node 16"
+    "build": "pkg program.js --target win --output bellafiora --node 16"
   },
   "license": "MIT",
   "author": "",
