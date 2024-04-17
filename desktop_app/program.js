@@ -1,7 +1,7 @@
-const { app, BrowserWindow, dialog, ipcMain, shell, Notification} = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, Notification } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const { spawn } = require('child_process');
 const axios = require('axios');
-const tmp = require('tmp');
 const vm = require('vm');
 const util = require('util');
 const fs = require('fs');
@@ -29,10 +29,13 @@ const Settings = require('./app/lib/settings')
 const Serial = require('./app/lib/devices')
 const files = require('./app/lib/files')
 
+// const Update = require('./misc/update')
+
 // const OsuDBReader = require('./app/lib/db_parser');
 // const osuutils = require('./app/lib/osu_utils');
+const packageJson = require('./package.json');
 
-let mainWindow 
+let mainWindow
 let cookieCheckWindow
 let continueExecute = true
 let isOsuLanuched
@@ -45,59 +48,65 @@ let knownPorts = [];
 let dictionnary = null
 let pluginLogs
 let isFirstTime = true;
+let isDev = true;
 
 
+const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
+
+if (!fs.existsSync(AppData)) {
+    fs.mkdirSync(AppData, { recursive: true });
+} 
 
 const readFile = util.promisify(fs.readFile);
 const Conf = new conf();
 const File = new files()
-
+Conf.setConf('client_version', packageJson.version);
 
 app.whenReady().then(async () => {
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
-    Conf.setConf('client_version', '1.0.932');
+    
     // Conf.setConf('AlreadyInstalled', null)
-    await (async () =>{
+    // Conf.setConf('osu_token', null)
+    await (async () => {
         return new Promise(async (resolve, reject) => {
             let userPreferencesBase = require('./app/common/arrays/array_userPreference')
             if (!Conf.getConf('AlreadyInstalled')) {
                 await File.createIni("userPreferences", userPreferencesBase)
-                Conf.setConf('AlreadyInstalled',"true")
-                fs.mkdir('static', (e) => {if (!e) {return true }})
+                Conf.setConf('AlreadyInstalled', "true")
+                fs.mkdir('static', (e) => { if (!e) { return true } })
                 resolve()
             }
-            console.log(File.check(path.join(Conf.getConf('AppPath'), 'userPreferences.ini')))
-            if(!await File.check(path.join(Conf.getConf('AppPath'), 'userPreferences.ini'))){
+            console.log(File.check(path.join(AppData, 'userPreferences.ini')))
+            if (!await File.check(path.join(AppData, 'userPreferences.ini'))) {
                 await File.createIni("userPreferences", userPreferencesBase)
                 resolve()
             } else {
                 resolve()
             }
-            
 
             let settings = new Settings()
             Conf.setConf('lang', settings.get('General', 'setLanguage'));
             loadTranslation()
         })
     })();
+
     
-    
-    
-    // Conf.setConf('osu_token', null)
     ipcMain.on('getLang', async (event, lang) => {
         mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary);
     });
+    await LaunchLoading();
+    await checkingUpdate()
 
     ipcMain.on('keypadSend', async (color) => {
         try {
             const device = new SerialPort({ path: 'COM16', baudRate: 9600 }, err => {
                 const parser = device.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-                if(err){
+                if (err) {
                     console.log(err)
                 }
 
-                device.write('identify\n', (err2) => { 
-                    if(err2){
+                device.write('identify\n', (err2) => {
+                    if (err2) {
                         console.log(err2)
                     }
                 })
@@ -105,10 +114,10 @@ app.whenReady().then(async () => {
                     console.log(data)
                 })
             })
-        } catch(e){
+        } catch (e) {
             console.log(e)
         }
-       
+
     });
 
     async function checkPorts() {
@@ -134,22 +143,22 @@ app.whenReady().then(async () => {
         setTimeout(checkPorts, 1200);
     }
 
-    
-
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
-    await LaunchLoading();
-    await ServerConnection().then(resp => { if (resp.err) { Log(resp.err, true, true);  continueExecute = false}})
-    .catch((e => { Log(e, true, true); continueExecute = CSSFontFeatureValuesRule}));
+    
+    await ServerConnection()
+    .then(resp => { if (resp.err) { Log(resp.err, true, true); continueExecute = false } })
+    .catch((e => { Log(e, true, true); continueExecute = CSSFontFeatureValuesRule }));
 
     // await gLaunch();
     await tLaunch()
+    
     await wsConnect();
     await osuConnect();
     await osuHandler();
     await LaunchGUI();
     checkPorts();
     await sendCache();
-    
+
     // await getOsuSession()
 
     // Declaring API endpoints for external plugins
@@ -243,7 +252,7 @@ async function osuConnect() {
             axios.get('https://osu.ppy.sh/api/v2/me', {
                 headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}` },
             }).then(async response => {
-                console.log(response.data.id);
+    
 
                 // Resolve if user ID exists in the response
                 if (response.data.id)
@@ -253,13 +262,12 @@ async function osuConnect() {
                 await SyncData();
                 resolve(true);
             }).catch(error => {
-                console.log(error)
+
                 console.error('Error fetching data:', error.message);
                 reject(error);
             });
         } else {
             // If Osu token doesn't exist, perform authentication and sync data
-            console.log('auth service');
             await AuthService();
             Log(tr('Data Synchronization'))
             await SyncData();
@@ -450,7 +458,7 @@ async function LaunchLoading() {
 
                 // Save the mainWindow reference in configuration
                 Conf.setConf('app', mainWindow);
-
+                Log('Checking Updates')
                 resolve(mainWindow);
 
                 // Send client information to the window
@@ -729,10 +737,8 @@ async function osuHandler() {
         // Create new osuFiles and configuration objects
         const OsuFiles = new osuFiles();
         const Conf = new conf();
-        console.log(Conf.getConf('AppPath'))
-        console.log(Conf.getConf('osu_path'))
         // Check if beatmaps.json file exists in the specified path
-        if (fs.existsSync(path.join(Conf.getConf('AppPath'), '/beatmaps.json'))) {
+        if (fs.existsSync(path.join(AppData, '/beatmaps.json'))) {
             // Log message for updating scores
             Log(tr('Update your Scores'), true, false);
 
@@ -818,7 +824,12 @@ async function sendCache() {
         setTimeout(async () => {
             let settings = new Settings()
             mainWindow.webContents.send('player-data', player_data);
-            mainWindow.webContents.send('settings', settings.getAll());
+            mainWindow.webContents.send('settings', settings.getAll(), Conf.getConf('client_version'));
+            if(Conf.getConf('Updated')){
+                mainWindow.webContents.send('notification', `Bella Fiora Desktop has been successfully updated to ${Conf.getConf('client_version')}`, 'info');
+                Conf.setConf('Updated',false)
+            }
+            
             e(true);
         }, 1000);
     });
@@ -982,7 +993,7 @@ async function createLogPluginWindow() {
 async function loadTranslation(lang = null) {
     let settings = new Settings()
     let setLang = await settings.get('General', 'setLanguage')
-    if(lang){setLang = lang;console.log('ya une lang')}
+    if (lang) { setLang = lang; }
     const e = fs.readFileSync(`${Conf.getConf('AppPath')}/app/locales/${setLang}.json`, "utf-8");
     translations = JSON.parse(e)
     dictionnary = e
@@ -1073,26 +1084,76 @@ ipcMain.on('open-directory-dialog', (event, pathId) => {
     const defaultPath = path.join(process.env.LOCALAPPDATA);
     dialog.showOpenDialog(window, {
         properties: ['openDirectory'],
-        defaultPath: defaultPath+'\\Osu!'
+        defaultPath: defaultPath + '\\Osu!'
     }).then(result => {
         if (!result.canceled && result.filePaths.length > 0) {
             const directoryPath = result.filePaths[0];
             let requiredFiles = ['osu!.exe', 'scores.db', 'presence.db', 'osu!.db'];
-            if(pathId === "folderPathStable") {
+            if (pathId === "folderPathStable") {
                 requiredFiles = ['osu!.exe', 'scores.db', 'presence.db', 'osu!.db'];
             } else {
                 requiredFiles = ['osu!.exe', 'scores.db', 'presence.db', 'osu!.db'];
             }
-            
+
             const missingFiles = requiredFiles.filter(file => !fs.existsSync(`${directoryPath}/${file}`));
-            
+
             if (missingFiles.length > 0) {
                 event.sender.send('file-check-failed', pathId, missingFiles);
             } else {
-                event.sender.send('selected-directory',pathId, directoryPath);
+                event.sender.send('selected-directory', pathId, directoryPath);
             }
         }
     }).catch(err => {
         console.log('Error selecting directory:', err);
     });
 });
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'Application Update',
+        message: process.platform === 'win32' ? releaseNotes : releaseName,
+        detail:
+            'A new version has been downloaded. Restart the application to apply the updates.'
+    }
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+        if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+})
+async function checkingUpdate() {
+    Log('Cheking updates');
+    return new Promise((resolve, reject) => {
+        if(isDev){
+            resolve()
+            return
+        }
+        console.log(Conf.getConf('Updated'))
+        autoUpdater.on("update-available",() => {
+            Log('Download new version, application will quit to install.');
+            autoUpdater.on('update-downloaded', () => {
+                Conf.setConf('Updated', true)
+                Log('Restart and install new version');
+                setTimeout(async () => {
+                autoUpdater.quitAndInstall();
+                    
+                }, 1200);
+            });
+        });
+
+        autoUpdater.on("update-not-available",()=> {
+            console.log('No update available. Continuing application launch.');
+            resolve(); 
+        });
+
+        autoUpdater.on('error', error => {
+            console.error(`Error during Update: ${error}`);
+            reject(); 
+        });
+
+        autoUpdater.checkForUpdatesAndNotify().catch(err => {
+            console.error("Error during check for updates:", err);
+            reject();
+        });
+    });
+}

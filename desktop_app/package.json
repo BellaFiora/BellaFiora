@@ -1,12 +1,15 @@
 {
   "name": "bellafiora",
-  "version": "1.0.929",
+  "version": "0.1.946",
   "description": "",
   "main": "program.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win ",
-    "build": "pkg program.js --target win --output bellafiora --node 16"
+    "post-build": "node build/update.js",
+    "pre-build": "node build/pre-build.js",
+    "build": "npm run pre-build && electron-builder --win --publish never && npm run post-build",
+    "build-only": "electron-builder --win --publish never",
+    "buildPckg": "pkg program.js --target win --x64 --ia32 --publish never --output bellafiora --node 16"
   },
   "license": "MIT",
   "author": "",
@@ -20,6 +23,7 @@
   "dependencies": {
     "@serialport/parser-readline": "^12.0.0",
     "axios": "^1.6.7",
+    "basic-ftp": "^5.0.5",
     "child_process": "^1.0.2",
     "credentials": "file:../../credentials",
     "crypto": "^1.0.1",
@@ -27,6 +31,7 @@
     "dotenv": "^16.4.1",
     "electron-remote": "^1.3.0",
     "electron-shell": "^0.0.1",
+    "electron-updater": "^6.1.8",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "highcharts": "^11.3.0",
@@ -42,6 +47,7 @@
     "serialport": "^12.0.0",
     "tmp": "^0.2.1",
     "uleb128": "^1.0.1",
+    "update-electron-app": "^3.0.0",
     "url": "^0.11.3",
     "util": "^0.12.5",
     "vm": "^0.1.0",
@@ -61,7 +67,7 @@
   ],
   "build": {
     "appId": "fr.techalchemy.bellafiora",
-    "productName": "Bella Fiora Early Access v0.1.929",
+    "productName": "Bella Fiora Early Access",
     "compression": "maximum",
     "win": {
       "target": "nsis",
@@ -69,21 +75,7 @@
       "artifactName": "${productName} Setup v${version}.${ext}",
       "extraFiles": [
         {
-          "from": "./misc/software/gosumemory.exe",
-          "to": ".",
-          "filter": [
-            "**/*"
-          ]
-        },
-        {
-          "from": "./misc/software/tosu.exe",
-          "to": ".",
-          "filter": [
-            "**/*"
-          ]
-        },
-        {
-          "from": "./misc/software/config.ini",
+          "from": "./misc/software",
           "to": ".",
           "filter": [
             "**/*"
@@ -123,6 +115,13 @@
           "filter": [
             "**/*"
           ]
+        },
+        {
+          "from": "./app/locales",
+          "to": "./app/locales",
+          "filter": [
+            "**/*"
+          ]
         }
       ]
     },
@@ -132,7 +131,12 @@
       "perMachine": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "differentialPackage": true
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://techalchemy.fr/bellafiora/update/"
     }
   }
 }
