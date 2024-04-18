@@ -236,6 +236,25 @@ class OsuUtils {
 			return -1;
 		}
 	}
+	ModeIntToString(modeString) {
+		try {
+			switch (modeString.toLowerCase()) {
+				case '0':
+					return "osu";
+				case '1':
+					return "taiko";
+				case '2':
+					return "ctb";
+				case '3':
+					return "mania";
+				default:
+					return "osu";
+			}
+		} catch (error) {
+			console.error("Error in ModeStringToInt function:", error);
+			return -1;
+		}
+	}
 
 }
 module.exports = OsuUtils;
