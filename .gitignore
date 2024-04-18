@@ -33,3 +33,6 @@ desktop_app/userPreferences.ini
 desktop_app/userPreferences.ini
 desktop_app/log.log
 desktop_app/config.ini
+desktop_app/build/pre-build.js
+desktop_app/build/update.js
+desktop_app/package-lock.json

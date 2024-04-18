@@ -1,7 +1,7 @@
 const fs = require('fs');
-const ini = require('ini');
 const conf = require('./priv/credentials')
 const path = require('path')
+const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
 
 class files {
     async createIni(name, obj){
@@ -14,7 +14,7 @@ class files {
             }
             iniString += '\n';
         }
-        fs.writeFile(path.join(Conf.getConf('AppPath'),`${name}.ini`), iniString, (err) => {
+        fs.writeFile(path.join(AppData,`${name}.ini`), iniString, (err) => {
             if (err) {
                 return false
             } 

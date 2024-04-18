@@ -28,6 +28,9 @@ const { logFile } = require('./app/lib/log')
 const Settings = require('./app/lib/settings')
 const Serial = require('./app/lib/devices')
 const files = require('./app/lib/files')
+const UserDatas = require('./app/lib/dataset')
+const properies = require('./app/lib/properties_dataset')
+
 
 // const Update = require('./misc/update')
 
@@ -64,7 +67,30 @@ Conf.setConf('client_version', packageJson.version);
 
 app.whenReady().then(async () => {
     Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
-    
+    const userDatas = new UserDatas('Puparia')
+    const Properties = new properies('Puparia')
+
+
+    /**
+     *Basic Informations of User
+     *@params userDatas.updateUser('refreshDate', null)
+     *@params userDatas.updateUser('username', null)
+     *@params userDatas.updateUser('country', null)
+     *@params userDatas.updateUser('userId', null)
+     *@params userDatas.updateUser('has_supported', null)
+     *@params serDatas.updateUser('is_restricted', null)
+     *@params userDatas.updateUser('playmode', null)
+     *@params userDatas.updateUser('avatar_url', null)
+     *@params userDatas.updateUser('cover_url', null)
+     *@params userDatas.updateUser('is_bot', null)
+    **/
+
+
+    Properties.getUser((user)=>{
+        console.log(user)
+    })
+
+
     // Conf.setConf('AlreadyInstalled', null)
     // Conf.setConf('osu_token', null)
     await (async () => {
@@ -142,6 +168,7 @@ app.whenReady().then(async () => {
         knownPorts = ports;
         setTimeout(checkPorts, 1200);
     }
+
 
     app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
     
@@ -458,7 +485,6 @@ async function LaunchLoading() {
 
                 // Save the mainWindow reference in configuration
                 Conf.setConf('app', mainWindow);
-                Log('Checking Updates')
                 resolve(mainWindow);
 
                 // Send client information to the window

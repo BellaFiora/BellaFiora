@@ -3,6 +3,7 @@ const conf = require('./priv/credentials')
 const fs = require('fs')
 const path = require('path')
 const AppError = require('./error')
+const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
 
 class osuFiles {
 	async osuDbParse(mainWindow) {
@@ -15,7 +16,7 @@ class osuFiles {
 					async function(data) {
 						const fileStream = fs.createWriteStream(
 							path.join(
-								Conf.getConf('AppPath'), '/beatmaps.json'),
+								AppData, '/beatmaps.json'),
 							{ flags : 'a' });
 						data.beatmaps.forEach(entry => {
 							const jsonEntry = JSON.stringify(entry, null, 2) + ',\n';
@@ -39,7 +40,7 @@ class osuFiles {
 					path.join(Conf.getConf('osu_path'), '/scores.db'),
 					function(data) {
 						fs.writeFileSync(
-							path.join(Conf.getConf('AppPath'), '/scores.json'),
+							path.join(AppData, '/scores.json'),
 							JSON.stringify(data, null, 2))
 						resolve(true)
 					});
@@ -52,9 +53,9 @@ class osuFiles {
 	async updateScores(mainWindow) {
 		const Conf = new conf();
 		return new Promise(async (resolve) => {
-			let scoresData = require(path.join(Conf.getConf('AppPath'), '/scores.json'));
+			let scoresData = require(path.join(AppData, '/scores.json'));
 			const fileStream = fs.createWriteStream(
-				path.join(Conf.getConf('AppPath'), '/beatmaps.json'),
+				path.join(AppData, '/beatmaps.json'),
 				{ flags : 'a' });
 			dbreader.readOsuDB(
 				path.join(Conf.getConf('osu_path'), 'osu!.db'), function(data) {
@@ -65,7 +66,7 @@ class osuFiles {
 					});
 					fileStream.end();
 					fs.writeFileSync(
-						path.join(Conf.getConf('AppPath'), '/scores.json'),
+						path.join(AppData, '/scores.json'),
 						JSON.stringify(scoresData, null, 2));
 					resolve(true)
 				});
