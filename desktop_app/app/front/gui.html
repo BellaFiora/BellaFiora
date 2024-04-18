@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="translation.js"></script>
     <!-- <link rel="stylesheet" href="index.css"> -->
     <link rel="stylesheet" href="../src/style.css">
 
@@ -31,12 +30,12 @@
             </div>
 
             <div class="menu-list">
-                <div class="menuBtn navigate-page" target="home_page">
+                <div class="menuBtn navigate-page  active" target="home_page">
                     <m class="white home"></m><span>
                         <trs key="Home">Home</trs>
                     </span>
                 </div>
-                <div class="menuBtn navigate-page active" target="gameplay_page">
+                <div class="menuBtn navigate-page" target="gameplay_page">
                     <m class="white cursor-arrow-rays"></m><span>
                         <trs key="Gameplay">Gameplay</trs>
                     </span>
@@ -89,7 +88,7 @@
                         <trs key="Settings">Settings</trs>
                     </span>
                 </div>
-                <div id="sofware-infos" id="software_info">v0.1.980</div>
+                <div id="software_infos" >v0.1.934</div>
             </div>
 
         </div>
@@ -97,7 +96,7 @@
             <div class="ui-actions windows-nav">
                 <!-- <img src="./12345.png"> -->
             </div>
-            <div id="home_page" class="page no-toggle">
+            <div id="home_page" class="page ">
                 <div class="box user-basic-infos">
                     <div class="title">
                         <trs>Your Game Statistics</trs>
@@ -407,7 +406,7 @@
                     </div>
                 </div>
             </div>
-            <div id="gameplay_page" class="page">
+            <div id="gameplay_page" class="page no-toggle">
                 <div class="box box transparent player-global">
                     <div class="box player-music-bg" style="padding: 0px!important">
                         <div class="map_background"><img src="../src/cover.jpg" id="backgroundCurrentMap" /></div>
@@ -415,18 +414,18 @@
                     <div class="box player-timeline" style="padding:0px!important"><span id="timelineProgress"></span>
                     </div>
                     <div class="box transparent player-timestamp">
-                        <span id="currentTimeMusic">01:34:45</span>
-                        <span id="totalTimeMusic">02:20:00</span>
+                        <span id="currentTimeMusic">00:00</span>
+                        <span id="totalTimeMusic">00:00</span>
                     </div>
                     <div class="box transparent music-infos">
-                        <span id="musicTitle">Totenblume</span>
-                        <span id="musicAuthor">-45</span>
-                        <span id="musicMapper">Mapped By Stick2Glue</span>
+                        <span id="musicTitle">....</span>
+                        <span id="musicAuthor">...</span>
+                        <span id="musicMapper">.....</span>
                     </div>
                     <div class="box transparent music-actions">
                         <span><m class="white bookmark"></m></span>
-                        <span><m class="white document"></m></span>
-                        <span><m class="white share"></m></span>
+                        <span><m class="white document" data-event="info" data-info="Open beatmap Info on your browser" id="OpenBtn" data-beatmapId="0" data-beatmapsetId="-1" data-gamemode="0" onclick="Link('OpenBrowser')"></m></span>
+                        <span><m class="white share" data-event="info" data-info="Copy link of beatmap on you clipboard" id="shareBtn" data-beatmapId="0" data-beatmapsetId="-1" data-gamemode="0" onclick="Link('CopyLink')"></m></span>
                     </div>
                     <div class="box transparent row mapSpecs">
                         <div class="left-side">
@@ -935,9 +934,6 @@
                             </div>
                         </div>
                     </div>
-
-
-               
                 </div>   
             </div>
         </div>
