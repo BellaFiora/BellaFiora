@@ -3,8 +3,11 @@ var bindKeys  = require('../common/arrays/array_key_binds')
 
 const { ctm } = require('../front/utils/ctm')
 const { calcHeight } = require('../front/utils/calcHeight')
+const { Link } = require('../front/utils/Link')
+
 
 const ReconnectingWebSocket = require('../server/gosumemory_handler');
+const osuUtils = require('../lib/osu_utils')
 const Highcharts = require('highcharts');
 require('highcharts/modules/exporting')(Highcharts);
 const { ipcRenderer } = require('electron');
@@ -22,6 +25,12 @@ var wsData = null
 var KeysImput = null
 var basic_infos
 var gameplay
+//Toggles 
+let left_menuToggle = true
+let settings_page_toggled = "settings_general"
+let global_page_toggled = "home_page"
+let GamemodeToggle = "STD"
+
 var missChecker = {Miss: 0, checked: false}
 var sbChecker = {SB: 0, checked: false}
 let translations = {};
@@ -47,11 +56,11 @@ bg.addEventListener('mousemove', (e) => {
   bg.style.backgroundPositionY = `${mouseY + 20}%`;
 });
 
-ipcRenderer.on('settings', (event, data)=>{
+ipcRenderer.on('settings', (event, data, software_info)=>{
 	loadSettings(data)
-	console.log(data)
+	console.log(data);
+	document.getElementById('software_infos').innerText = `v${software_info}` 
 })
-
 function sortScoreList() {
 	const listContainer = document.querySelector('.list-score');
 	const sortedBySpan = document.querySelector('.sorted-by');
@@ -96,11 +105,7 @@ function sortScoreList() {
 }
 document.querySelector('.sorted-by').addEventListener('click', sortScoreList);
 
-//Toggles 
-let left_menuToggle = true
-let settings_page_toggled = "settings_general"
-let global_page_toggled = "gameplay_page"
-let GamemodeToggle = "STD"
+
 
 //Global
 var os = false
@@ -601,6 +606,7 @@ global.pluginInterface = { getWindow: () => window }
 		document.getElementById('noDevice').classList.remove('noshow')
 		document.getElementById('deviceInfos').classList.add('noshow')
 	})
+	
 	function setInputKey(keyNumber) {
 		document.getElementById(`keySelect`).innerText = document.getElementById(`key${keyNumber}`).innerHTML
 		console.log(keyNumber);
@@ -887,6 +893,9 @@ let fc100 = document.getElementById('bm_stats_fc100')
 let difficulty = document.getElementById('bm_stats_difficulty')
 let bpm = document.getElementById('bm_stats_bpm')
 let mapStatus = document.getElementById('bm_stats_status')
+let shareBtn = document.getElementById('shareBtn')
+let openBtn = document.getElementById('OpenBtn')
+
 
 
 setTimeout(() => {
@@ -971,6 +980,13 @@ setTimeout(() => {
 			fc100.innerText = (parseInt(wsData.menu.pp['100'])).toFixed(2)+" PP"
 			mapStatus.innerText = rs
 			currentBeatmapId = wsData.menu.bm.id
+			shareBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
+			shareBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
+			shareBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
+
+			openBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
+			openBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
+			openBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
 
 		}
 	
@@ -1294,7 +1310,9 @@ setTimeout(() => {
 // 	  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 //   }
 
-
+ipcRenderer.on('notification', (event, content, type) => {
+	showNotificationBox(content, type)
+})
 
 
 
