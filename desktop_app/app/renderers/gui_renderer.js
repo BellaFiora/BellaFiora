@@ -1,13 +1,9 @@
 var sortOrders = require('../common/arrays/array_sort_order')
-var bindKeys  = require('../common/arrays/array_key_binds')
-
+var bindKeys = require('../common/arrays/array_key_binds')
 const { ctm } = require('../front/utils/ctm')
 const { calcHeight } = require('../front/utils/calcHeight')
 const { Link } = require('../front/utils/Link')
-
-
 const ReconnectingWebSocket = require('../server/gosumemory_handler');
-const osuUtils = require('../lib/osu_utils')
 const Highcharts = require('highcharts');
 require('highcharts/modules/exporting')(Highcharts);
 const { ipcRenderer } = require('electron');
@@ -15,27 +11,75 @@ const { ipcRenderer } = require('electron');
 let currentIndex = 0;
 let currentBeatmapId = null;
 
-var hitErrorArrayTab
-var key1ArrayHits = []
-var key2ArrayHits = []
-var settingsFile = null
 var ts = 0
-var playing = false
 var wsData = null
-var KeysImput = null
 var basic_infos
 var gameplay
-//Toggles 
-let left_menuToggle = true
-let settings_page_toggled = "settings_general"
-let global_page_toggled = "home_page"
-let GamemodeToggle = "STD"
 
-var missChecker = {Miss: 0, checked: false}
-var sbChecker = {SB: 0, checked: false}
+var toggles = {
+	left_menuToggle: true,
+	settings_page: "settings_general",
+	global_page: "home_page",
+	Gamemode: "STD",
+	cursorTrace: false,
+	spectactePlay: false,
+}
+var phPStats = {
+	countryRank: document.getElementById('stat_CountryRank'),
+	globalRank: document.getElementById('stat_GlobalRank'),
+	classedScore: document.getElementById('stat_ClassedScore'),
+	accuracy: document.getElementById('stat_Accuracy'),
+	playCount: document.getElementById('stat_PlayCount'),
+	totalScore: document.getElementById('stat_TotalScore'),
+	clicks: document.getElementById('stat_Clicks'),
+	masterSkillset: document.getElementById('stat_MasterSkillset'),
+	maxCombo: document.getElementById('stat_ComboMax'),
+	AIM: document.getElementById('stat_AIM'),
+	graph: document.getElementById('stat_Graph'),
+	refresh_dt: document.getElementById('stats_refresh_dt'),
+	username: document.getElementById('playerInfo_Username'),
+	gamePreference: document.getElementById('playerInfo_GamePreference'),
+	avatarUrl: document.getElementById('playerInfo_AvatarUrl'),
+	isSupporter: document.getElementById('playerInfo_isSupporter')
+}
+
+let software_info = document.getElementById('software_info')
+
 let translations = {};
 let newTranslations = {};
-let previousValues = {
+
+let shareBtn = document.getElementById('shareBtn')
+let openBtn = document.getElementById('OpenBtn')
+
+const bg = document.getElementById('root');
+const windowWidth = window.innerWidth / 5;
+const windowHeight = window.innerHeight / 5;
+
+var bm_stats_holders = {
+	hp: document.getElementById('bm_stats_hp'),
+	od: document.getElementById('bm_stats_od'),
+	cs: document.getElementById('bm_stats_cs'),
+	sr: document.getElementById('bm_stats_sr'),
+	ar: document.getElementById('bm_stats_ar'),
+	kc: document.getElementById('bm_stats_kc'),
+	fc95: document.getElementById('bm_stats_fc95'),
+	fc98: document.getElementById('bm_stats_fc98'),
+	fc100: document.getElementById('bm_stats_fc100'),
+	difficulty: document.getElementById('bm_stats_difficulty'),
+	bpm: document.getElementById('bm_stats_bpm'),
+	mapStatus: document.getElementById('bm_stats_status'),
+}
+var playerEvents = {
+	draggeable: false,
+	draggedItem: null,
+	originalParent: null,
+	originalEvent: null,
+	originalInfo: null,
+	dragTimeout: null,
+	timeout: null,
+	allowAddClass: null
+}
+var previousValues = {
 	"0": 0,
 	"50": 0,
 	"100": 0,
@@ -44,23 +88,299 @@ let previousValues = {
 	"katu": 0,
 	"sliderBreaks": 0,
 }
-const bg = document.getElementById('root');
-const windowWidth = window.innerWidth / 5;
-const windowHeight = window.innerHeight / 5 ;
+var miniPlayerEl = {
+	miniPlayer: document.getElementById('player-spectacle-min'),
+	overlay: document.getElementById('overlayMiniPlayer'),
+	playerMain: document.getElementById('myVideo'),
+	playerAux: document.getElementById('player2'),
+	toolbarEmbed: document.getElementById('toolbarEmbed'),
+	allBtns: document.querySelectorAll('.btn-player')
+}
+var miniPlayerPos = {
+	startX: 0,
+	startY: 0,
+	startWidth: 0,
+	startHeight: 0,
+	aspectRatio: 0,
+	rafId: null
+}
+const resizingHandles = {
+	ovr1: document.getElementById('ovr1'),
+	ovr2: document.getElementById('ovr2'),
+	ovr3: document.getElementById('ovr3'),
+	ovr4: document.getElementById('ovr4')
+};
+miniPlayerEl.overlay.onmousedown = function (event) {
+	event.preventDefault();
+	miniPlayerPos.startX = event.clientX - miniPlayerEl.miniPlayer.getBoundingClientRect().left;
+	miniPlayerPos.startY = event.clientY - miniPlayerEl.miniPlayer.getBoundingClientRect().top;
+	document.addEventListener('mousemove', onMouseMovePlayer);
+	document.addEventListener('mouseup', stopDragPlayer);
+};
+function onMouseMovePlayer(event) {
+	let newX = event.clientX - miniPlayerPos.startX;
+	let newY = event.clientY - miniPlayerPos.startY;
 
-bg.addEventListener('mousemove', (e) => {
-  const mouseX = e.clientX / windowWidth;
-  const mouseY = e.clientY / windowHeight;
-  
-  bg.style.backgroundPositionX = `${mouseX}%`;
-  bg.style.backgroundPositionY = `${mouseY + 20}%`;
+	const divWidth = miniPlayerEl.miniPlayer.offsetWidth;
+	const divHeight = miniPlayerEl.miniPlayer.offsetHeight;
+
+
+	const maxX = 1392 - divWidth;
+	const maxY = 692 - divHeight;
+
+	newX = Math.max(18, Math.min(newX, maxX));
+	newY = Math.max(18, Math.min(newY, maxY));
+
+	miniPlayerEl.miniPlayer.style.left = newX + 'px';
+	miniPlayerEl.miniPlayer.style.top = newY + 'px';
+};
+function stopDragPlayer() {
+	document.removeEventListener('mousemove', onMouseMovePlayer);
+	document.removeEventListener('mouseup', stopDragPlayer);
+};
+document.querySelectorAll('.overlayResizing').forEach(handle => {
+	handle.addEventListener('mousedown', function (event) {
+		event.preventDefault();
+		miniPlayerPos.startX = event.clientX;
+		miniPlayerPos.startY = event.clientY;
+		miniPlayerPos.startWidth = parseInt(window.getComputedStyle(miniPlayerEl.miniPlayer).width, 10);
+		miniPlayerPos.startHeight = parseInt(window.getComputedStyle(miniPlayerEl.miniPlayer).height, 10);
+		miniPlayerPos.aspectRatio = miniPlayerPos.startWidth / miniPlayerPos.startHeight;
+
+		document.addEventListener('mousemove', startResize);
+		document.addEventListener('mouseup', stopResize);
+	});
 });
+function startResize(event) {
+	window.cancelAnimationFrame(miniPlayerPos.aspectRatio);
+	miniPlayerPos.aspectRatio = window.requestAnimationFrame(function () {
+		resize(event);
+	});
+};
+function resize(event) {
+	const deltaX = event.clientX - miniPlayerPos.startX;
+	const deltaY = event.clientY - miniPlayerPos.startY;
+	let newWidth, newHeight;
 
-ipcRenderer.on('settings', (event, data, software_info)=>{
-	loadSettings(data)
-	console.log(data);
-	document.getElementById('software_infos').innerText = `v${software_info}` 
-})
+	newWidth = miniPlayerPos.startWidth + deltaX;
+	newHeight = newWidth / miniPlayerPos.aspectRatio;
+
+	if (newWidth >= 100 && newWidth <= 1392 && newHeight >= 50 && newHeight <= 692) {
+		miniPlayerEl.miniPlayer.style.width = `${newWidth}px`;
+		miniPlayerEl.miniPlayer.style.height = `${newHeight}px`;
+	}
+};
+function stopResize() {
+	document.removeEventListener('mousemove', startResize);
+	document.removeEventListener('mouseup', stopResize);
+	window.cancelAnimationFrame(miniPlayerPos.aspectRatio);
+	updateHandles();
+};
+function updateHandles() {
+	const bounds = miniPlayerEl.miniPlayer.getBoundingClientRect();
+	resizingHandles.ovr1.classList.toggle('allow', bounds.right + 8 <= 1392 && bounds.top - 8 >= 18);
+	resizingHandles.ovr2.classList.toggle('allow', bounds.right + 8 <= 1392 && bounds.bottom + 8 <= 692);
+	resizingHandles.ovr3.classList.toggle('allow', bounds.left - 8 >= 18 && bounds.top - 8 >= 18);
+	resizingHandles.ovr4.classList.toggle('allow', bounds.left - 8 >= 18 && bounds.bottom + 8 <= 692);
+};
+function playerEvent(e) {
+	var event = e.currentTarget.getAttribute('event');
+	var currentTime = miniPlayerEl.playerMain.currentTime;
+
+	switch (event) {
+		case 'forward':
+			if (miniPlayerEl.playerMain.currentTime + 5 < miniPlayerEl.playerMain.duration) {
+				miniPlayerEl.playerMain.currentTime += 5;
+			} else {
+				miniPlayerEl.playerMain.currentTime = miniPlayerEl.playerMain.duration;
+			}
+			break;
+		case 'cursor-trail':
+
+			if (!toggles.cursorTrace) {
+				miniPlayerEl.playerMain.src = "../src/withTrace.mp4";
+				toggles.cursorTrace = true
+				e.target.classList.remove('white')
+				e.target.classList.add('soft-green')
+
+
+			} else {
+				miniPlayerEl.playerMain.src = "../src/noTrace.mp4";
+				toggles.cursorTrace = false
+				e.target.classList.remove('soft-green')
+				e.target.classList.add('white')
+
+			}
+			miniPlayerEl.playerMain.addEventListener('loadedmetadata', function () {
+				miniPlayerEl.playerMain.currentTime = currentTime;
+
+				miniPlayerEl.playerMain.play();
+
+			}, { once: true });
+
+			break;
+		case 'settings':
+
+			break;
+		case 'detach-screen':
+			miniPlayerEl.miniPlayer.classList.add('show')
+			var isPlaying = !miniPlayerEl.playerMain.paused;
+
+			miniPlayerEl.playerAux.src = "../src/noTrace.mp4";
+			miniPlayerEl.playerAux.load();
+
+			miniPlayerEl.playerAux.addEventListener('loadedmetadata', function () {
+				miniPlayerEl.playerAux.currentTime = currentTime;
+				if (isPlaying) {
+					miniPlayerEl.playerAux.play();
+				} else {
+					miniPlayerEl.playerAux.pause();
+				}
+			}, { once: true });
+
+			miniPlayerEl.playerMain.src = '';
+			break;
+		case 'full-screen':
+
+			break;
+		case 'play':
+
+			if (!toggles.spectactePlay) {
+				miniPlayerEl.playerMain.play();
+
+				e.target.classList.remove('play-circle')
+				e.target.classList.add('pause-circle')
+				toggles.spectactePlay = true
+
+			} else {
+				miniPlayerEl.playerMain.pause()
+
+				e.target.classList.add('play-circle')
+				e.target.classList.remove('pause-circle')
+				toggles.spectactePlay = false
+			}
+
+			break;
+		case 'pause':
+
+			break;
+		case 'rewind':
+			if (miniPlayerEl.playerMain.currentTime - 5 > 0) {
+				miniPlayerEl.playerMain.currentTime -= 5;
+			} else {
+				miniPlayerEl.playerMain.currentTime = 0;
+			}
+			break;
+
+		default:
+			break;
+	}
+};
+miniPlayerEl.allBtns.forEach(btn => {
+	btn.addEventListener('mousedown', function (e) {
+		if (this.querySelector('m')) {
+			playerEvents.originalParent = this;
+			playerEvents.originalEvent = this.getAttribute('event');
+			playerEvents.originalInfo = this.getAttribute('data-info')
+			playerEvents.dragTimeout = setTimeout(() => {
+				startDrag(this, e);
+				
+			}, 1000);
+		}
+	});
+	document.addEventListener('mouseup', () => {
+		if (playerEvents.dragTimeout) {
+			clearTimeout(playerEvents.dragTimeout);
+			playerEvents.dragTimeout = null;
+		}
+	});
+});
+function startDrag(element, e) {
+	if (!playerEvents.dragTimeout) return;
+	playerEvents.draggeable = true
+	playerEvents.draggedItem = element.querySelector('m').cloneNode(true);
+	playerEvents.draggedItem.style.cursor = "grabbing"
+	playerEvents.draggedItem.style.position = 'absolute';
+	playerEvents.draggedItem.style.zIndex = '1000';
+	document.body.appendChild(playerEvents.draggedItem);
+	updateDraggedItemPosition(e);
+	element.setAttribute('event', 'null');
+	element.innerHTML = '•';
+	document.querySelectorAll('.btn-player[event="null"]').forEach(btn => {
+		btn.classList.add('prepare-to-drag');
+	});
+	document.addEventListener('mousemove', onMouseMove);
+	document.addEventListener('mouseup', stopDrag);
+};
+function onMouseMove(e) {
+	if (playerEvents.draggedItem) {
+		updateDraggedItemPosition(e);
+	}
+};
+function updateDraggedItemPosition(e) {
+	playerEvents.draggedItem.style.left = e.pageX - playerEvents.draggedItem.offsetWidth / 2 + 'px';
+	playerEvents.draggedItem.style.top = e.pageY - playerEvents.draggedItem.offsetHeight / 2 + 'px';
+};
+function stopDrag(e) {
+	if (playerEvents.draggedItem) {
+		document.removeEventListener('mousemove', onMouseMove);
+		document.body.removeChild(playerEvents.draggedItem);
+		let dropTarget = document.elementFromPoint(e.clientX, e.clientY).closest('.btn-player');
+		if (dropTarget && miniPlayerEl.toolbarEmbed.contains(dropTarget) && !dropTarget.querySelector('m') && dropTarget.getAttribute('event') === 'null') {
+			dropTarget.innerHTML = '';
+			dropTarget.appendChild(playerEvents.draggedItem);
+			dropTarget.setAttribute('event', playerEvents.originalEvent);
+			dropTarget.setAttribute('data-info', playerEvents.originalInfo);
+
+		} else {
+			oplayerEvents.riginalParent.innerHTML = '';
+			playerEvents.originalParent.appendChild(playerEvents.draggedItem);
+			playerEvents.originalParent.setAttribute('data-info', playerEvents.originalInfo);
+		}
+		playerEvents.draggedItem.style = "", playerEvents.draggedItem.style.cursor = ""
+		playerEvents.draggedItem = null, playerEvents.originalParent = null, playerEvents.originalEvent = null;
+
+	}
+	document.querySelectorAll('.btn-player.prepare-to-drag').forEach(btn => {
+		btn.classList.remove('prepare-to-drag');
+	});
+	playerEvents.draggeable = false
+	document.removeEventListener('mouseup', stopDrag);
+};
+const callToActionsEmbed = document.getElementById('callToActionsEmbed');
+const callToActions = document.getElementById('callToActions');
+function player_toolbar_handleMouseOver() {
+	if (playerEvents.allowAddClass) {
+		callToActions.classList.add('show');
+		resetTimer();
+	}
+};
+function player_toolbar_handleMouseMove() {
+	if (!playerEvents.allowAddClass) {
+		callToActions.classList.add('show');
+		resetTimer();
+	}
+};
+function resetTimer() {
+	if (!playerEvents.draggeable) {
+		clearTimeout(playerEvents.timeout);
+		playerEvents.timeout = setTimeout(() => {
+			callToActions.classList.remove('show');
+			playerEvents.allowAddClass = false;
+		}, 8000);
+	}
+};
+function player_toolbar_handleMouseLeave() {
+	if (!playerEvents.draggeable) {
+		clearTimeout(playerEvents.timeout);
+		callToActions.classList.remove('show');
+		playerEvents.allowAddClass = true;
+	}
+};
+callToActionsEmbed.addEventListener('mouseover', player_toolbar_handleMouseOver);
+callToActionsEmbed.addEventListener('mouseleave', player_toolbar_handleMouseLeave);
+callToActionsEmbed.addEventListener('mousemove', player_toolbar_handleMouseMove)
+
 function sortScoreList() {
 	const listContainer = document.querySelector('.list-score');
 	const sortedBySpan = document.querySelector('.sorted-by');
@@ -102,50 +422,16 @@ function sortScoreList() {
 
 	// Mise à jour du texte et de l'icône du bouton
 	sortedBySpan.innerHTML = `Sort By ${sortOrder.name} <m class="${sortOrder.icon} white"></m>`;
-}
+};
 document.querySelector('.sorted-by').addEventListener('click', sortScoreList);
 
-
-
-//Global
-var os = false
-
-//Placeholders
-let stat_CountryRank = document.getElementById('stat_CountryRank')
-
-let stat_GlobalRank = document.getElementById('stat_GlobalRank')
-let stat_ClassedScore = document.getElementById('stat_ClassedScore')
-let stat_Accuracy = document.getElementById('stat_Accuracy')
-let stat_PlayCount = document.getElementById('stat_PlayCount')
-let stat_TotalScore = document.getElementById('stat_TotalScore')
-let stat_Clicks = document.getElementById('stat_Clicks')
-let stat_MasterSkillset = document.getElementById('stat_MasterSkillset')
-let stats_MaxCombo = document.getElementById('stat_ComboMax')
-let stat_AIM = document.getElementById('stat_AIM')
-let stat_Graph = document.getElementById('stat_Graph')
-let stats_refresh_dt = document.getElementById('stats_refresh_dt')
-
-
-let playerInfo_Username = document.getElementById('playerInfo_Username')
-let playerInfo_GamePreference = document.getElementById('playerInfo_GamePreference')
-let playerInfo_AvatarUrl = document.getElementById('playerInfo_AvatarUrl')
-
-let isSupporter = document.getElementById('playerInfo_isSupporter')
-
-let software_info = document.getElementById('software_info')
-
-
-//Actions-btn
 let action_RefreshDataScores = document.getElementById('action_RefreshDataScores')
-
-//Contents Elements
 let left_menu = document.getElementById('side_left_menu');
 let content = document.getElementById('main-content')
 let boxInfo = document.querySelector('.over-info');
 let scores = document.querySelectorAll('.toprank-element')
 let notificationBox = document.getElementById('notification-box')
 
-//Dynamic Events
 function loadSettings(data) {
 	Object.entries(data).forEach(([key, value]) => {
 		let settingBtn = document.querySelectorAll(`[data-event="${key}"]`);
@@ -159,8 +445,512 @@ function loadSettings(data) {
 		});
 	})
 }
+function switchMode(mode) {
+	document.querySelectorAll('.modeswtichBtn').forEach(function (element) {
+		element.classList.remove('active')
+		document.getElementById(`modeBtn${mode}`).classList.add('active')
 
-//Create Collection
+		phPStats.countryRank.innerText = ''
+		phPStats.globalRank.innerText = ''
+		phPStats.classedScore.innerText = ''
+		phPStats.accuracy.innerText = ''
+		phPStats.playCount.innerText = ''
+		phPStats.totalScore.innerText = ''
+		phPStats.clicks.innerText = ''
+		phPStats.masterSkillset.innerText = ''
+		phPStats.AIM.innerText = ''
+		phPStats.maxCombo.innerText = ''
+		// phPStats.graph = null
+	})
+}
+document.querySelectorAll('.btn').forEach(function (btn) {
+	btn.addEventListener('click', function () {
+		let siblings = btn.closest('.setting-element').querySelectorAll('.btn');
+		if (!btn.getAttribute('data-privilege')) {
+			siblings.forEach(function (sibling) {
+				sibling.classList.remove('active');
+			});
+			btn.classList.add('active');
+
+			let value = btn.getAttribute('data-option')
+			let event = btn.getAttribute('data-event')
+			switch (event) {
+				case 'setLanguage':
+					ipcRenderer.send('getLang', value)
+					ipcRenderer.on('lang', (lg, dictionnary) => {
+						newTranslations = JSON.parse(dictionnary)
+						updateTranslations()
+					})
+					break;
+				case 'setMinimizeWindow':
+					break;
+				case 'setTheme':
+					break;
+				case 'setDisplayNumber':
+					document.querySelectorAll('.number').forEach(function (element) {
+						let number = parseFloat(element.getAttribute('data-value').replace(/\s/g, ''));
+
+						let formattedNumber = '';
+				
+						switch (btn.getAttribute('data-option')) {
+							case '100s':
+								formattedNumber = number.toLocaleString('fr-FR');
+								break;
+							case '1ks':
+								if (number <= 9999) {
+									formattedNumber = number.toLocaleString('fr-FR');
+								} else {
+									formattedNumber = ((number / 1000).toFixed(0)).toLocaleString('fr-FR', { maximumFractionDigits: 0, minimumFractionDigits: 1 }).replace(' ', ',');
+									let ks = parseFloat(formattedNumber)
+									ks = ks.toLocaleString('fr-FR');
+									formattedNumber = ks + " k"
+								}
+								break;
+							case '1ms':
+								formattedNumber = (number / 1000000).toLocaleString('fr-FR') + " M";
+								break;
+							default:
+							
+								formattedNumber = number.toString();
+						}
+
+						element.innerText = formattedNumber
+					});
+
+
+					break;
+				case 'setSubmitScore':
+					break;
+				case 'setAutoUpdate':
+					break;
+				case 'setOsuFolderStable':
+					ipcRenderer.send('open-directory-dialog', 'folderPathStable');
+					break;
+				case 'setOsuFolderLazer':
+					ipcRenderer.send('open-directory-dialog', 'folderPathLazer');
+					break;
+				case 'setDownloadMapsCollection':
+					break;
+				case 'setDownloadMapsSpectacle':
+					break;
+				case 'logout':
+
+					break;
+				case 'setScanosuFiles':
+					break;
+				case 'setMusicSync':
+					break;
+				case 'Reset':
+					break;
+				default:
+					break;
+			}
+		} else {
+			showNotificationBox('Please subscribe Osu!Supporter for enable this option', 'info')
+		}
+	});
+});
+function showNotificationBox(content, type) {
+
+	notificationBox.style.left = '1145px';
+	let icon = null
+	let color = null
+	switch (type) {
+		case 'warning':
+			icon = "exclamation-triangle"
+			color = "soft-red"
+			break;
+		case 'dl':
+			icon = "document-arrow-down"
+			color = "soft-green"
+			break;
+		case 'info':
+			icon = "information-circle"
+			color = "white"
+			break;
+	}
+
+	document.getElementById('notifIcon').classList.add(icon)
+	document.getElementById('notifIcon').classList.add(color)
+
+	document.getElementById('notifLabel').innerText = content
+	setTimeout(() => {
+		notificationBox.style.left = '1400px';
+	}, 5000);
+}
+document.getElementById("settings_menu").addEventListener("click", function (event) {
+	if (event.target.classList.contains("navigate-page")) {
+		if (!event.target.classList.contains('active')) {
+			let target = event.target.getAttribute('target')
+
+			let oldToggle = toggles.settings_page
+			toggles.settings_page = target
+			setTimeout(() => {
+				document.querySelector(`div[target=${oldToggle}]`).classList.remove('active')
+				document.getElementById(oldToggle).classList.remove('active')
+				document.getElementById(target).classList.add('active')
+				event.target.classList.add('active')
+			}, 50);
+		}
+	}
+});
+document.querySelectorAll('.menuBtn').forEach(function (element) {
+	element.addEventListener('click', function (event) {
+		if (element.getAttribute('disabled')) {
+			showNotificationBox(tr('This page is not available'), 'warning')
+			return
+		}
+		if (!element.classList.contains('active')) {
+
+			let target = element.getAttribute('target')
+			let oldToggle = toggles.global_page
+			toggles.global_page = target
+			setTimeout(() => {
+				if (toggles.global_page === "gameplay_page") {
+					document.getElementById('root').classList.add('bg-img')
+					document.getElementById('main-content').classList.add('nocolor')
+				} else {
+					document.getElementById('root').classList.remove('bg-img')
+					document.getElementById('main-content').classList.remove('nocolor')
+
+				}
+				document.querySelector(`div[target=${oldToggle}]`).classList.remove('active')
+				element.classList.add('active')
+				document.getElementById(oldToggle).classList.add('no-toggle')
+				document.getElementById(target).classList.remove('no-toggle')
+			}, 50);
+		}
+	})
+
+});
+
+function showScoreContextMenu(element) {
+	document.querySelector('.context-menu').classList.add('show')
+	function createBtn(label, action, targetID) {
+
+		let div = document.createElement('div')
+		div.classList.add('button-context')
+		div.textContent = label
+		if (action === "cancel") {
+			div.onclick = function () {
+				document.querySelector('.context-menu').classList.remove('show')
+				document.querySelector('.context-menu').innerHTML = ""
+			}
+		} else {
+			div.onclick = function () {
+				window.open(`${action}/${targetID}`, '_blank');
+			}
+		}
+
+		document.querySelector('.context-menu').appendChild(div)
+	}
+
+	createBtn('View Thread', 'https://osu.ppy.sh/beatmaps', element.getAttribute('data-bmid'))
+	createBtn('Open in Osu!', 'osu://b', element.getAttribute('data-bmid'))
+	createBtn('View Score', 'https://osu.ppy.sh/scores', element.getAttribute('data-scoreid'))
+	createBtn('Share Score', '', element.getAttribute('data-scoreid'))
+	createBtn('Cancel', 'cancel', null)
+
+}
+scores.forEach(function (element) {
+	element.addEventListener('click', function () {
+		showScoreContextMenu(element);
+	});
+});
+
+function handleMouseOver(event, element) {
+	boxInfo.innerHTML = element.getAttribute('data-info')
+	updateBoxInfoPosition(event.clientX, event.clientY, calcHeight(element.getAttribute('data-info')));
+	boxInfo.classList.add('show')
+
+
+
+	element.addEventListener('mousemove', function (event) {
+		handleMouseMove(event, calcHeight(element.getAttribute('data-info')));
+	});
+
+}
+function handleMouseMove(event, height) { updateBoxInfoPosition(event.clientX, event.clientY, height); }
+function handleMouseOut() {
+	boxInfo.classList.remove('show')
+}
+function updateBoxInfoPosition(x, y, estimatedHeight) {
+	boxInfo.style.height = estimatedHeight
+	const boxInfoWidth = boxInfo.offsetWidth;
+	boxInfo.style.left = (x - boxInfoWidth - 10) + 'px';
+	boxInfo.style.top = y + 'px';
+}
+document.querySelectorAll('[data-event="info"]').forEach(function (element) {
+	element.addEventListener('mouseover', function (event) {
+		handleMouseOver(event, element);
+	});
+	element.addEventListener('mouseout', handleMouseOut);
+});
+function handleMouseOut(event) { boxInfo.classList.remove('show'); }
+
+var pollrateGameplay = 250
+global.pluginInterface = { getWindow: () => window }
+
+
+function setInputKey(keyNumber) {
+	document.getElementById(`keySelect`).innerText = document.getElementById(`key${keyNumber}`).innerHTML
+
+	document.getElementById('changeKeyBind').classList.add('show');
+	let key = document.getElementById(`key${keyNumber}`).innerHTML;
+
+	function handleKeyDown(event) {
+		
+
+		if (event.key === "Enter") {
+
+			document.getElementById('changeKeyBind').classList.remove('show');
+			document.getElementById(`key${keyNumber}`).innerText = key;
+			document.removeEventListener('keydown', handleKeyDown);
+			
+		} else {
+		
+
+			key = event.key;
+
+			if (event.code === "Space") {
+				key = "space";
+			}
+			key = bindKeys[key.toUpperCase()] || key.toUpperCase();
+			isSelected = true;
+
+			document.getElementById(`keySelect`).innerText = key
+		}
+	}
+
+	document.addEventListener('keydown', handleKeyDown);
+}
+async function IntroduceDataPlayer(defaultMod = false) {
+	var defaultMod
+
+	if (!defaultMod) {
+		defaultMod = (basic_infos.playmode === 'osu') ? 0 : (basic_infos.playmode === 'mania') ? 3 : (basic_infos.playmode === 'ctb') ? 2 : (basic_infos.playmode === 'taiko') ? 1 : '?';
+	}
+	else {
+		defaultMod = (defaultMod === 'osu') ? 0 : (defaultMod === 'mania') ? 3 : (defaultMod === 'ctb') ? 2 : (defaultMod === 'taiko') ? 1 : '?';
+	}
+
+	document.getElementById('userAvatar').src = basic_infos.avatar_url
+	document.getElementById('welcomePseudo').innerText = basic_infos.username
+	document.getElementById('welcomeRank').innerText = `Rank: ${gameplay['m' + defaultMod].global_rank} (${gameplay['m' + defaultMod].country_rank} ${basic_infos.country})`
+	document.getElementById('welcomePP').innerText = `${parseInt(gameplay['m' + defaultMod].pp)} PP`
+	document.getElementById('userStat_classedPlays').innerText = `${gameplay['m' + defaultMod].plays_count}`;
+	document.getElementById('userphPStats.totalScore').innerText = `${gameplay['m' + defaultMod].total_score}`;
+	document.getElementById('userphPStats.accuracy').innerText = `${(parseFloat(gameplay['m' + defaultMod].accuracy)).toFixed(2)} %`;
+	document.getElementById('userStat_nbClick').innerText = `${gameplay['m' + defaultMod].clicks}`;
+	document.getElementById('userStat_maxCombo').innerText = `${gameplay['m' + defaultMod].combo_max}`
+
+	document.getElementById('userStat_nb_ssh').innerText = `${gameplay['m' + defaultMod].notes.ssh}`;
+	document.getElementById('userStat_nb_ss').innerText = `${gameplay['m' + defaultMod].notes.ss}`;
+	document.getElementById('userStat_nb_sh').innerText = `${gameplay['m' + defaultMod].notes.sh}`;
+	document.getElementById('userStat_nb_s').innerText = `${gameplay['m' + defaultMod].notes.s}`;
+	document.getElementById('userStat_nb_a').innerText = `${gameplay['m' + defaultMod].notes.a}`;
+	rankHistoryUpdate(gameplay['m' + defaultMod].history_rank)
+}
+
+let tosuWebSocket = new ReconnectingWebSocket('ws://127.0.0.1:24050/ws');
+let tosuWebSocketKeys = new ReconnectingWebSocket('ws://127.0.0.1:24050/websocket/v2/precise');
+
+tosuWebSocket.onclose = () => { tosuWebSocket.send('Client Closed!'); };
+tosuWebSocketKeys.onclose = () => { tosuWebSocket.send('Client Closed!'); };
+tosuWebSocket.onerror = error => console.log('Socket Error: ', error);
+tosuWebSocketKeys.onerror = error => console.log('Socket Error: ', error);
+
+tosuWebSocketKeys.onmessage = event => {
+	KeysImput = JSON.parse(event.data)
+}
+tosuWebSocket.onmessage = event => {
+	let data = JSON.parse(event.data)
+	wsData = data
+	if (ts !== data.menu.bm.time.current && data.gameplay.name) {
+		playing = true
+	}
+	else { playing = false } ts = data.menu.bm.time.current
+}
+function setTranslations(newDictionnary = null) {
+	document.querySelectorAll('trs').forEach(elem => {
+		const key = elem.innerHTML
+		if (newDictionnary) {
+			elem.innerHTML = tr(key, newDictionnary);
+		} else {
+			elem.innerHTML = tr(key);
+		}
+	});
+}
+function setTranslations() {
+	document.querySelectorAll('trs').forEach(elem => {
+		const key = elem.innerHTML
+		elem.innerHTML = tr(key);
+	});
+}
+function updateTranslations() {
+	document.querySelectorAll('trs').forEach(elem => {
+		const key = elem.getAttribute('key')
+		elem.innerHTML = tr(key, true);
+	});
+}
+function tr(key, ifUpdate) {
+	return ifUpdate ? newTranslations[key] || key : translations[key] || key
+	// return translations[key] || "<err>"+key+"</err>"
+}
+setTimeout(() => {
+	setInterval(async () => {
+		document.getElementById('currentTimeMusic').innerText = ctm(wsData.menu.bm.time.current, wsData.menu.bm.time.full)
+		document.getElementById('totalTimeMusic').innerText = ctm(wsData.menu.bm.time.full, wsData.menu.bm.time.full)
+		let backgroundCurrentMap = document.getElementById('backgroundCurrentMap')
+		if (currentBeatmapId !== wsData.menu.bm.id) {
+
+			document.getElementById('musicAuthor').innerText = wsData.menu.bm.metadata.artist
+			document.getElementById('musicMapper').innerText = wsData.menu.bm.metadata.mapper
+			document.getElementById('musicTitle').innerText = wsData.menu.bm.metadata.title
+			let rs = (wsData.menu.bm.rankedStatus).toString()
+
+			switch (rs) {
+				case "6":
+					rs = "Qualified"
+					break;
+				case "2":
+					rs = "WIP/Graveyard"
+					break;
+				case "4":
+					rs = "Ranked"
+					break;
+				case "1":
+					rs = "Graveyard"
+					break;
+				case "5":
+					rs = "Qualified"
+					break;
+				case "7":
+					rs = "Loved"
+					break;
+				default:
+					break;
+			}
+			bm_stats_holders.hp.innerText = wsData.menu.bm.stats.HP
+			bm_stats_holders.od.innerText = wsData.menu.bm.stats.OD
+			bm_stats_holders.cs.innerText = wsData.menu.bm.stats.CS
+			bm_stats_holders.ar.innerText = wsData.menu.bm.stats.AR
+			bm_stats_holders.sr.innerText = wsData.menu.bm.stats.fullSR
+			bm_stats_holders.bpm.innerText = wsData.menu.bm.stats.BPM.common
+			bm_stats_holders.difficulty.innerText = wsData.menu.bm.metadata.difficulty
+			bm_stats_holders.fc95.innerText = (parseInt(wsData.menu.pp['95'])).toFixed(2) + " PP"
+			bm_stats_holders.fc98.innerText = (parseInt(wsData.menu.pp['98'])).toFixed(2) + " PP"
+			bm_stats_holders.fc100.innerText = (parseInt(wsData.menu.pp['100'])).toFixed(2) + " PP"
+			bm_stats_holders.mapStatus.innerText = rs
+			currentBeatmapId = wsData.menu.bm.id
+			shareBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
+			shareBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
+			shareBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
+
+			openBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
+			openBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
+			openBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
+		}
+
+		if (backgroundCurrentMap.getAttribute('src') !== `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`) {
+			backgroundCurrentMap.setAttribute('src', `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`)
+			var basePath = wsData.settings.folders.songs.replace(/\\/g, '/');
+			var imagePath = wsData.menu.bm.path.full.replace(/\\/g, '/');
+			var fullUrl = encodeURI(`${basePath}/${imagePath}`);
+			document.getElementById('root').style.backgroundImage = `url('${fullUrl}')`;
+		}
+	}, pollrateGameplay);
+}, 2000);
+
+updateHandles();
+
+ipcRenderer.on('player-data', (event, data) => {
+	const player_data = data
+	basic_infos = player_data.basic_informations
+	gameplay = player_data.gameplay
+	// IntroduceDataPlayer(basic_infos.playmode)
+})
+ipcRenderer.on('notification', (event, content, type) => {
+	showNotificationBox(content, type)
+})
+ipcRenderer.on('newDevice', (event, data) => {
+	showNotificationBox(`${data.model} Connected`, "info")
+
+	document.getElementById('noDevice').classList.add('noshow')
+	document.getElementById('deviceInfos').classList.remove('noshow')
+
+	document.getElementById('deviceName').innerText = data.model
+	if (data.keys === 2) {
+		document.getElementById('keyBindList').innerHTML = `
+			<div class="btn keybind" onClick="setInputKey(1)" data-value="Q" id="key1">Q</div>
+			<div class="btn keybind" onClick="setInputKey(2)" data-value="S" id="key2">S</div>
+			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
+			`
+	} else {
+		document.getElementById('keyBindList').innerHTML = `
+			<div class="btn keybind" onClick="setInputKey(1)" data-value="D" id="key1">D</div>
+			<div class="btn keybind" onClick="setInputKey(2)" data-value="F" id="key2">F</div>
+			<div class="btn keybind" onClick="setInputKey(3)" data-value="J" id="key3">J</div>
+			<div class="btn keybind" onClick="setInputKey(4)" data-value="K" id="key4">K</div>
+			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
+			`
+	}
+})
+ipcRenderer.on('deviceDisconnected', (event, data) => {
+	showNotificationBox(`${data} Disconnected`, "info")
+	document.getElementById('keyBindList').innerHTML = ''
+	document.getElementById('noDevice').classList.remove('noshow')
+	document.getElementById('deviceInfos').classList.add('noshow')
+})
+ipcRenderer.on('api', (event, data) => {
+	if (data.event === 'createHTMLObject') {
+		document.getElementById('endOfNav').insertAdjacentHTML('afterend', data.HTML);
+	}
+});
+ipcRenderer.on('selected-directory', (event, pathId, path) => {
+	document.getElementById(pathId).value = path;
+});
+ipcRenderer.on('file-check-failed', (event, pathId) => {
+	showNotificationBox('Please select an Osu! Folder', 'warning')
+});
+ipcRenderer.on('settings', (event, data, software_info) => {
+	loadSettings(data)
+	console.log(data);
+	document.getElementById('software_infos').innerText = `v${software_info}`
+})
+left_menu.addEventListener('click', function (event) {
+	if (event.target.getAttribute('id') == 'side_left_menu' &&
+		event.offsetX >= left_menu.offsetWidth - 12) {
+		if (toggles.left_menu) {
+			left_menu.classList.add('hide');
+			content.classList.add('full')
+			left_menu.style.setProperty('--after-content', '""')
+			setTimeout(() => {
+				left_menu.style.setProperty('--after-content', '"❭"')
+				left_menu.style.setProperty('--after-content-width-left', '1%')
+				toggles.left_menu = false
+			}, 150);
+		} else {
+			left_menu.classList.remove('hide');
+			content.classList.remove('full')
+			left_menu.style.setProperty('--after-content', '""')
+			setTimeout(() => {
+				left_menu.style.setProperty('--after-content', '"❬"')
+				left_menu.style.setProperty('--after-content-width-left', '13.4%')
+				toggles.left_menu = true
+			}, 150)
+		}
+	}
+});
+window.addEventListener('resize', updateHandles);
+document.addEventListener('mousemove', updateHandles);
+bg.addEventListener('mousemove', (e) => {
+	const mouseX = e.clientX / windowWidth;
+	const mouseY = e.clientY / windowHeight;
+
+	bg.style.backgroundPositionX = `${mouseX}%`;
+	bg.style.backgroundPositionY = `${mouseY + 20}%`;
+});
 document.getElementById('createCollectionBtn').addEventListener('click', function () {
 	let CollectionList = document.getElementById('lcollection')
 
@@ -238,936 +1028,14 @@ document.getElementById('createCollectionBtn').addEventListener('click', functio
 	});
 	m2.addEventListener('mouseout', handleMouseOut);
 })
-function switchMode(mode) {
-	document.querySelectorAll('.modeswtichBtn').forEach(function (element) {
-		element.classList.remove('active')
-		document.getElementById(`modeBtn${mode}`).classList.add('active')
-
-		stat_CountryRank.innerText = ''
-		stat_GlobalRank.innerText = ''
-		stat_ClassedScore.innerText = ''
-		stat_Accuracy.innerText = ''
-		stat_PlayCount.innerText = ''
-		stat_TotalScore.innerText = ''
-		stat_Clicks.innerText = ''
-		stat_MasterSkillset.innerText = ''
-		stat_AIM.innerText = ''
-		stats_MaxCombo.innerText = ''
-		// stat_Graph = null
+document.addEventListener('DOMContentLoaded', async () => {
+	ipcRenderer.send('getLang', null)
+	ipcRenderer.on('lang', (lg, dictionnary) => {
+		translations = JSON.parse(dictionnary)
+		setTranslations()
 	})
-}
-document.querySelectorAll('.btn').forEach(function (btn) {
-	btn.addEventListener('click', function () {
-		// loadSettings()
-		let siblings = btn.closest('.setting-element').querySelectorAll('.btn');
-		if (!btn.getAttribute('data-privilege')) {
-			siblings.forEach(function (sibling) {
-				sibling.classList.remove('active');
-			});
-			btn.classList.add('active');
-
-			let value = btn.getAttribute('data-option')
-			let event = btn.getAttribute('data-event')
-			switch (event) {
-				case 'setLanguage':
-					ipcRenderer.send('getLang', value)
-					ipcRenderer.on('lang', (lg, dictionnary) => {
-						newTranslations = JSON.parse(dictionnary)
-						updateTranslations()
-					})
-					break;
-				case 'setMinimizeWindow':
-					//yes = yes
-					//no = no
-
-					break;
-				case 'setTheme':
-					//dark = dark
-					//light = light
-
-					break;
-				case 'setDisplayNumber':
-					//100s = 100 space
-					//1ks = 1000 space
-					//1ms = 1000000 space
-					document.querySelectorAll('.number').forEach(function (element) {
-						let number = parseFloat(element.getAttribute('data-value').replace(/\s/g, ''));
-
-						let formattedNumber = '';
-						console.log(btn.getAttribute('data-option'))
-						switch (btn.getAttribute('data-option')) {
-							case '100s':
-								formattedNumber = number.toLocaleString('fr-FR');
-								break;
-							case '1ks':
-								if (number <= 9999) {
-									formattedNumber = number.toLocaleString('fr-FR');
-								} else {
-									formattedNumber = ((number / 1000).toFixed(0)).toLocaleString('fr-FR', { maximumFractionDigits: 0, minimumFractionDigits: 1 }).replace(' ', ',');
-									let ks = parseFloat(formattedNumber)
-									ks = ks.toLocaleString('fr-FR');
-									formattedNumber = ks + " k"
-								}
-								break;
-							case '1ms':
-								formattedNumber = (number / 1000000).toLocaleString('fr-FR') + " M";
-								break;
-							default:
-								console.log('default')
-								formattedNumber = number.toString();
-						}
-
-						element.innerText = formattedNumber
-					});
-
-
-					break;
-				case 'setSubmitScore':
-					//ap = after playing
-					//30m = 30 min
-					//1h = 1h
-					//al = after launching
-
-					break;
-				case 'setAutoUpdate':
-					//dl = during launching
-					//manually = manually
-					//never = never
-
-					break;
-				case 'setOsuFolderStable':
-					ipcRenderer.send('open-directory-dialog', 'folderPathStable');
-					break;
-				case 'setOsuFolderLazer':
-					ipcRenderer.send('open-directory-dialog', 'folderPathLazer');
-					break;
-				case 'setDownloadMapsCollection':
-					//sa = self-acting
-					//manually = manually
-
-					break;
-				case 'setDownloadMapsSpectacle':
-					//no = no
-					//manually = manually
-					//sa = self-acting
-
-					break;
-				case 'logout':
-					//  osu or irc
-
-					break;
-				case 'setScanosuFiles':
-					//yes = yes
-					//no = no
-
-					break;
-				case 'setMusicSync':
-					//al = after launching
-					//manually = manually
-					//1h = every 1h
-					//1d = every 1d
-
-					break;
-				case 'Reset':
-				break;
-				default:
-				break;
-			}
-		} else {
-			showNotificationBox('Please subscribe Osu!Supporter for enable this option', 'info')
-		}
-	});
 });
-ipcRenderer.on('selected-directory', (event, pathId, path) => {
-    document.getElementById(pathId).value = path;
-});
-ipcRenderer.on('file-check-failed', (event, pathId) => {
-    showNotificationBox('Please select an Osu! Folder', 'warning')
-});
-
-//Dynamic UI
-
-//Show a notification
-function showNotificationBox(content, type) {
-
-	notificationBox.style.left = '1145px';
-	let icon = null
-	let color = null
-	switch (type) {
-		case 'warning':
-			icon = "exclamation-triangle"
-			color = "soft-red"
-			break;
-		case 'dl':
-			icon = "document-arrow-down"
-			color = "soft-green"
-			break;
-		case 'info':
-			icon = "information-circle"
-			color = "white"
-			break;
-	}
-
-	document.getElementById('notifIcon').classList.add(icon)
-	document.getElementById('notifIcon').classList.add(color)
-
-	document.getElementById('notifLabel').innerText = content
-	setTimeout(() => {
-		notificationBox.style.left = '1400px';
-	}, 5000);
-}
-//Settings Menu 
-left_menu.addEventListener('click', function (event) {
-	if (event.target.getAttribute('id') == 'side_left_menu' &&
-		event.offsetX >= left_menu.offsetWidth - 12) {
-		if (left_menuToggle) {
-			left_menu.classList.add('hide');
-			content.classList.add('full')
-			left_menu.style.setProperty('--after-content', '""')
-			setTimeout(() => {
-				left_menu.style.setProperty('--after-content', '"❭"')
-				left_menu.style.setProperty('--after-content-width-left', '1%')
-				left_menuToggle = false
-			}, 150);
-		} else {
-			left_menu.classList.remove('hide');
-			content.classList.remove('full')
-			left_menu.style.setProperty('--after-content', '""')
-			setTimeout(() => {
-				left_menu.style.setProperty('--after-content', '"❬"')
-				left_menu.style.setProperty('--after-content-width-left', '13.4%')
-				left_menuToggle = true
-			}, 150)
-		}
-	}
-});
-document.getElementById("settings_menu").addEventListener("click", function (event) {
-	if (event.target.classList.contains("navigate-page")) {
-		if (!event.target.classList.contains('active')) {
-			let target = event.target.getAttribute('target')
-
-			let oldToggle = settings_page_toggled
-			settings_page_toggled = target
-			setTimeout(() => {
-				document.querySelector(`div[target=${oldToggle}]`).classList.remove('active')
-				document.getElementById(oldToggle).classList.remove('active')
-				document.getElementById(target).classList.add('active')
-				event.target.classList.add('active')
-			}, 50);
-		}
-	}
-});
-
-//Global Menu 
-document.querySelectorAll('.menuBtn').forEach(function (element) {
-	element.addEventListener('click', function (event) {
-		if (element.getAttribute('disabled')) {
-			showNotificationBox(tr('This page is not available'), 'warning')
-			return
-		}
-		if (!element.classList.contains('active')) {
-
-			let target = element.getAttribute('target')
-			let oldToggle = global_page_toggled
-			global_page_toggled = target
-			setTimeout(() => {
-				if(global_page_toggled === "gameplay_page"){
-					document.getElementById('root').classList.add('bg-img')
-					document.getElementById('main-content').classList.add('nocolor')
-				} else {
-					document.getElementById('root').classList.remove('bg-img')
-					document.getElementById('main-content').classList.remove('nocolor')
-
-				}
-				document.querySelector(`div[target=${oldToggle}]`).classList.remove('active')
-				element.classList.add('active')
-				document.getElementById(oldToggle).classList.add('no-toggle')
-				document.getElementById(target).classList.remove('no-toggle')
-			}, 50);
-		}
-	})
-
-});
-
-//Show context Menu
-function showScoreContextMenu(element) {
-	document.querySelector('.context-menu').classList.add('show')
-	function createBtn(label, action, targetID) {
-
-		let div = document.createElement('div')
-		div.classList.add('button-context')
-		div.textContent = label
-		if (action === "cancel") {
-			div.onclick = function () {
-				document.querySelector('.context-menu').classList.remove('show')
-				document.querySelector('.context-menu').innerHTML = ""
-			}
-		} else {
-			div.onclick = function () {
-				window.open(`${action}/${targetID}`, '_blank');
-			}
-		}
-
-		document.querySelector('.context-menu').appendChild(div)
-	}
-
-	createBtn('View Thread', 'https://osu.ppy.sh/beatmaps', element.getAttribute('data-bmid'))
-	createBtn('Open in Osu!', 'osu://b', element.getAttribute('data-bmid'))
-	createBtn('View Score', 'https://osu.ppy.sh/scores', element.getAttribute('data-scoreid'))
-	createBtn('Share Score', '', element.getAttribute('data-scoreid'))
-	createBtn('Cancel', 'cancel', null)
-
-}
-scores.forEach(function (element) {
-	element.addEventListener('click', function () {
-		showScoreContextMenu(element);
-	});
-});
-
-//MiniBox Info
-
-function handleMouseOver(event, element) {
-	boxInfo.innerHTML = element.getAttribute('data-info')
-	updateBoxInfoPosition(event.clientX, event.clientY, calcHeight(element.getAttribute('data-info')));
-	boxInfo.classList.add('show')
-
-
-
-	element.addEventListener('mousemove', function (event) {
-		handleMouseMove(event, calcHeight(element.getAttribute('data-info')));
-	});
-
-}
-function handleMouseMove(event, height) { updateBoxInfoPosition(event.clientX, event.clientY, height); }
-function handleMouseOut(event) {
-	boxInfo.classList.remove('show')
-	console.log('quit')
-}
-function updateBoxInfoPosition(x, y, estimatedHeight) {
-	boxInfo.style.height = estimatedHeight
-	const boxInfoWidth = boxInfo.offsetWidth;
-	boxInfo.style.left = (x - boxInfoWidth - 10) + 'px';
-	boxInfo.style.top = y + 'px';
-}
-document.querySelectorAll('[data-event="info"]').forEach(function (element) {
-	element.addEventListener('mouseover', function (event) {
-		handleMouseOver(event, element);
-	});
-	element.addEventListener('mouseout', handleMouseOut);
-});
-function handleMouseOut(event) { boxInfo.classList.remove('show'); }
-
-
-//Dynamic Bella Fiora with backend
-
-/*
-* Renewal of data in play in the dom
-*/
-	var pollrateGameplay = 250
-
-//Api gestion
-ipcRenderer.on('api', (event, data) => {
-	if (data.event === 'createHTMLObject') {
-		document.getElementById('endOfNav').insertAdjacentHTML('afterend', data.HTML);
-	}
-});
-global.pluginInterface = { getWindow: () => window }
-
-/**
-** All the dynamic part for device management and communications
-*  Mainly manages the keypads
-*/
-	ipcRenderer.on('newDevice', (event, data) => {
-		showNotificationBox(`${data.model} Connected`, "info")
-
-		document.getElementById('noDevice').classList.add('noshow')
-		document.getElementById('deviceInfos').classList.remove('noshow')
-
-		document.getElementById('deviceName').innerText = data.model
-		if (data.keys === 2) {
-			document.getElementById('keyBindList').innerHTML = `
-			<div class="btn keybind" onClick="setInputKey(1)" data-value="Q" id="key1">Q</div>
-			<div class="btn keybind" onClick="setInputKey(2)" data-value="S" id="key2">S</div>
-			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
-			`
-		} else {
-			document.getElementById('keyBindList').innerHTML = `
-			<div class="btn keybind" onClick="setInputKey(1)" data-value="D" id="key1">D</div>
-			<div class="btn keybind" onClick="setInputKey(2)" data-value="F" id="key2">F</div>
-			<div class="btn keybind" onClick="setInputKey(3)" data-value="J" id="key3">J</div>
-			<div class="btn keybind" onClick="setInputKey(4)" data-value="K" id="key4">K</div>
-			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
-			`
-		}
-	})
-	ipcRenderer.on('deviceDisconnected', (event, data) => {
-		showNotificationBox(`${data} Disconnected`, "info")
-		document.getElementById('keyBindList').innerHTML = ''
-		document.getElementById('noDevice').classList.remove('noshow')
-		document.getElementById('deviceInfos').classList.add('noshow')
-	})
-	
-	function setInputKey(keyNumber) {
-		document.getElementById(`keySelect`).innerText = document.getElementById(`key${keyNumber}`).innerHTML
-		console.log(keyNumber);
-		document.getElementById('changeKeyBind').classList.add('show');
-		let key = document.getElementById(`key${keyNumber}`).innerHTML;
-
-		function handleKeyDown(event) {
-			console.log(document.getElementById(`key${keyNumber}`).innerHTML)
-
-			if (event.key === "Enter") {
-
-				document.getElementById('changeKeyBind').classList.remove('show');
-				document.getElementById(`key${keyNumber}`).innerText = key;
-				document.removeEventListener('keydown', handleKeyDown); // Retirer l'écouteur
-				console.log("Key binding completed and listener removed.");
-			} else {
-				console.log(event);
-
-				key = event.key;
-
-				if (event.code === "Space") {
-					key = "space";
-				}
-				key = bindKeys[key.toUpperCase()] || key.toUpperCase();
-				isSelected = true;
-
-				document.getElementById(`keySelect`).innerText = key
-			}
-		}
-
-		document.addEventListener('keydown', handleKeyDown);
-	}
-
-
-/**
-** Update Users datas
-*/
-	ipcRenderer.on('player-data', (event, data) => {
-		const player_data = data
-		basic_infos = player_data.basic_informations
-		gameplay = player_data.gameplay
-		// IntroduceDataPlayer(basic_infos.playmode)
-	})
-	async function IntroduceDataPlayer(defaultMod = false) {
-		var defaultMod
-
-		if (!defaultMod) {
-			defaultMod = (basic_infos.playmode === 'osu') ? 0 : (basic_infos.playmode === 'mania') ? 3 : (basic_infos.playmode === 'ctb') ? 2 : (basic_infos.playmode === 'taiko') ? 1 : '?';
-		}
-		else {
-			defaultMod = (defaultMod === 'osu') ? 0 : (defaultMod === 'mania') ? 3 : (defaultMod === 'ctb') ? 2 : (defaultMod === 'taiko') ? 1 : '?';
-		}
-		console.log(defaultMod)
-		document.getElementById('userAvatar').src = basic_infos.avatar_url
-		document.getElementById('welcomePseudo').innerText = basic_infos.username
-		document.getElementById('welcomeRank').innerText = `Rank: ${gameplay['m' + defaultMod].global_rank} (${gameplay['m' + defaultMod].country_rank} ${basic_infos.country})`
-		document.getElementById('welcomePP').innerText = `${parseInt(gameplay['m' + defaultMod].pp)} PP`
-		document.getElementById('userStat_classedPlays').innerText = `${gameplay['m' + defaultMod].plays_count}`;
-		document.getElementById('userStat_TotalScore').innerText = `${gameplay['m' + defaultMod].total_score}`;
-		document.getElementById('userStat_Accuracy').innerText = `${(parseFloat(gameplay['m' + defaultMod].accuracy)).toFixed(2)} %`;
-		document.getElementById('userStat_nbClick').innerText = `${gameplay['m' + defaultMod].clicks}`;
-		document.getElementById('userStat_maxCombo').innerText = `${gameplay['m' + defaultMod].combo_max}`
-
-		document.getElementById('userStat_nb_ssh').innerText = `${gameplay['m' + defaultMod].notes.ssh}`;
-		document.getElementById('userStat_nb_ss').innerText = `${gameplay['m' + defaultMod].notes.ss}`;
-		document.getElementById('userStat_nb_sh').innerText = `${gameplay['m' + defaultMod].notes.sh}`;
-		document.getElementById('userStat_nb_s').innerText = `${gameplay['m' + defaultMod].notes.s}`;
-		document.getElementById('userStat_nb_a').innerText = `${gameplay['m' + defaultMod].notes.a}`;
-		console.log(gameplay['m' + defaultMod].top_rank)
-		rankHistoryUpdate(gameplay['m' + defaultMod].history_rank)
-	}
-
-/*
-*  Declaration by the websockets 
-*/
-	let tosuWebSocket = new ReconnectingWebSocket('ws://127.0.0.1:24050/ws');
-	let tosuWebSocketKeys = new ReconnectingWebSocket('ws://127.0.0.1:24050/websocket/v2/precise');
-	tosuWebSocket.onopen = (event) => console.log(event);
-	tosuWebSocketKeys.onopen = (event) => console.log(event);
-
-/*
-*  Events of websockets
-*/
-	tosuWebSocket.onclose = event => {tosuWebSocket.send('Client Closed!');};
-	tosuWebSocketKeys.onclose = event => {tosuWebSocket.send('Client Closed!');};
-	tosuWebSocket.onerror = error => console.log('Socket Error: ', error);
-	tosuWebSocketKeys.onerror = error => console.log('Socket Error: ', error);
-
-/*
-*  Recovery of data from websockets
-*/
-	tosuWebSocketKeys.onmessage = event => {
-		KeysImput = JSON.parse(event.data)
-	}
-	tosuWebSocket.onmessage = event => {
-		let data = JSON.parse(event.data)
-		wsData = data
-		if (ts !== data.menu.bm.time.current && data.gameplay.name) {
-			playing = true
-		}
-		else { playing = false } ts = data.menu.bm.time.current
-		// console.log(playing)
-	}
-
-/*
-*  Pages translations
-*/
-	
-	document.addEventListener('DOMContentLoaded', async () => {
-		ipcRenderer.send('getLang', null)
-		ipcRenderer.on('lang', (lg, dictionnary) => {
-			translations = JSON.parse(dictionnary)
-			setTranslations()
-		})
-	});
-	function setTranslations(newDictionnary = null) {
-		document.querySelectorAll('trs').forEach(elem => {
-			const key = elem.innerHTML
-			if(newDictionnary){
-				elem.innerHTML = tr(key, newDictionnary);
-			} else {
-				elem.innerHTML = tr(key);
-			}
-		});
-	}
-	function setTranslations() {
-		document.querySelectorAll('trs').forEach(elem => {
-			const key = elem.innerHTML
-			elem.innerHTML = tr(key);
-		});
-	}
-	function updateTranslations() {
-		document.querySelectorAll('trs').forEach(elem => {
-			const key = elem.getAttribute('key')
-			elem.innerHTML = tr(key, true);
-		});
-	}
-	function tr(key, ifUpdate) {
-		console.log(ifUpdate)
-		if(ifUpdate){
-			console.log(newTranslations)
-			return newTranslations[key] || key
-		} else {
-			return translations[key] || key
-		}
-		// return translations[key] || "<err>"+key+"</err>"
-		
-
-	}
-
-
-// 		switch (bm.gameMode) {
-// 		case 0:
-// 			document.getElementById('bm_stats_handler_hp')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_od')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_cs')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_sr')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_ar')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_kc')
-// 				.classList.add('unsued')
-// 			hp.innerText = bm.bm.stats.HP
-// 			od.innerText = bm.bm.stats.OD
-// 			cs.innerText = bm.bm.stats.CS
-// 			ar.innerText = bm.bm.stats.AR
-// 			sr.innerText = bm.bm.stats.SR
-// 			hp.style.width = `${Math.min((bm.bm.stats.HP / 10) * 100)}%`
-// 			od.style.width = `${Math.min((bm.bm.stats.OD / 10) * 100)}%`
-// 			cs.style.width = `${Math.min((bm.bm.stats.CS / 10) * 100)}%`
-// 			ar.style.width = `${Math.min((bm.bm.stats.AR / 10) * 100)}%`
-// 			sr.style.width = `${Math.min((bm.bm.stats.SR / 20) * 100)}%`
-// 			break;
-// 		case 1:
-// 			document.getElementById('bm_stats_handler_hp')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_od')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_cs')
-// 				.classList.add('unsued')
-// 			document.getElementById('bm_stats_handler_sr')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_ar')
-// 				.classList.add('unsued')
-// 			document.getElementById('bm_stats_handler_kc')
-// 				.classList.add('unsued')
-// 			hp.innerText = bm.bm.stats.HP
-// 			od.innerText = bm.bm.stats.OD
-// 			sr.innerText = bm.bm.stats.SR
-// 			hp.style.width = `${Math.min((bm.bm.stats.HP / 10) * 100)}%`
-// 			od.style.width = `${Math.min((bm.bm.stats.OD / 10) * 100)}%`
-// 			sr.style.width = `${Math.min((bm.bm.stats.SR / 20) * 100)}%`
-// 			break;
-// 		case 2:
-// 			document.getElementById('bm_stats_handler_hp')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_od')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_cs')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_sr')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_ar')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_kc')
-// 				.classList.add('unsued')
-// 			hp.innerText = bm.bm.stats.HP
-// 			od.innerText = bm.bm.stats.OD
-// 			cs.innerText = bm.bm.stats.CS
-// 			ar.innerText = bm.bm.stats.AR
-// 			sr.innerText = bm.bm.stats.SR
-// 			hp.style.width = `${Math.min((bm.bm.stats.HP / 10) * 100)}%`
-// 			od.style.width = `${Math.min((bm.bm.stats.OD / 10) * 100)}%`
-// 			cs.style.width = `${Math.min((bm.bm.stats.CS / 10) * 100)}%`
-// 			ar.style.width = `${Math.min((bm.bm.stats.AR / 10) * 100)}%`
-// 			sr.style.width = `${Math.min((bm.bm.stats.SR / 20) * 100)}%`
-// 			break;
-// 		case 3:
-// 			document.getElementById('bm_stats_handler_hp')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_od')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_cs')
-// 				.classList.add('unsued')
-// 			document.getElementById('bm_stats_handler_sr')
-// 				.classList.remove('unsued')
-// 			document.getElementById('bm_stats_handler_ar')
-// 				.classList.add('unsued')
-// 			document.getElementById('bm_stats_handler_kc')
-// 				.classList.remove('unsued')
-// 			hp.innerText = bm.bm.stats.HP
-// 			od.innerText = bm.bm.stats.OD
-// 			sr.innerText = bm.bm.stats.SR
-// 			hp.style.width = `${Math.min((bm.bm.stats.HP / 10) * 100)}%`
-// 			od.style.width = `${Math.min((bm.bm.stats.OD / 10) * 100)}%`
-// 			sr.style.width = `${Math.min((bm.bm.stats.SR / 20) * 100)}%`
-// 			break;
-// 		}
-// 		musicPlayer.classList.remove('music__player__offline')
-// 	})
-
-
-
-//   ipcRenderer.on(
-// 	  'fader', (event, fader) => { document.body.classList.add(fader) })
-//   ipcRenderer.on('initGUI', async (event, data) => {
-// 	  const defaultMod = data.playmode
-// 	  document.getElementById('userAvatar').src = data.avatar_url;
-// 	  document.getElementById('welcomePseudo').innerText = data.username;
-// 	  document.getElementById('welcomeRank').innerText = `Rank: ${data.statistics_rulesets[defaultMod].global_rank} (${
-// 		  data.statistics.rank.country} ${data.country_code})`
-// 	  document.getElementById('welcomePP').innerText = `${parseInt(data.statistics_rulesets[defaultMod].pp)} PP`
-// 	  document.getElementById('userStat_classedScore').innerText = `${data.statistics.ranked_score}`;
-// 	  document.getElementById('userStat_classedPlays').innerText = `${data.statistics.play_count}`;
-// 	  document.getElementById('userStat_TotalScore').innerText = `${data.statistics.total_score}`;
-// 	  document.getElementById('userStat_Accuracy').innerText = `${(data.statistics.hit_accuracy).toFixed(2)} %`;
-// 	  document.getElementById('userStat_nbClick').innerText = `${data.statistics.total_hits}`;
-// 	  document.getElementById('userStat_maxCombo').innerText = `${data.statistics.maximum_combo}`
-
-// 	  document.getElementById('userStat_nb_ssh').innerText = `${data.statistics.grade_counts.ssh}`;
-// 	  document.getElementById('userStat_nb_ss').innerText = `${data.statistics.grade_counts.ss}`;
-// 	  document.getElementById('userStat_nb_sh').innerText = `${data.statistics.grade_counts.sh}`;
-// 	  document.getElementById('userStat_nb_s').innerText = `${data.statistics.grade_counts.s}`;
-// 	  document.getElementById('userStat_nb_a').innerText = `${data.statistics.grade_counts.a}`;
-// 	  rankHistoryUpdate(data.rank_history.data)
-//   })
-
-
-
-
-
-let hp = document.getElementById('bm_stats_hp')
-let od = document.getElementById('bm_stats_od')
-let cs = document.getElementById('bm_stats_cs')
-let sr = document.getElementById('bm_stats_sr')
-let ar = document.getElementById('bm_stats_ar')
-let kc = document.getElementById('bm_stats_kc')
-let fc95 = document.getElementById('bm_stats_fc95')
-let fc98 = document.getElementById('bm_stats_fc98')
-let fc100 = document.getElementById('bm_stats_fc100')
-let difficulty = document.getElementById('bm_stats_difficulty')
-let bpm = document.getElementById('bm_stats_bpm')
-let mapStatus = document.getElementById('bm_stats_status')
-let shareBtn = document.getElementById('shareBtn')
-let openBtn = document.getElementById('OpenBtn')
-
-
-
-setTimeout(() => {
-	setInterval(async () => {
-
-		const keysToCheck = ["0", "50", "100", "300", "geki", "katu"];
-
-		keysToCheck.forEach(key => {
-
-			if (wsData.gameplay.hits[key] !== previousValues[key]) {
-				console.log(`Change detected in ${key}: ${previousValues[key]} -> ${wsData.gameplay.hits[key]}`);
-				switch(key){
-					case '300':
-						ipcRenderer.send('keypadSend', 'faed3ff8');
-					break
-					case 'geki':
-						ipcRenderer.send('keypadSend','14e742f8');
-					break
-					case 'katu':
-						ipcRenderer.send('keypadSend', '2529ffde');
-					break
-					case "100" : 
-					ipcRenderer.send('keypadSend', 'aa5b00f8');
-					break
-					case "50" : 
-					ipcRenderer.send('keypadSend', '820cb1f8');
-					break;
-					case "0": 
-					ipcRenderer.send('keypadSend', 'ff2828f8');
-					break;
-
-				}
-				previousValues[key] = wsData.gameplay.hits[key];
-			}
-		})
-
-
-
-		document.getElementById('currentTimeMusic').innerText = ctm(wsData.menu.bm.time.current,wsData.menu.bm.time.full)
-		document.getElementById('totalTimeMusic').innerText = ctm(wsData.menu.bm.time.full, wsData.menu.bm.time.full)
-		
-		let backgroundCurrentMap = document.getElementById('backgroundCurrentMap')
-
-		if(currentBeatmapId !== wsData.menu.bm.id){
-			
-			document.getElementById('musicAuthor').innerText = wsData.menu.bm.metadata.artist
-			document.getElementById('musicMapper').innerText = wsData.menu.bm.metadata.mapper
-			document.getElementById('musicTitle').innerText = wsData.menu.bm.metadata.title
-			let rs = (wsData.menu.bm.rankedStatus).toString()
-			
-			switch (rs) {
-				case "6":
-					rs = "Qualified"
-					break;
-				case "2":
-					rs = "WIP/Graveyard"
-					break;
-				case "4":
-					rs = "Ranked"
-					break;
-				case "1":
-					rs = "Graveyard"
-					break;
-				case "6":
-					rs = "Qualified"
-					break;
-				case "7":
-					rs = "Loved"
-					break;
-				default:
-					break;
-			}
-			hp.innerText = wsData.menu.bm.stats.HP
-			od.innerText = wsData.menu.bm.stats.OD
-			cs.innerText = wsData.menu.bm.stats.CS
-			ar.innerText = wsData.menu.bm.stats.AR
-			sr.innerText = wsData.menu.bm.stats.fullSR
-			bpm.innerText = wsData.menu.bm.stats.BPM.common
-			difficulty.innerText = wsData.menu.bm.metadata.difficulty
-			fc95.innerText =  (parseInt(wsData.menu.pp['95'])).toFixed(2)+" PP"
-			fc98.innerText = (parseInt(wsData.menu.pp['98'])).toFixed(2)+" PP"
-			fc100.innerText = (parseInt(wsData.menu.pp['100'])).toFixed(2)+" PP"
-			mapStatus.innerText = rs
-			currentBeatmapId = wsData.menu.bm.id
-			shareBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
-			shareBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
-			shareBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
-
-			openBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
-			openBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
-			openBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
-
-		}
-	
-
-		if(backgroundCurrentMap.getAttribute('src') !== `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`){
-			backgroundCurrentMap.setAttribute('src', `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`)
-			var basePath = wsData.settings.folders.songs.replace(/\\/g, '/'); 
-			var imagePath = wsData.menu.bm.path.full.replace(/\\/g, '/'); 
-			var fullUrl = encodeURI(`${basePath}/${imagePath}`);
-			document.getElementById('root').style.backgroundImage = `url('${fullUrl}')`;
-		}
-		// console.table(wsData.gameplay.hits)
-		// if()
-		// 	  updateProgressBar(
-		// 		  wsData.menu.bm.time.current, wsData.menu.bm.time.full);
-		// 	  document.getElementById('timeElapsed').innerHTML = `
-		// <span>${
-		// 		  ctm(wsData.menu.bm.time.current,
-		// 			  wsData.menu.bm.time.full)}</span>-<span>${
-		// 		  ctm(wsData.menu.bm.time.full, wsData.menu.bm.time.full)}</span>`
-		// 	  document.getElementById('MusictimeElapsed').innerHTML = `
-		// <span>${
-		// 		  ctm(wsData.menu.bm.time.current,
-		// 			  wsData.menu.bm.time.mp3)}</span>-<span>${
-		// 		  ctm(wsData.menu.bm.time.mp3, wsData.menu.bm.time.mp3)}</span>
-		// `
-
-		// 	  document.getElementById('gameplayStat_300_g').innerText = fnws(wsData.gameplay.hits.geki)
-		// 	  document.getElementById('gameplayStat_300').innerText = fnws(wsData.gameplay.hits['300'])
-		// 	  document.getElementById('gameplayStat_200').innerText = fnws(wsData.gameplay.hits.katu)
-		// 	  document.getElementById('gameplayStat_100').innerText = fnws(wsData.gameplay.hits['100'])
-		// 	  document.getElementById('gameplayStat_50').innerText = fnws(wsData.gameplay.hits['50'])
-		// 	  document.getElementById('gameplayStat_miss').innerText = fnws(wsData.gameplay.hits['0'])
-		// 	  document.getElementById('gameplayStat_sb').innerText = fnws(wsData.gameplay.hits.sliderBreaks)
-		// 	  document.getElementById('gameplayStat_score').innerText = fnws(wsData.gameplay.score)
-		// 	  document.getElementById('gameplayStat_rank').innerText = wsData.gameplay.hits.grade.current
-		// 	  document.getElementById('gameplayStat_acc').innerText = `${wsData.gameplay.accuracy} %`
-		// 	  document.getElementById('gameplayStat_combo').innerText = fnws(wsData.gameplay.combo.current)
-		// 	  document.getElementById('gameplayStat_mcombo').innerText = fnws(wsData.gameplay.combo.max)
-
-		// if (parseInt(missChecker.Miss) !== parseInt((wsData.gameplay.hits['0'] + wsData.gameplay.hits.sliderBreaks))) {
-		// 	missChecker.Miss = wsData.gameplay.hits['0'] + wsData.gameplay.hits.sliderBreaks
-		// 	missChecker.checked = false
-		// }
-
-		// if (parseInt(missChecker.Miss) !== parseInt((wsData.gameplay.hits['0'] + wsData.gameplay.hits.sliderBreaks))) {
-		// 	missChecker.Miss = wsData.gameplay.hits['0'] + wsData.gameplay.hits.sliderBreaks
-		// 	missChecker.checked = false
-		// }
-
-		// if (!missChecker.checked) {
-		// 	missChecker.checked = true
-		// 	//   const keyPressed = document.querySelectorAll('.pressed');
-		// 	//   keyPressed.forEach(function(element) {
-		// 	// 	//   element.classList.add('missed')
-		// 	// 	  setTimeout(
-		// 	// 		  () => { 
-		// 	// 			// element.classList.remove('missed')
-
-		// 	// 		  },
-		// 	// 		  100);
-		// 	//   });
-		// }
-
-		// if (parseInt(sbChecker.Miss) !== parseInt((wsData.gameplay.hits.sliderBreaks))) {
-		// 	sbChecker.Miss = wsData.gameplay.hits['0'] + wsData.gameplay.hits.sliderBreaks
-		// 	sbChecker.checked = false
-		// }
-
-		// if (!sbChecker.checked) {
-		// 	sbChecker.checked = true
-		// 	// playVoice('FR', 'aim')
-		// }
-		// let lastHit = []
-		// const gameplay = wsData.gameplay
-		// if (gameplay.hits.hitErrorArray) {
-		// 	hitErrorArrayTab = gameplay.hits.hitErrorArray.slice(-200);
-		// 	lastHit = gameplay.hits.hitErrorArray.slice(-1);
-		// }
-
-		// //   const key1 = document.getElementById('keyPressed1')
-		// //   const key2 = document.getElementById('keyPressed2')
-
-		// //   document.getElementById('urStat').innerText = `UR: ${parseInt(gameplay.hits.unstableRate)}`
-		// if (gameplay.keyOverlay.k1.isPressed) {
-		// 	//   key1.classList.add('pressed')
-		// 	console.log('k1 pressed')
-		// 	key1ArrayHits.push([lastHit, gameplay.hits.unstableRate]);
-		// }
-		// else {
-
-		// 	//   key1.classList.remove('pressed')
-		// }
-		// if (gameplay.keyOverlay.k2.isPressed) {
-		// 	//   key2.classList.add('pressed')
-		// 	console.log('k2 pressed')
-
-		// 	key2ArrayHits.push([lastHit, gameplay.hits.unstableRate]);
-
-		// } else {
-		// 	//   key2.classList.remove('pressed')
-
-
-		// }
-
-		//   await rankHitErrors(hitErrorArrayTab)
-		//   const k1 = calcAVGk1()
-		//   const k2 = calcAVGk2()
-
-		//   document.getElementById('k1avg').innerText = `UR ~ ${parseInt(k1.avgUnstableRate)}`
-		//   document.getElementById('k2avg').innerText = `UR ~ ${parseInt(k2.avgUnstableRate)}`
-		//   document.getElementById('k1avg2').innerText = `~ ${(k1.avgLastHit).toFixed(2)} ms`
-		//   document.getElementById('k2avg2').innerText = `~ ${(k2.avgLastHit).toFixed(2)} ms`
-
-		//   if (k2.avgLastHit <= -5 || k2.avgLastHit >= 5) {
-		// 	  document.getElementById('k2avg2').classList.remove('ok')
-		// 	  document.getElementById('k2avg2').classList.add('err')
-		//   }
-		//   else {
-		// 	  document.getElementById('k2avg2').classList.remove('err')
-		// 	  document.getElementById('k2avg2').classList.add('ok')
-		//   }
-		//   if (k1.avgLastHit <= -5 || k1.avgLastHit >= 5) {
-		// 	  document.getElementById('k1avg2').classList.remove('ok')
-		// 	  document.getElementById('k1avg2').classList.add('err')
-		//   } else {
-		// 	  document.getElementById('k1avg2').classList.remove('err')
-		// 	  document.getElementById('k1avg2').classList.add('ok')
-		//   }
-
-		//   function calcAVGk2() {
-		// 	  let sumLastHit = 0;
-		// 	  let sumUnstableRate = 0;
-		// 	  let validCount = 0;
-		// 	  for (let i = 0; i < key2ArrayHits.length; i++) {
-		// 		  const subArray = key2ArrayHits[i];
-		// 		  const lastHitValue = parseFloat(subArray[0]);
-		// 		  if (!isNaN(lastHitValue)) {
-		// 			  sumLastHit += lastHitValue;
-		// 			  sumUnstableRate += subArray[1];
-		// 			  validCount++;
-		// 		  }
-		// 	  }
-		// 	  const avgLastHit = validCount > 0 ? sumLastHit / validCount : 0;
-		// 	  const avgUnstableRate = validCount > 0 ? sumUnstableRate / validCount : 0;
-		// 	  return { avgLastHit, avgUnstableRate };
-		//   }
-		//   function calcAVGk1() {
-		// 	  let sumLastHit = 0;
-		// 	  let sumUnstableRate = 0;
-		// 	  let validCount = 0;
-		// 	  for (let i = 0; i < key1ArrayHits.length; i++) {
-		// 		  const subArray = key1ArrayHits[i];
-		// 		  const lastHitValue = parseFloat(subArray[0]);
-		// 		  if (!isNaN(lastHitValue)) {
-		// 			  sumLastHit += lastHitValue;
-		// 			  sumUnstableRate += subArray[1];
-		// 			  validCount++;
-		// 		  }
-		// 	  }
-		// 	  const avgLastHit = validCount > 0 ? sumLastHit / validCount : 0;
-		// 	  const avgUnstableRate = validCount > 0 ? sumUnstableRate / validCount : 0;
-		// 	  return { avgLastHit, avgUnstableRate };
-		//   }
-	}, pollrateGameplay);
-}, 2000);
-
-//   ipcRenderer.on('endPlaying', (event, result) => {})
-//   ipcRenderer.on('leftPlaying', (event) => {})
-
-
-//   async function rankHistoryUpdate(data) {
-// 	  function generateDateLabels(numDays) {
-// 		  const labels = [];
-// 		  for (let i = numDays; i >= 1; i--) {
-// 			  labels.push(`${i} day${i > 1 ? 's' : ''} ago`);
-// 		  }
-// 		  return labels;
-// 	  }
-
-// 	  // Nombre de jours
+//    Nombre de jours
 // 	  const numDays = 90;
 // 	  const chartOptions = {
 // 		  chart : {
@@ -1306,13 +1174,6 @@ setTimeout(() => {
 
 // 	  Highcharts.chart('HitArrErr_highligh', chartOptions);
 //   }
-//   function fnws(number) {
-// 	  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-//   }
-
-ipcRenderer.on('notification', (event, content, type) => {
-	showNotificationBox(content, type)
-})
 
 
 

@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <div id="root" class="bg-img">
+    <div id="root">
         <div id="side_left_menu">
             <div class="user-profil">
                 <div class="avatar-img">
@@ -30,7 +30,7 @@
             </div>
 
             <div class="menu-list">
-                <div class="menuBtn navigate-page  active" target="home_page">
+                <div class="menuBtn navigate-page active" target="home_page">
                     <m class="white home"></m><span>
                         <trs key="Home">Home</trs>
                     </span>
@@ -70,7 +70,7 @@
                         <trs key="Chatbot IA">Chatbot IA</trs>
                     </span>
                 </div>
-                <div class="menuBtn navigate-page" target="" disabled="true">
+                <div class="menuBtn navigate-page" target="spectacle_page">
                     <m class="white video-camera-slash"></m><span>
                         <trs key="Spectacle">Spectacle</trs>
                     </span>
@@ -88,7 +88,7 @@
                         <trs key="Settings">Settings</trs>
                     </span>
                 </div>
-                <div id="software_infos" >v0.1.934</div>
+                <div id="software_infos">v0.1.934</div>
             </div>
 
         </div>
@@ -96,10 +96,10 @@
             <div class="ui-actions windows-nav">
                 <!-- <img src="./12345.png"> -->
             </div>
-            <div id="home_page" class="page ">
+            <div id="home_page" class="page no-toggle">
                 <div class="box user-basic-infos">
                     <div class="title">
-                        <trs>Your Game Statistics</trs>
+                        <trs key="Your Game Statistics">Your Game Statistics</trs>
                         <span class="subtitle">
                             <m class="glass-grey s1 arrow-path" id="action_RefreshDataScores" data-event="info"
                                 data-info="Refresh Datas" style="margin-top: 2px;"></m>
@@ -115,7 +115,7 @@
                     <div class="user-statistics">
                         <div class="ranking-stat">
                             <label>
-                                <trs>Ranking</trs>
+                                <trs key="Ranking">Ranking</trs>
                             </label>
                             <div>
                                 <span data-event="info" data-info="Country Ranking">
@@ -130,55 +130,60 @@
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <trs>Classed Score</trs>
+                                <trs key="Classed Score">Classed Score</trs>
                             </label>
                             <span id="stat_ClassedScore" class="number" data-value="2875825285">2875825285</span>
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <rtl><trs>Accuracy</trs></rtl></rtl>
+                                <rtl>
+                                    <trs key="Accuracy">Accuracy</trs>
+                                </rtl>
+                                </rtl>
                             </label>
                             <span id="stat_Accuracy">94.03 %</span>
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <trs>Play Count</trs>
+                                <trs key="Play Count">Play Count</trs>
                             </label>
                             <span id="stat_PlayCount">20 989</span>
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <trs>Total Score</trs>
+                                <trs key="Total Score">Total Score</trs>
                             </label>
                             <span id="stat_TotalScore" class="number" data-value="12875825285">12875825285</span>
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <trs>Clicks</trs>
+                                <trs key="Clicks">Clicks</trs>
                             </label>
                             <span id="stat_Clicks" class="number" data-value="3450211">3450211</span>
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <trs>Combo Max</trs>
+                                <trs key="Combo Max">Combo Max</trs>
                             </label>
                             <span id="stat_ComboMax">1 534</span>
                         </div>
 
                         <div class="unique-stat">
                             <label data-event="info" data-info="The skillets you measure best">
-                                <trs>Master Skillset</trs>
+                                <trs key="Master Skillset">Master Skillset</trs>
                             </label>
                             <span id="stat_MasterSkillset">Jump 4~5★ | DT 5~6★</span>
                         </div>
                         <div class="unique-stat">
-                            <label><trs>AIM</trs></label>
+                            <label>
+                                <trs key="AIM">AIM</trs>
+                            </label>
                             <span id="stat_AIM">65 %</span>
                         </div>
 
                         <div id="graph_rank">
                             <span>
-                                <trs>Rank History</trs>
+                                <trs key="Rank History">Rank History</trs>
                             </span>
                             <div id="graphRanKArea">
 
@@ -423,65 +428,102 @@
                         <span id="musicMapper">.....</span>
                     </div>
                     <div class="box transparent music-actions">
-                        <span><m class="white bookmark"></m></span>
-                        <span><m class="white document" data-event="info" data-info="Open beatmap Info on your browser" id="OpenBtn" data-beatmapId="0" data-beatmapsetId="-1" data-gamemode="0" onclick="Link('OpenBrowser')"></m></span>
-                        <span><m class="white share" data-event="info" data-info="Copy link of beatmap on you clipboard" id="shareBtn" data-beatmapId="0" data-beatmapsetId="-1" data-gamemode="0" onclick="Link('CopyLink')"></m></span>
+                        <span>
+                            <m class="white bookmark"></m>
+                        </span>
+                        <span>
+                            <m class="white document" data-event="info" data-info="Open beatmap Info on your browser"
+                                id="OpenBtn" data-beatmapId="0" data-beatmapsetId="-1" data-gamemode="0"
+                                onclick="Link('OpenBrowser')"></m>
+                        </span>
+                        <span>
+                            <m class="white share" data-event="info" data-info="Copy link of beatmap on you clipboard"
+                                id="shareBtn" data-beatmapId="0" data-beatmapsetId="-1" data-gamemode="0"
+                                onclick="Link('CopyLink')"></m>
+                        </span>
                     </div>
                     <div class="box transparent row mapSpecs">
                         <div class="left-side">
                             <div class="title">Beatmaps specifications</div>
                             <div class="unique-stat transparent">
-                                <label><trs>Difficulty Name</trs></label>
+                                <label>
+                                    <trs key="">Difficulty Name</trs>
+                                </label>
                                 <span id="bm_stats_difficulty"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Stars Rating</trs></label>
+                                <label>
+                                    <trs key="">Stars Rating</trs>
+                                </label>
                                 <span id="bm_stats_sr"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>BPM</trs></label>
+                                <label>
+                                    <trs key="">BPM</trs>
+                                </label>
                                 <span id="bm_stats_bpm"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Approach Rate</trs></label>
+                                <label>
+                                    <trs key="">Approach Rate</trs>
+                                </label>
                                 <span id="bm_stats_ar"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Cercle Size</trs></label>
+                                <label>
+                                    <trs key="">Cercle Size</trs>
+                                </label>
                                 <span id="bm_stats_cs"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Overall Difficulty</trs></label>
+                                <label>
+                                    <trs key="">Overall Difficulty</trs>
+                                </label>
                                 <span id="bm_stats_od"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Health points</trs></label>
+                                <label>
+                                    <trs key="">Health points</trs>
+                                </label>
                                 <span id="bm_stats_hp"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Status</trs></label>
+                                <label>
+                                    <trs key="">Status</trs>
+                                </label>
                                 <span id="bm_stats_status"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>Master patterns</trs></label>
+                                <label>
+                                    <trs key="">Master patterns</trs>
+                                </label>
                                 <span id="bm_stats_master_pattern"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>FC 95%</trs></label>
+                                <label>
+                                    <trs key="">FC 95%</trs>
+                                </label>
                                 <span id="bm_stats_fc95"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>FC 98%</trs></label>
+                                <label>
+                                    <trs key="">FC 98%</trs>
+                                </label>
                                 <span id="bm_stats_fc98"></span>
                             </div>
                             <div class="unique-stat transparent">
-                                <label><trs>FC 100%</trs></label>
+                                <label>
+                                    <trs key="">FC 100%</trs>
+                                </label>
                                 <span id="bm_stats_fc100"></span>
                             </div>
 
                         </div>
                         <div class="right-side">
-                            
+                            <div class="title">
+                                <trs>Gameplay in Real Time</trs>
+                            </div>
+                            <div class="actualScore"></div>
                         </div>
                     </div>
                 </div>
@@ -606,7 +648,7 @@
                                 <trs key="1 hour">1 hour</trs>
                             </div>
                             <div class="btn" data-event="setSubmitScore" data-option="al">
-                                <trs  key="After launching">After launching</trs>
+                                <trs key="After launching">After launching</trs>
                             </div>
                         </span>
                     </div>
@@ -641,7 +683,7 @@
                 <div class="box settings-page" id="settings_paths">
                     <div class="setting-element">
                         <label data-event="info" data-info="Folder in which Osu!Stable is located">
-                            <trs  key="Osu!Stable Path Folder">Osu!Stable Path Folder</trs>
+                            <trs key="Osu!Stable Path Folder">Osu!Stable Path Folder</trs>
                         </label>
                         <span>
                             <input type="text" id="folderPathStable" value="C:\Users\fareo\AppData\Local\osu!" />
@@ -753,7 +795,7 @@
                                 <trs key="Every 1 hour">Every 1 hour</trs>
                             </div>
                             <div class="btn" data-event="setMusicSync" data-option="1d">
-                                <trs  key="Every 1 day">Every 1 day</trs>
+                                <trs key="Every 1 day">Every 1 day</trs>
                             </div>
                         </span>
                     </div>
@@ -855,6 +897,68 @@
                     </div>
                 </div>
             </div>
+            <div id="spectacle_page" class="page">
+                <div class="box full spectate">
+                    <div class="title">Spectate a Player</div>
+                    <div class="setupPlayer"></div>
+                    <div class="player-spectacle-box">
+                        <div class="player-spectacle">
+                            <div class="video-player" id="videoEmbed">
+                                <video id="myVideo" width="987" height="555">
+                                    <source src="../src/noTrace.mp4" type="video/mp4">
+                                    Votre navigateur ne prend pas en charge les vidéos HTML5.
+                                </video>
+                            </div>
+                            <div class="call-to-actions" id="callToActionsEmbed">
+                                <div id="callToActions" class="show">
+                                    <div class="btn-embeds" id="toolbarEmbed">
+                                        <span class="btn btn-player timestamp">
+                                            <txt>0:00:00 - 0:00:00</txt>
+                                        </span>
+                                        <span class="button btn-player" btn-slot="1" data-info="" onclick="playerEvent(event)"
+                                            event="null">•</span>
+                                        <span class="button btn-player" btn-slot="2" data-info=""onclick="playerEvent(event)"
+                                            event="null">•</span>
+                                        <span class="button btn-player" btn-slot="3" data-info=""onclick="playerEvent(event)"
+                                            event="rewind">
+                                            <m class="white arrow-uturn-left"></m>
+                                        </span>
+                                        <span class="button btn-player" btn-slot="4" data-info="" event="play"
+                                            onclick="playerEvent(event)">
+                                            <m class="white play-circle"></m>
+                                        </span>
+                                        <span class="button btn-player" btn-slot="5" data-info="" event="forward"
+                                            onclick="playerEvent(event)">
+                                            <m class="white arrow-uturn-right">
+                                        </span>
+                                        <span class="button btn-player" btn-slot="6" data-info="" onclick="playerEvent(event)"
+                                            event="null">•</span>
+                                        <span class="button btn-player" btn-slot="7" data-info="" onclick="playerEvent(event)"
+                                            event="null">•</span>
+                                        <span class="button btn-player" btn-slot="8" data-info="" onclick="playerEvent(event)"
+                                            event="cursor-trail">
+                                            <m class="white sparkles"></m>
+                                        </span>
+                                        <span class="button btn-player" btn-slot="9" data-info="" onclick="playerEvent(event)"
+                                            event="settings">
+                                            <m class="white wrench-screwdriver"></m>
+                                        </span>
+                                        <span class="button btn-player" btn-slot="10" data-info="" onclick="playerEvent(event)"
+                                            event="detach-screen">
+                                            <m class="white arrow-top-right-on-square"></m>
+                                        </span>
+                                        <span class="button btn-player" btn-slot="11" data-info="" onclick="playerEvent(event)"
+                                            event="full-screen">
+                                            <m class="white arrows-pointing-out"></m>
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- <div class="watermark">No watch a player</div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="devices_page" class="page no-toggle">
                 <div class="box devices-detect ">
                     <div class="title">Devices
@@ -869,89 +973,109 @@
                         <span>Try plug the device</span>
                     </div>
                     <div class="device-config noshow" id="deviceInfos">
-                      <div class="device-name" id="deviceName"></div>
-                      <div class="setting-element">
-                        <label data-event="info" data-info="Bind input switch for the keypad">
-                            <trs>Keys bind</trs>
-                        </label>
-                        <span id="keyBindList">
-                        </span>
+                        <div class="device-name" id="deviceName"></div>
+                        <div class="setting-element">
+                            <label data-event="info" data-info="Bind input switch for the keypad">
+                                <trs>Keys bind</trs>
+                            </label>
+                            <span id="keyBindList">
+                            </span>
 
-                    </div>
-               
-                    <div class="setting-element">
-                        <label data-event="info" data-info="Bind input switch for the keypad">
-                            <trs>Standby color effect</trs>
-                        </label>
-                      
-                    </div>
-                    <div class="setting-element">
-                        <label data-event="info" data-info="Bind input switch for the keypad">
-                            <trs>Press color</trs>
-                        </label>
-                     
-                    </div>
-                    <div class="setting-element half-height">
-                        <label data-event="info" data-info="Bind input switch for the keypad">
-                            <trs>In-Game interaction</trs>
-                        </label>
-                        <div class="box subbox">
-                            <div class="setting-element">
-                                <label data-event="info" data-info="Bind input switch for the keypad">
-                                    <trs>Color Miss</trs>
-                                </label>
-                                <div class="colorPaletBtn" style="background-color: #ff2828f8;"></div>
-                            </div>
-                            <div class="setting-element">
-                                <label data-event="info" data-info="Bind input switch for the keypad">
-                                    <trs>Color 300g</trs>
-                                </label>
-                                <div class="colorPaletBtn" style="background-color: #2529ffde;"></div>
-                            </div>
-                            <div class="setting-element">
-                                <label data-event="info" data-info="Bind input switch for the keypad">
-                                    <trs>Color 300</trs>
-                                </label>
-                                <div class="colorPaletBtn" style="background-color: #faed3ff8;" ></div>
-                            </div>
-                            <div class="setting-element">
-                                <label data-event="info" data-info="Bind input switch for the keypad">
-                                    <trs>Color 200</trs>
-                                </label>
-                                <div class="colorPaletBtn" style="background-color: #14e742f8;"></div>
-                            </div>
-                            <div class="setting-element">
-                                <label data-event="info" data-info="Bind input switch for the keypad">
-                                    <trs>Color 100</trs>
-                                </label>
-                                <div class="colorPaletBtn" style="background-color: #aa5b00f8;"></div>
-                            </div>
-                            <div class="setting-element">
-                                <label data-event="info" data-info="Bind input switch for the keypad">
-                                    <trs>Color 50</trs>
-                                </label>
-                                <div class="colorPaletBtn" style="background-color: #820cb1f8;"></div>
+                        </div>
+
+                        <div class="setting-element">
+                            <label data-event="info" data-info="Bind input switch for the keypad">
+                                <trs>Standby color effect</trs>
+                            </label>
+
+                        </div>
+                        <div class="setting-element">
+                            <label data-event="info" data-info="Bind input switch for the keypad">
+                                <trs>Press color</trs>
+                            </label>
+
+                        </div>
+                        <div class="setting-element half-height">
+                            <label data-event="info" data-info="Bind input switch for the keypad">
+                                <trs>In-Game interaction</trs>
+                            </label>
+                            <div class="box subbox">
+                                <div class="setting-element">
+                                    <label data-event="info" data-info="Bind input switch for the keypad">
+                                        <trs>Color Miss</trs>
+                                    </label>
+                                    <div class="colorPaletBtn" style="background-color: #ff2828f8;"></div>
+                                </div>
+                                <div class="setting-element">
+                                    <label data-event="info" data-info="Bind input switch for the keypad">
+                                        <trs>Color 300g</trs>
+                                    </label>
+                                    <div class="colorPaletBtn" style="background-color: #2529ffde;"></div>
+                                </div>
+                                <div class="setting-element">
+                                    <label data-event="info" data-info="Bind input switch for the keypad">
+                                        <trs>Color 300</trs>
+                                    </label>
+                                    <div class="colorPaletBtn" style="background-color: #faed3ff8;"></div>
+                                </div>
+                                <div class="setting-element">
+                                    <label data-event="info" data-info="Bind input switch for the keypad">
+                                        <trs>Color 200</trs>
+                                    </label>
+                                    <div class="colorPaletBtn" style="background-color: #14e742f8;"></div>
+                                </div>
+                                <div class="setting-element">
+                                    <label data-event="info" data-info="Bind input switch for the keypad">
+                                        <trs>Color 100</trs>
+                                    </label>
+                                    <div class="colorPaletBtn" style="background-color: #aa5b00f8;"></div>
+                                </div>
+                                <div class="setting-element">
+                                    <label data-event="info" data-info="Bind input switch for the keypad">
+                                        <trs>Color 50</trs>
+                                    </label>
+                                    <div class="colorPaletBtn" style="background-color: #820cb1f8;"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>   
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="context-menu">
-    </div>
-    <div class="changeKeyBind" id="changeKeyBind">
-        <span>Press any keys and press enter</span>
-        <span id="keySelect">A</span>
-    </div>
-    <div class="over-info">
-    </div>
-    <div id="notification-box">
-        <m id="notifIcon" class=""></m>
-        <span id="notifLabel"></span>
-    </div>
+        <div class="context-menu">
+        </div>
+        <div class="player-spectacle-min" id="player-spectacle-min">
+            <video id="player2" width="100%" height="100%">
+                <source src="../src/noTrace.mp4" type="video/mp4">
+                Votre navigateur ne prend pas en charge les vidéos HTML5.
+            </video>
+            <div id="overlayMiniPlayer"></div>
+            <div id="ovr1" class="overlayResizing allow"></div>
+            <div id="ovr2" class="overlayResizing"></div>
+            <div id="ovr3" class="overlayResizing"></div>
+            <div id="ovr4" class="overlayResizing"></div>
+
+
+        </div>
+        <div class="changeKeyBind" id="changeKeyBind">
+            <span>Press any keys and press enter</span>
+            <span id="keySelect">A</span>
+        </div>
+        <div class="over-info">
+        </div>
+        <div id="notification-box">
+            <m id="notifIcon" class=""></m>
+            <span id="notifLabel"></span>
+        </div>
 
 </body>
+<script>
+
+    
+
+
+</script>
 <script src="../renderers/gui_renderer.js" defer></script>
+
 </html>

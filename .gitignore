@@ -36,3 +36,9 @@ desktop_app/config.ini
 desktop_app/build/pre-build.js
 desktop_app/build/update.js
 desktop_app/package-lock.json
+desktop_app.rar
+desktop_app.zip
+desktop_app/app/src/noTrace.mp4
+desktop_app/app/src/001.mp4
+desktop_app/app/src/withTrace.mp4
+/desktop_app/report
