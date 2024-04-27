@@ -1,6 +1,6 @@
-const { app, BrowserWindow, dialog, ipcMain, shell, Notification } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, Notification, globalShortcut } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const axios = require('axios');
 const vm = require('vm');
 const util = require('util');
@@ -8,261 +8,151 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const http = require('http');
-const { SerialPort } = require('serialport')
-const { ReadlineParser } = require('@serialport/parser-readline')
-
-// const { Beatmap, Osu: { DifficultyCalculator, PerformanceCalculator} } = require('osu-bpdpc')
-// const dns = require('dns');
-// const { type } = require('os');
+const readFile = util.promisify(fs.readFile);
 
 // *** App Libs *** // 
-const osuFiles = require('./app/lib/osuFiles')
-const { AppError, PluginError } = require('./app/lib/error')
-const gini = require('./app/lib/ini')
-const Artisan = require('./app/lib/artisan')
+const { AppError, PluginError } = require('./app/lib/Errors')
 const remoteSrv = require('./app/lib/priv/remote-server')
-const localSrv = require('./app/lib/local_server')
 const conf = require('./app/lib/priv/credentials');
-const LocalServer = require('./app/lib/local_server');
-const { logFile } = require('./app/lib/log')
-const Settings = require('./app/lib/settings')
-const Serial = require('./app/lib/devices')
-const files = require('./app/lib/files')
-const UserDatas = require('./app/lib/dataset')
-const properies = require('./app/lib/properties_dataset')
+// const LocalServer = require('./app/lib/Servers');
+// const Artisan = require('./app/lib/Web_Builder')
+const Settings = require('./app/lib/Settings')
+const {Files} = require('./app/lib/Files')
+const {OsuParse} = require('./app/lib/Parsers')
+const { GenerateUID} = require('./app/lib/Utils')
 
-
-// const Update = require('./misc/update')
-
-// const OsuDBReader = require('./app/lib/db_parser');
-// const osuutils = require('./app/lib/osu_utils');
 const packageJson = require('./package.json');
 
-let mainWindow
-let cookieCheckWindow
+
+let mainWindow = {}
 let continueExecute = true
-let isOsuLanuched
-let gmIsReady
-let player_data
+let isOsuLanuched = false
+let tsIsReady = false
+let player_data = {}
 var isLimitedMod = false
 let translations = {};
-let devicesDetects = []
-let knownPorts = [];
 let dictionnary = null
-let pluginLogs
+let pluginLogs = {}
 let isFirstTime = true;
-let isDev = true;
+// let isDev = process.env.dev || false;
+let isDev = false
+let client_id = null
 
 
 const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
+if (!fs.existsSync(AppData)){fs.mkdirSync(AppData, { recursive: true })} 
 
-if (!fs.existsSync(AppData)) {
-    fs.mkdirSync(AppData, { recursive: true });
-} 
-
-const readFile = util.promisify(fs.readFile);
 const Conf = new conf();
-const File = new files()
+const File = new Files()
+const RemoteSrv = new remoteSrv();
+
 Conf.setConf('client_version', packageJson.version);
+Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
+Conf.setConf('LocalPath', AppData);
+
 
 app.whenReady().then(async () => {
-    Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
-    const userDatas = new UserDatas('Puparia')
-    const Properties = new properies('Puparia')
+    app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); 
+    globalShortcut.register('F11', () => {})
 
-
-    /**
-     *Basic Informations of User
-     *@params userDatas.updateUser('refreshDate', null)
-     *@params userDatas.updateUser('username', null)
-     *@params userDatas.updateUser('country', null)
-     *@params userDatas.updateUser('userId', null)
-     *@params userDatas.updateUser('has_supported', null)
-     *@params serDatas.updateUser('is_restricted', null)
-     *@params userDatas.updateUser('playmode', null)
-     *@params userDatas.updateUser('avatar_url', null)
-     *@params userDatas.updateUser('cover_url', null)
-     *@params userDatas.updateUser('is_bot', null)
-    **/
-
-
-    Properties.getUser((user)=>{
-        console.log(user)
-    })
-
-
-    // Conf.setConf('AlreadyInstalled', null)
-    // Conf.setConf('osu_token', null)
-    await (async () => {
-        return new Promise(async (resolve, reject) => {
-            let userPreferencesBase = require('./app/common/arrays/array_userPreference')
-            if (!Conf.getConf('AlreadyInstalled')) {
-                await File.createIni("userPreferences", userPreferencesBase)
-                Conf.setConf('AlreadyInstalled', "true")
-                fs.mkdir('static', (e) => { if (!e) { return true } })
-                resolve()
-            }
-            console.log(File.check(path.join(AppData, 'userPreferences.ini')))
-            if (!await File.check(path.join(AppData, 'userPreferences.ini'))) {
-                await File.createIni("userPreferences", userPreferencesBase)
-                resolve()
-            } else {
-                resolve()
-            }
-
-            let settings = new Settings()
-            Conf.setConf('lang', settings.get('General', 'setLanguage'));
-            loadTranslation()
-        })
-    })();
-
-    
-    ipcMain.on('getLang', async (event, lang) => {
-        mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary);
-    });
+    if (process.platform === "win32") { execSync('chcp 65001 > nul')};
+    if (!Conf.getConf('AlreadyInstalled')){isFirstTime = false};
+    isFirstTime = false
+   
+    if(!Conf.getConf('client_id') && isFirstTime){ client_id = GenerateUID()}
+ 
+    await checkLocalApp()
+    await loadTranslation(null, ipcMain)
     await LaunchLoading();
-    await checkingUpdate()
+    // await checkingUpdate()
 
-    ipcMain.on('keypadSend', async (color) => {
-        try {
-            const device = new SerialPort({ path: 'COM16', baudRate: 9600 }, err => {
-                const parser = device.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-                if (err) {
-                    console.log(err)
-                }
-
-                device.write('identify\n', (err2) => {
-                    if (err2) {
-                        console.log(err2)
-                    }
-                })
-                parser.on('data', (data) => {
-                    console.log(data)
-                })
-            })
-        } catch (e) {
-            console.log(e)
-        }
-
-    });
-
-    async function checkPorts() {
-        const ports = await SerialPort.list();
-        const currentPortIds = ports.map(port => port.path);
-        const knownPortIds = knownPorts.map(port => port.path);
-        const newPorts = ports.filter(port => !knownPortIds.includes(port.path));
-        for (const port of newPorts) {
-
-            await getInformations(port.path, mainWindow);
-        }
-        const removedPorts = knownPorts.filter(port => !currentPortIds.includes(port.path));
-        removedPorts.forEach(port => {
-            const removedDevices = devicesDetects.filter(device => device.comPath === port.path);
-            removedDevices.forEach(device => {
-                mainWindow.webContents.send('deviceDisconnected', device.model)
-            });
-
-            console.log(`Port removed: ${port.path}`);
-            devicesDetects = devicesDetects.filter(device => device.comPath !== port.path);
-        });
-        knownPorts = ports;
-        setTimeout(checkPorts, 1200);
-    }
-
-
-    app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
-    
     await ServerConnection()
-    .then(resp => { if (resp.err) { Log(resp.err, true, true); continueExecute = false } })
-    .catch((e => { Log(e, true, true); continueExecute = CSSFontFeatureValuesRule }));
-
-    // await gLaunch();
-    await tLaunch()
-    
-    await wsConnect();
+    await tLaunch(isFirstTime).then(async (stat)=> {
+        await wsConnect(stat);
+    })
+   
     await osuConnect();
     await osuHandler();
     await LaunchGUI();
-    checkPorts();
     await sendCache();
-
-    // await getOsuSession()
+    ipcMain.on('getLang', async (event, lang) => { mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary)});
 
     // Declaring API endpoints for external plugins
-    const pluginAPI = {
-        //Initalisation and creation of the user interface 
-        OpenLog: () => {
-            createLogPluginWindow()
-        },
-        Tab: (obj) => { },
-        //Error monitoring and management
-        Log: (log) => {
-            try {
-                throw new Error();
-            } catch (error) {
-                const c = error.stack.split('\n')[2].trim();
-                const pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
-                const j = require(`./plugin/${pi}/plugin.json`)
-                if (pluginLogs) {
-                    pluginLogs.webContents.send('log', `<b>${j.name}</b>:  ${log}`)
-                }
+    // const pluginAPI = {
+    //     //Initalisation and creation of the user interface 
+    //     OpenLog: () => {
+    //         createLogPluginWindow()
+    //     },
+    //     Tab: (obj) => { },
+    //     //Error monitoring and management
+    //     Log: (log) => {
+    //         try {
+    //             throw new Error();
+    //         } catch (error) {
+    //             const c = error.stack.split('\n')[2].trim();
+    //             const pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
+    //             const j = require(`./plugin/${pi}/plugin.json`)
+    //             if (pluginLogs) {
+    //                 pluginLogs.webContents.send('log', `<b>${j.name}</b>:  ${log}`)
+    //             }
 
-            }
-        },
-        FatalError: (fatalError) => {
-            PluginError(mainWindow, fatalError, true)
-        },
-        Error: (error, exit = false) => {
-            PluginError(mainWindow, error, exit)
-        },
+    //         }
+    //     },
+    //     FatalError: (fatalError) => {
+    //         PluginError(mainWindow, fatalError, true)
+    //     },
+    //     Error: (error, exit = false) => {
+    //         PluginError(mainWindow, error, exit)
+    //     },
 
-        //Get Objetcts
-        PlayerData: async () => { }, //Return an object
-        Osu: async () => { }, //Return an object
+    //     //Get Objetcts
+    //     PlayerData: async () => { }, //Return an object
+    //     Osu: async () => { }, //Return an object
 
-        //GetFile
-        LoadFile: async (filePath) => {
-            return new Promise((resolve, reject) => {
-                let pi
-                try {
-                    throw new Error();
-                } catch (error) {
-                    const c = error.stack.split('\n')[2].trim();
-                    pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
-                }
+    //     //GetFile
+    //     LoadFile: async (filePath) => {
+    //         return new Promise((resolve, reject) => {
+    //             let pi
+    //             try {
+    //                 throw new Error();
+    //             } catch (error) {
+    //                 const c = error.stack.split('\n')[2].trim();
+    //                 pi = c.substring(c.indexOf("plugin") + "plugin".length + 1, c.indexOf("\\", c.indexOf("plugin") + "plugin".length + 1));
+    //             }
 
 
-                fs.readFile(`${Conf.getConf('AppPath')}/plugin/${pi}/${filePath}`, 'utf8', (err, file) => {
-                    if (err) {
-                        PluginError(mainWindow, `Cannot load file <b>${file}</b>`)
-                    } else {
-                        resolve(file)
-                    }
-                });
-            })
-        },
-        WebRequest: async (url, method, headers = {}, data = null) => {
-            return new Promise((resolve, reject) => {
-                const requestConfig = {
-                    method: method,
-                    url: url,
-                    headers: headers,
-                    data: data,
-                };
-                axios(requestConfig).then(response => {
-                    resolve(response);
-                }).catch(error => {
-                    resolve(error);
-                });
-            });
-        },
-        Renderer: (eventName, data = null) => {
-            mainWindow.webContents.send(eventName, data)
-        }
-    }
-    await loadPlugin(pluginAPI)
+    //             fs.readFile(`${Conf.getConf('AppPath')}/plugin/${pi}/${filePath}`, 'utf8', (err, file) => {
+    //                 if (err) {
+    //                     PluginError(mainWindow, `Cannot load file <b>${file}</b>`)
+    //                 } else {
+    //                     resolve(file)
+    //                 }
+    //             });
+    //         })
+    //     },
+    //     WebRequest: async (url, method, headers = {}, data = null) => {
+    //         return new Promise((resolve, reject) => {
+    //             const requestConfig = {
+    //                 method: method,
+    //                 url: url,
+    //                 headers: headers,
+    //                 data: data,
+    //             };
+    //             axios(requestConfig).then(response => {
+    //                 resolve(response);
+    //             }).catch(error => {
+    //                 resolve(error);
+    //             });
+    //         });
+    //     },
+    //     Renderer: (eventName, data = null) => {
+    //         mainWindow.webContents.send(eventName, data)
+    //     }
+    // }
+    // await loadPlugin(pluginAPI)
 
 })
+
 async function osuConnect() {
     if (!continueExecute) return
     if (isLimitedMod) return
@@ -275,24 +165,35 @@ async function osuConnect() {
     return new Promise(async (resolve, reject) => {
         // Check if Osu token exists in configuration
         if (Conf.getConf('osu_token')) {
-            // Make a GET request to Osu! API to fetch user data
-            axios.get('https://osu.ppy.sh/api/v2/me', {
-                headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}` },
-            }).then(async response => {
+
+            RemoteSrv.checkToken(Conf.getConf('osu_token'), Conf.getConf('client_id')).then(resp => {
+                if(!resp.isValide){
+                    AuthService().then(result => {
+                        // console.log(result)
+                        // await SyncData();
+                        resolve()
+                    })
+                }
+            })
+            // // Make a GET request to Osu! API to fetch user data
+            // axios.get('https://osu.ppy.sh/api/v2/me', {
+            //     headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}` },
+            // }).then(async response => {
     
 
-                // Resolve if user ID exists in the response
-                if (response.data.id)
-                    // Call SyncData function
-                    Log(tr('Data Synchronization'))
+            //     // Resolve if user ID exists in the response
+            //     if (response.data.id)
+            //         // Call SyncData function
+            //         Log(tr('Data Synchronization'))
 
-                await SyncData();
-                resolve(true);
-            }).catch(error => {
+            //     await SyncData();
+            //     resolve(true);
+            // }).catch(error => {
 
-                console.error('Error fetching data:', error.message);
-                reject(error);
-            });
+            //     console.error('Error fetching data:', error.message);
+            //     reject(error);
+            // });
+           
         } else {
             // If Osu token doesn't exist, perform authentication and sync data
             await AuthService();
@@ -307,22 +208,27 @@ async function osuConnect() {
         return new Promise(async (resolve, reject) => {
             // Open external URL for Osu! OAuth authorization
             shell.openExternal('https://osu.ppy.sh/oauth/authorize?client_id=30165&redirect_uri=https://techalchemy.fr/oAuth2/Bellafiora/index.php&response_type=code&scope=public identify');
-
+            let osuConnectError = setTimeout(() => {
+                Log('Vous devez vous connecter sur Osu! Pour continuer',true, true)
+            }, 5000);
             // Create a server for handling the authorization callback
             const server = http.createServer((req, res) => {
                 const parsedUrl = url.parse(req.url, true);
                 const queryParameters = parsedUrl.query;
-
-                // Make a GET request to Osu! API with the received token
-                axios.get('https://osu.ppy.sh/api/v2/me', { headers: { 'Authorization': `Bearer ${queryParameters.token}` } })
+                if(queryParameters.error){
+                    Log('Vous devez vous connecter sur Osu! Pour continuer',true, true)
+                    mainWindow.webContents.send('osuError', tr('Connect your Osu!Account')); 
+                    server.close();
+                } else {
+                    clearTimeout(osuConnectError)
+                    axios.get('https://osu.ppy.sh/api/v2/me', { headers: { 'Authorization': `Bearer ${queryParameters.token}` } })
                     .then(response => {
-
-
                         // Resolve if user ID exists in the response
                         if (response.data.id) {
                             // Save Osu ID and token in configuration
                             Conf.setConf('osu_id', response.data.id);
                             Conf.setConf('osu_token', queryParameters.token);
+                            Conf.setConf('refresh_token', queryParameters.refresh_token);
 
                             // Close the authorization window
                             res.writeHead(200, { 'content-Type': 'text/html' })
@@ -383,15 +289,23 @@ async function osuConnect() {
                             res.end(closeWindowScript);
                             // res.end(closeWindowScript);
                             setTimeout(() => { server.close(); }, 500);
-
                             resolve(true);
+                        } else {
+                            console.log(response)
                         }
+
+                     
                     }).catch(error => {
                         // Close the authorization window in case of error
                         const closeWindowScript = '<script>window.close();</script>';
                         res.end(closeWindowScript);
                         server.close();
+                        resolve(false)
                     });
+
+                }
+
+                // Make a GET request to Osu! API with the received token
             });
 
             // Start the server on localhost:3000
@@ -402,7 +316,7 @@ async function osuConnect() {
     // Function to synchronize data
     async function SyncData() {
         const Conf = new conf();
-        const RemoteSrv = new remoteSrv();
+        
 
         return new Promise(async (resolve, reject) => {
             try {
@@ -667,91 +581,85 @@ async function ServerConnection() {
     const RemoteSrv = new remoteSrv();
 
     // Fetch the client's IP address using an external API
-    let ipResponse
     try {
         ipResponse = await axios.get("https://api64.ipify.org?format=json");
+        Conf.setConf('client_ip', ipResponse.data.ip);
     } catch (e) {
         AppError(mainWindow, tr('Please Enable Internet Connection'));
         continueExecute = false;
         return
     };
 
-    // Set the client's IP address in the configuration
-    Conf.setConf('client_ip', ipResponse.data.ip);
-
-    // Return a Promise
     return new Promise(async (resolve, reject) => {
-        // Check if client ID exists in the configuration
-        if (Conf.getConf('client_id')) {
-            // Log message for server synchronization
-            Log(tr('Server Synchronization..'));
 
-            // Perform login to the remote server
-            RemoteSrv.Login(mainWindow).then(result => {
+        if(!Conf.getConf('AlreadyInstalled')){ 
+            Log(tr('Server Register'));
+            RemoteSrv.Reg(client_id).then(result => {
                 resolve({ stat: result.stat, err: result.err });
             });
         } else {
-            // Log message for server registration
-            Log(tr('Server Register'));
-
-            // Perform registration to the remote server
-            RemoteSrv.Reg(mainWindow).then(result => {
+            Log(tr('Server Synchronization..'));
+            RemoteSrv.Login(client_id).then(result => {
                 resolve({ stat: result.stat, err: result.err });
             });
-        };
+        }
+    
     });
 };
 async function tLaunch() {
-    if (!continueExecute) return
-
-
+    if (!continueExecute) return;
     Log(tr('Starting Tosu'));
-    return new Promise(async (o, r) => {
-        let s;
-        try {
-            const Conf = new conf();
-            fs.access(path.join(Conf.getConf('AppPath'), "tosu.exe"), fs.constants.F_OK, e => {
-                if (e) { Log(tr('Error trying to launch Tosu:') + `<br>${e}`); o(false) }
-                else {
-                    externalProcess = spawn(path.join(Conf.getConf('AppPath'), "tosu.exe"));
-                    const n = new Promise(n => {
-                        if (externalProcess) {
-                            externalProcess.stdout.on("data", async e => {
-                                Log(`stdout: ${e}`, false);
-                                if (e.includes('Checking Updates')) isOsuLanuched = true;
-                                if (e.includes("Web server started") || e.includes("ALL PATTERNS ARE RESOLVED")) {
-                                    gmIsReady = true;
-                                    clearTimeout(s);
-                                    // new gini().set('Main', 'update',1);
-                                    gosumemoryProcess = externalProcess;
-                                    // gIni.set('Main', 'update',1);
-                                    n(externalProcess);
-                                };
-                            })
-                        };
-                    });
-                    const t = new Promise(n => {
-                        s = setTimeout(() => {
-                            if (!gmIsReady) {
-                                if (isOsuLanuched) {
-                                    Log(tr("If this is the first time, start Osu!"), true, true);
-                                    setTimeout(async () => {
-                                        o(false);
-                                        isOsuLanuched = false;
-                                    }, 3000);
-                                } else { Log(tr("Error When Launching Tosu"), true, true); o(false) };
-                            } else { o(true) };
-                        }, 10e3);
-                    });
-                    Promise.race([n, t]).then(e => { o(e) }).
-                        catch(e => {
-                            Log(tr("Error When Launching Tosu"), true, true);
-                            isOsuLanuched = false;
-                            o(e);
-                        });
+    return new Promise((resolve, reject) => {
+        var output
+        fs.access(path.join(Conf.getConf('AppPath'), "tosu.exe"), fs.constants.F_OK, error => {
+            if (error) {
+                Log(tr('Error trying to launch Tosu:') + `<br>${error}`);
+                resolve(false);
+            } else {
+                const externalProcess = spawn(path.join(Conf.getConf('AppPath'), "tosu.exe"));
+                const outputHandler = (data) => {
+                    output = data.toString();
+                    if (output.includes('ALL PATTERNS ARE RESOLVED')) { isOsuLanuched = true}
+                    if (output.includes('Searching for osu!')) { Log('Wait Osu!')}
+                    if (output.includes("Web server started")) { tsIsReady = true}
                 };
-            });
-        } catch (e) { Log(tr('Error When Launching Tosu:') + ` ${e.message}`, true, true); o(e) };
+                externalProcess.stdout.on("data", outputHandler);
+                if(!isFirstTime){
+                    setTimeout(() => { 
+                      if(!isOsuLanuched){
+                        mainWindow.webContents.send('EventError', tr('Wait Osu!')); 
+                        resolve(true)
+                      } else {
+                        resolve(false)  
+                      }
+                    }, 5000);
+                } else {
+                    setTimeout(() => { 
+                        if (!isOsuLanuched) {  
+                            Log(tr("Please start Osu! and restart Bella Fiora Desktop"), true, true); 
+                        } else {
+                            resolve(false); 
+                        }
+                    }, 5000)
+                }
+                setTimeout(() => {
+                    if (!isOsuLanuched) {
+                        if (isFirstTime) {
+                            mainWindow.webContents.send('EventError', tr('Wait Osu!')); 
+                            let awaitOsu = setInterval(() => {
+                                if(output.includes('ALL PATTERNS ARE RESOLVED')){
+                                    clearTimeout(awaitOsu)
+                                    resolve(false)   
+                                }
+                            }, 850);    
+                        } else {
+                            mainWindow.webContents.send('EventError', tr('Wait Osu!'))
+                            resolve(true);  
+                        }
+                    }
+                }, 8000);
+            };
+        });
     });
 };
 async function osuHandler() {
@@ -761,15 +669,14 @@ async function osuHandler() {
     // Return a Promise
     return new Promise(async (resolve, reject) => {
         // Create new osuFiles and configuration objects
-        const OsuFiles = new osuFiles();
-        const Conf = new conf();
+        const osuFiles = new OsuParse();
         // Check if beatmaps.json file exists in the specified path
         if (fs.existsSync(path.join(AppData, '/beatmaps.json'))) {
             // Log message for updating scores
             Log(tr('Update your Scores'), true, false);
 
             // Update scores using the osuFiles object
-            OsuFiles.updateScores(mainWindow).then(() => {
+            osuFiles.updateScores(mainWindow).then(() => {
                 resolve(true);
             });
         } else {
@@ -777,13 +684,13 @@ async function osuHandler() {
             Log(tr('Scan your beatmaps'), true, false);
 
             // Parse osu database and scan beatmaps using osuFiles object
-            OsuFiles.osuDbParse(mainWindow).then(() => {
+            osuFiles.osuDbParse(mainWindow).then(() => {
                 // Log message for scanning scores
                 Log(tr('Scan your scores'), true, false);
 
                 // Parse score database and update scores using osuFiles object
-                OsuFiles.scoreDbParse(mainWindow).then(() => {
-                    OsuFiles.updateScores(mainWindow).then(() => {
+                osuFiles.scoreDbParse(mainWindow).then(() => {
+                    osuFiles.updateScores(mainWindow).then(() => {
                         resolve(true);
                     });
                 });
@@ -791,19 +698,14 @@ async function osuHandler() {
         };
     });
 };
-async function wsConnect() {
+async function wsConnect(isAfterError) {
     // Check if execution should continue
     if (!continueExecute) return
-
+    Log(tr('Connection to the Websocket'), true, false, true, isAfterError);
     // Create a new configuration object
     const Conf = new conf();
-
-    // // Log message for connecting to the Websocket
-    Log(tr('Connection to the Websocket'));
-
-    // // Send a message to the main window to initiate Websocket connection
+ 
     mainWindow.webContents.send('ws_connect', true);
-
     // // Return a Promise
     return new Promise((resolve) => {
         // resolve(true);
@@ -818,7 +720,7 @@ async function wsConnect() {
                 continueExecute = false;
 
             } else {
-                const localServer = new LocalServer(51247)
+                // const localServer = new LocalServer(51247)
                 resolve(true);
             }
         });
@@ -830,14 +732,14 @@ async function wsConnect() {
         });
     });
 };
-async function Log(e, show = true, err = false, toServ = true) {
+async function Log(e, show = true, err = false, toServ = true, afterErr = false) {
     const RemoteSrv = new remoteSrv()
     if (show) {
         if (err) {
-            try { await mainWindow.webContents.send("loading_err", e) }
+            try { await mainWindow.webContents.send("loading_err", e, afterErr) }
             catch (e) { console.log(e); };
         } else {
-            try { await mainWindow.webContents.send("progress_loading", e) }
+            try { await mainWindow.webContents.send("progress_loading", e, afterErr) }
             catch (e) { console.log(e); };
         };
     };
@@ -848,9 +750,9 @@ async function sendCache() {
     if (!continueExecute) return
     return new Promise((e, n) => {
         setTimeout(async () => {
-            let settings = new Settings()
+            let settingsManager = new Settings()
             mainWindow.webContents.send('player-data', player_data);
-            mainWindow.webContents.send('settings', settings.getAll(), Conf.getConf('client_version'));
+            mainWindow.webContents.send('settings', settingsManager.getAll(), Conf.getConf('client_version'));
             if(Conf.getConf('Updated')){
                 mainWindow.webContents.send('notification', `Bella Fiora Desktop has been successfully updated to ${Conf.getConf('client_version')}`, 'info');
                 Conf.setConf('Updated',false)
@@ -921,68 +823,6 @@ function checkPlugin(pluginContent) {
     const electronRequire = `if (modulePath === 'electron') { throw new Error('Cannot load Electron'); }`;
     return `${electronRequire}; ${restrictedRequire}; ${pluginContent}`;
 };
-async function getOsuSession() {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const session = await createCookieCheckWindow();
-            if (session) {
-                if (cookieCheckWindow) {
-                    cookieCheckWindow.close();
-                }
-                resolve(session)
-            } else {
-                const intervalId = setInterval(async () => {
-                    try {
-                        const cookies = await session.cookies.get({});
-                        const osuSessionCookie = cookies.find(cookie => cookie.name === 'osu_session');
-                        if (osuSessionCookie) {
-
-                            resolve(osuSessionCookie)
-
-                            clearInterval(intervalId);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }, 1000);
-            }
-
-        } catch (error) {
-            console.error(error);
-        }
-    })
-    async function createCookieCheckWindow() {
-        return new Promise((resolve, reject) => {
-            cookieCheckWindow = new BrowserWindow({
-                width: 800,
-                height: 600,
-                webPreferences: {
-                    nodeIntegration: true,
-                },
-            });
-
-            cookieCheckWindow.loadURL('https://osu.ppy.sh');
-            const cookieSession = cookieCheckWindow.webContents.session;
-            cookieCheckWindow.on('closed', () => {
-                cookieCheckWindow = null;
-            });
-            cookieCheckWindow.webContents.on('did-finish-load', async () => {
-                try {
-                    const cookies = await cookieSession.cookies.get({});
-                    const osuSessionCookie = cookies.find(cookie => cookie.name === 'osu_session');
-                    if (osuSessionCookie) {
-                        resolve({ session: osuSessionCookie.value });
-                        cookieCheckWindow.close();
-                    }
-                    resolve({ session: null });
-
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
-    };
-};
 async function createLogPluginWindow() {
     return new Promise((e, n) => {
         try {
@@ -1017,93 +857,19 @@ async function createLogPluginWindow() {
     })
 };
 async function loadTranslation(lang = null) {
-    let settings = new Settings()
-    let setLang = await settings.get('General', 'setLanguage')
+    let settingsManager = new Settings()
+    await settingsManager.load()
+    Conf.setConf('lang', settingsManager.get('General', 'setLanguage'));
+    let setLang = Conf.getConf('lang')
     if (lang) { setLang = lang; }
     const e = fs.readFileSync(`${Conf.getConf('AppPath')}/app/locales/${setLang}.json`, "utf-8");
     translations = JSON.parse(e)
     dictionnary = e
+    
     return e
 };
 function tr(key) {
     return `${translations[key] || key}`
-};
-async function getInformations(port, mainWindow) {
-    return new Promise((resolve, reject) => {
-        try {
-
-            const device = new SerialPort({ path: port, baudRate: 9600 }, err => {
-                if (err) {
-                    console.error(`Error opening ${port}:`, err.message);
-                    resolve()
-                }
-
-                const parser = device.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-                device.write('identify\n', (err2) => {
-                    if (err2) {
-                        return resolve()
-                    }
-                    parser.on('data', (data) => {
-                        const regex = /Identify: Serial No: (\S+), Model: (\S+ \S+ \S+), Version: (\S+)/;
-                        const match = data.match(regex);
-                        let keys
-                        if (match) {
-                            switch (match[2]) {
-                                case "Keypad 4SW MANIA":
-                                    keys = 4;
-                                    break;
-                                case "Keypad 2SW STD":
-                                    keys = 2
-                                    break;
-                                default:
-                                    keys = 2
-                            }
-                            const newDeviceInfo = {
-                                comPath: port,
-                                serialNumber: match[1],
-                                model: match[2],
-                                version: match[3],
-                                keys: keys,
-                                // device: device,
-                                // parser: parser
-                            };
-                            const index = devicesDetects.findIndex(d => d.serialNumber === newDeviceInfo.serialNumber);
-                            if (index === -1) {
-                                devicesDetects.push(newDeviceInfo);
-                            } else {
-                                if (devicesDetects[index].comPath !== port) {
-                                    console.log(`Device updated from ${devicesDetects[index].comPath} to ${port}`);
-                                    devicesDetects[index] = { ...devicesDetects[index], ...newDeviceInfo };
-                                }
-                            }
-                            console.log(`New device: ${match[2]} : ${match[1]} on ${port}`)
-                            mainWindow.webContents.send('newDevice', newDeviceInfo);
-
-                            device.write('Connected', (err2) => {
-                                if (err) {
-                                    console.log(err)
-                                }
-                                console.log('connected')
-                            })
-                            // device.close()
-
-                        }
-
-                        resolve()
-                    });
-
-
-                })
-                device.on('error', err => {
-                    console.log(err)
-
-                });
-                resolve()
-            });
-        } catch (e) {
-            resolve()
-        }
-    })
 };
 ipcMain.on('open-directory-dialog', (event, pathId) => {
     const window = BrowserWindow.getFocusedWindow();
@@ -1182,4 +948,23 @@ async function checkingUpdate() {
             reject();
         });
     });
+}
+async function checkLocalApp(){
+    await (async () => {
+        return new Promise(async (resolve, reject) => {
+            let userPreferencesBase = require('./app/common/arrays/array_userPreference')
+            if (Conf.getConf('AlreadyInstalled')) {
+                await File.createIni("userPreferences", userPreferencesBase)
+                fs.mkdir('static', (e) => { if (!e) { return true } })
+                resolve()
+            }
+            if (!await File.check(path.join(Conf.getConf('LocalPath'), 'userPreferences.ini'))) {
+                await File.createIni("userPreferences", userPreferencesBase)
+                reject()
+                continueExecute = false
+            } else {
+                resolve()
+            }
+        })
+    })();
 }

@@ -1,10 +1,10 @@
 {
   "name": "bellafiora",
-  "version": "0.1.946",
+  "version": "0.1.974",
   "description": "",
   "main": "program.js",
   "scripts": {
-    "start": "electron .",
+    "start": "set dev=true && electron .",
     "post-build": "node build/update.js",
     "pre-build": "node build/pre-build.js",
     "build": "npm run pre-build && electron-builder --win --publish never && npm run post-build",
@@ -23,7 +23,6 @@
   "dependencies": {
     "@serialport/parser-readline": "^12.0.0",
     "axios": "^1.6.7",
-    "basic-ftp": "^5.0.5",
     "child_process": "^1.0.2",
     "credentials": "file:../../credentials",
     "crypto": "^1.0.1",
@@ -55,6 +54,7 @@
     "ws": "^8.16.0"
   },
   "devDependencies": {
+    "basic-ftp": "^5.0.5",
     "clean-modules": "^3.0.4",
     "electron": "^28.2.1",
     "electron-builder": "^24.9.1"
