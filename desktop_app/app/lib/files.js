@@ -1,11 +1,14 @@
-const fs = require('fs');
+const dbreader = require('osudb')
 const conf = require('./priv/credentials')
+const fs = require('fs')
 const path = require('path')
 const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
+const ini = require('ini');
 
-class files {
+
+
+class Files {
     async createIni(name, obj){
-        const Conf = new conf()
         let iniString = '';
         for (const section in obj) {
             iniString += `[${section}]\n`;
@@ -28,5 +31,22 @@ class files {
         }
     }
 }
+class Ini {
+	constructor() {
+		this.Conf = new conf() 
+		this.ini = ini.parse((fs.readFileSync(path.join(
+		this.Conf.getConf('AppPath'), '/config.ini'))).toString())
+	}
 
-module.exports = files
+	get(cat, key) {
+		return this.ini[cat][key]
+	}
+
+	set(cat, key, value) {
+		this.ini[cat][key] = value
+		fs.writeFileSync(
+			path.join(this.Conf.getConf('AppPath'), '/config.ini'),
+			ini.stringify(this.ini), 'utf8')
+	}
+}
+module.exports = {Files, Ini}

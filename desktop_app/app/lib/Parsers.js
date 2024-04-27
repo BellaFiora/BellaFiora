@@ -2,10 +2,21 @@ const dbreader = require('osudb')
 const conf = require('./priv/credentials')
 const fs = require('fs')
 const path = require('path')
-const AppError = require('./error')
+const AppError = require('./Errors')
 const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
+const Long = require('long');
+const { promises : fsPromises } = require('fs');
 
-class osuFiles {
+
+class OsuParse {
+	constructor() {
+		try {
+			this.windowsTickEpoch = Long.fromInt(621355968).multiply(100000);
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
 	async osuDbParse(mainWindow) {
 		const Conf = new conf();
 		return new Promise(async (resolve) => {
@@ -72,6 +83,7 @@ class osuFiles {
 				});
 		})
 	}
-}
 
-module.exports = osuFiles
+	
+}
+module.exports = {OsuParse}

@@ -1,4 +1,4 @@
-const osutils = require('./osu_utils')
+const osutils = require('./Osu_Utils')
 
 class Artisan {
 	constructor() {

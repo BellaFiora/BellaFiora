@@ -1,5 +1,15 @@
 const fs = require('fs')
 const path = require('path')
+function GenerateUID(){
+    const s = "abcdefghijklmnopqrstuvwxyz0123456789"
+    let o = "";
+    for (let e = 0; e < 8; e++) {
+        const l = Math.floor(Math.random() * s.length);
+        o += s[l]
+    }
+    return o 
+}
+
 /**
  * LogFile class for handling log operations.
  *
@@ -110,3 +120,5 @@ class LogFile {
 // Create an instance of the LogFile class and export it
 const logFile = new LogFile()
 module.exports = {logFile}
+
+module.exports = { GenerateUID, logFile }
