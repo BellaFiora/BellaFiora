@@ -2,6 +2,11 @@
 background-image: url('./icons/#{$icon-name}.svg');
 }
 
+$base-icon-size: 32px;
+$pointer-cursor-transition: 0.16s ease-in-out;
+$hover-opacity: 0.9;
+$hover-opacity-pointer: 60%;
+
 $icons: (
     "academic-cap",
     "adjustments-horizontal",
@@ -610,4 +615,78 @@ $icons: (
     .#{$icon} {
         @include icon-url($icon, $format);
     }
+}
+@mixin icon-style($width, $height, $background-size: auto, $important: false) {
+  width: $width;
+  height: $height;
+  background-size: $background-size;
+  @if $important {
+    width: $width !important;
+    height: $height !important;
+  }
+}
+m {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  transition: transform 0.08s ease-in-out;
+  @include icon-style($base-icon-size, $base-icon-size);
+
+  &.s1 { @include icon-style(12px, 12px, contain); }
+  &.s2 { @include icon-style(16px, 16px); }
+  &.s3 { @include icon-style(34px, 34px); }
+  &.s4 { @include icon-style(48px, 48px); }
+  &.s5 { @include icon-style(56px, 56px); }
+  &.s6 { @include icon-style(64px, 64px, cover, true); }
+  &.nopointer { cursor: default; }
+  &.pointer { transition: all $pointer-cursor-transition; }
+
+  &:hover {
+    opacity: $hover-opacity;
+  }
+}
+
+note, .flag {
+  display: flex;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+
+  &.ssh { background-image: url('./icons/SSH.svg'); }
+  &.ss  { background-image: url('./icons/SS.svg'); }
+  &.sh  { background-image: url('./icons/SH.svg'); }
+  &.s   { background-image: url('./icons/S.svg'); }
+  &.a   { background-image: url('./icons/A.svg'); }
+  &.b   { background-image: url('./icons/B.svg'); }
+  &.c   { background-image: url('./icons/C.svg'); }
+  &.d   { background-image: url('./icons/D.svg'); }
+}
+
+note {
+  width: 40px;
+  height: 40px;
+}
+
+.flag {
+  width: 44px;
+  height: 22px;
+}
+
+j {
+  @include icon-style(28px, 18px, contain);
+}
+
+m {
+  &.white { @include icon-filter(100%, 0%, 0%, 0deg, 100%, 100%); }
+  &.glass-white { @include icon-filter(82%, 1%, 2%, 1deg, 92%, 90%); }
+  &.glass-grey { @include icon-filter(53%, 8%, 1382%, 166deg, 97%, 90%); }
+  &.soft-red { @include icon-filter(70%, 90%, 1600%, 299deg, 98%, 89%); }
+  &.soft-green { @include icon-filter(39%, 46%, 1027%, 106deg, 100%, 100%); }
+}
+
+@mixin icon-filter($invert, $sepia, $saturate, $hue-rotate, $brightness, $contrast) {
+  filter: invert($invert) sepia($sepia) saturate($saturate) hue-rotate($hue-rotate) brightness($brightness) contrast($contrast);
 }
