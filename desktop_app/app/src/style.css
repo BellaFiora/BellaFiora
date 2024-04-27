@@ -6,6 +6,7 @@ body {
     /* margin-top: 20px; */
     /* margin-left: 20px; */
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-sizing: border-box;
 }
 :root {
     --background-all: #212141;
@@ -115,7 +116,7 @@ err {
     width: 1400px;
     height: 700px;
     display: flex;
-    background-color: #ffffff00;
+    background-color: var(--background-all);
   
 }
 .bg-img {
@@ -428,7 +429,10 @@ l {
     background-color: #2121414f!important;
 }
 
-
+.mapSpecs {
+    gap: 20px;
+    justify-content: space-between;
+}
 .mapSpecs span{
     letter-spacing: -1px;
     /* width: 50%; */
@@ -444,6 +448,11 @@ l {
 .box .left-side,  .box .right-side{
     display: flex;
     width: 35%;
+    flex-direction: column;
+}
+.box .right-side{
+    display: flex;
+    width: 60%;
     flex-direction: column;
 }
 .unique-stat.transparent label{
@@ -547,6 +556,7 @@ l {
     align-items: center;
     justify-content: space-between;
 }
+
 .box .title .subtitle{
     font-size: 11px;
     display: flex;
@@ -578,6 +588,195 @@ margin-top: 6px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.062);
     display: flex;
     align-items: center;
+}
+.box.full {
+    width: 100%;
+}
+.spectate {
+    height: 610px;
+    
+}
+.player-spectacle-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    
+}
+.video-player {
+    width: 100%;
+    z-index: -1;
+    background-color: rgb(0, 0, 0);
+    position: relative;
+}
+.call-to-actions {
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 1;
+    position: absolute;
+    overflow: hidden;
+    transition: all 0.5 ease-in-out; 
+}
+#myVideo {
+    outline: none; /* Enlève toute bordure qui pourrait être visible sur le focus */
+}
+.call-to-actions #callToActions {
+    height: 50px;
+    display: flex;
+    background-color: rgba(226, 223, 223, 0.082);
+    margin-top: 60px;
+    transition: all 0.15s ease-in-out;
+    /* flex-direction: row; */
+    /* justify-content: center; */
+}
+.call-to-actions #callToActions span {
+    /* outline: 1px solid white; */
+    /* background-color: blue; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    justify-content: center;
+}
+.btn-embeds {
+    display: flex;
+    width: 100%;
+    /* background-color: red; */
+    height: 40px;
+    bottom: 0;
+    margin-top: 5px;
+    position: relative;
+}
+.btn-embeds.opacity {
+    opacity: 0.3;
+    transition: opacity ease;
+}
+.btn-embeds.edit-drag {
+    display: none;
+    position: absolute;
+    top: 10px;
+    width: 100%; 
+    height: 40px; 
+    z-index: 3;
+}
+/* draggedItem.style="" */
+
+.btn-embeds.edit-drag.show {
+    display: flex;
+}
+
+.btn-embeds .button{
+    width: 8.33%;
+    /* outline: 1px solid white; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: transparent!important;
+}
+.btn-player.prepare-to-drag {
+    color: white!important;
+}
+.watermark {
+    display: flex;
+    position: absolute;
+    overflow: hidden;
+    height: 30px;
+    width: 100%;
+
+}
+
+.call-to-actions #callToActions .timestamp {
+    justify-content: start;
+    padding-left: 10px;
+    width: 109px!important;
+    font-size: 11px;
+    color: white!important;
+    
+}
+.player-spectacle-min {
+    overflow: hidden;
+    height: 255px;
+    width: 449px;
+    position: absolute;
+    z-index: 2;
+    left: 905px;
+    top: 407px;
+    display: none;
+    background-color: black;
+    border-radius: 8px;
+    transition: outline 0.2s ease-in-out;
+    outline: 2px solid rgba(0, 0, 0, 0.178);
+    justify-content: center;
+    align-items: center;
+}
+#player2 {
+    display: flex;
+    position: absolute;
+    
+}
+.overlayResizing{
+    z-index: 3;
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    display: none;
+}
+.overlayResizing.allow {
+    display: flex;
+}
+#ovr1 {
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+    /* haut droite  */
+}
+#ovr2 {
+    cursor: se-resize;
+    bottom: 0;
+    right: 0;
+    /* bas droite */
+}
+
+#ovr3 {
+    cursor: se-resize;
+    left: 0;
+    top: 0;
+    /* haut gauche  */
+}
+#ovr4 {
+    cursor: ne-resize;
+    left: 0;
+    bottom: 0;
+    /* bas gauche  */
+}
+
+#overlayMiniPlayer {
+    display: flex;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    z-index: 888;
+    cursor: pointer;
+    border-radius: 6px;
+}
+.player-spectacle-min:hover{
+    outline: 2px solid rgba(0, 0, 0, 0.623);
+    
+}
+.player-spectacle-min.show {
+    display: flex;
+}
+.call-to-actions #callToActions.show {
+    margin-top: 10px!important;
+    transition : all 0.15s ease-in-out;
+}
+.player-spectacle {
+    display: flex;
+    height: 555px;
+    width: 987px;
+    z-index: 2;
+    background-color: black;
+    position: relative;
 }
 .btn-gamemode {
     height: 28px;
