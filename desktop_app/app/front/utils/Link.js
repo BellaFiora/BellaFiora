@@ -1,4 +1,4 @@
-const OsuUtils = require('../../lib/osu_utils')
+const OsuUtils = require('../../lib/Osu_Utils')
 const { shell } = require('electron');
 let osuUtils = new OsuUtils()
 
