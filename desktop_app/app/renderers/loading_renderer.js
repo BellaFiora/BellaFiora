@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron');
 const ReconnectingWebSocket = require('../server/gosumemory_handler')
 
-ipcRenderer.on('progress_loading', (event, stat) => {
+ipcRenderer.on('progress_loading', (event, stat, afterError) => {
 	document.getElementById('loading_error').innerText = ``
 
 	const lastElm = document.getElementById('progress_loading').lastElementChild
@@ -9,7 +9,13 @@ ipcRenderer.on('progress_loading', (event, stat) => {
 		const loadingStat = lastElm.querySelector('div');
 		loadingStat.classList.remove('loading')
 		loadingStat.classList.add('ok')
-		loadingStat.innerText = '✓'
+		console.log(afterError)
+		if(afterError){
+			loadingStat.innerText = '❌'
+		} else {
+			loadingStat.innerText = '✓'
+		}
+		
 		lastElm.classList.add('reduce')
 	}
 
@@ -33,14 +39,14 @@ ipcRenderer.on('ws_connect', (event) => {
 		}
 	}
 
-								socket.onclose
+	socket.onclose
 		= event => {
-			  const lastElm = document.getElementById('progress_loading').lastElementChild
-			  lastElm.innerHTML = `Connection to the Websocket ❌`
-			  ipcRenderer.send('ws_connect_result', event)
-			  console.log('Socket Closed Connection: ', event);
-			  socket.send('Client Closed!');
-		  };
+			const lastElm = document.getElementById('progress_loading').lastElementChild
+			lastElm.innerHTML = `Connection to the Websocket ❌`
+			ipcRenderer.send('ws_connect_result', event)
+			console.log('Socket Closed Connection: ', event);
+			socket.send('Client Closed!');
+		};
 	socket.onerror = error => {
 		const lastElm = document.getElementById('progress_loading').lastElementChild
 		lastElm.innerHTML = `Connection to the Websocket ❌`
@@ -60,3 +66,7 @@ ipcRenderer.on(
 	(event,
 		infos) => { document.getElementById('client_informations').innerText = `v${infos.client_version}` })
 ipcRenderer.on('fader', (event, fader) => { document.body.classList.add(fader) })
+ipcRenderer.on('osuError', (event, errorName) => {
+	const lastElm = document.getElementById('progress_loading').lastElementChild
+	lastElm.innerHTML = `${errorName} ❌`
+})
