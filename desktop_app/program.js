@@ -22,6 +22,7 @@ const {OsuParse} = require('./app/lib/Parsers')
 const { GenerateUID} = require('./app/lib/Utils')
 
 const packageJson = require('./package.json');
+const OsuDBReader = require('./app/lib/Readers');
 
 
 let mainWindow = {}
@@ -37,6 +38,7 @@ let isFirstTime = true;
 // let isDev = process.env.dev || false;
 let isDev = false
 let client_id = null
+let collections
 
 
 const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
@@ -71,8 +73,8 @@ app.whenReady().then(async () => {
         await wsConnect(stat);
     })
    
-    await osuConnect();
-    await osuHandler();
+    // await osuConnect();
+    await osuHandler(collections);
     await LaunchGUI();
     await sendCache();
     ipcMain.on('getLang', async (event, lang) => { mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary)});
@@ -662,14 +664,22 @@ async function tLaunch() {
         });
     });
 };
-async function osuHandler() {
+async function osuHandler(collections) {
     // Check if execution should continue
     if (!continueExecute) return
     // logFile.background('test', app)
     // Return a Promise
     return new Promise(async (resolve, reject) => {
+        
         // Create new osuFiles and configuration objects
         const osuFiles = new OsuParse();
+        const osudbReader = new OsuDBReader
+        osudbReader.readCollectionDB(
+            path.join(Conf.getConf('osu_path'), '/collection.db'), 
+            path.join(Conf.getConf('osu_path'), '/osu!.db'),
+            (callback)=>{
+            collections = callback
+        })
         // Check if beatmaps.json file exists in the specified path
         if (fs.existsSync(path.join(AppData, '/beatmaps.json'))) {
             // Log message for updating scores
@@ -752,6 +762,8 @@ async function sendCache() {
         setTimeout(async () => {
             let settingsManager = new Settings()
             mainWindow.webContents.send('player-data', player_data);
+            mainWindow.webContents.send('collections', collections);
+
             mainWindow.webContents.send('settings', settingsManager.getAll(), Conf.getConf('client_version'));
             if(Conf.getConf('Updated')){
                 mainWindow.webContents.send('notification', `Bella Fiora Desktop has been successfully updated to ${Conf.getConf('client_version')}`, 'info');
