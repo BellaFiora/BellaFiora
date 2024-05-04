@@ -1,7 +1,7 @@
 const fs = require('fs');
 const uleb128 = require('uleb128');
 const Long = require('long');
-const { promises : fsPromises } = require('fs');
+const { promises: fsPromises } = require('fs');
 
 class OsuDBReader {
 	constructor() {
@@ -15,14 +15,14 @@ class OsuDBReader {
 	readString(buf, offset) {
 		try {
 			if (buf[offset++] !== 11) {
-				return { str : '', length : 1 };
+				return { str: '', length: 1 };
 			}
 			const strlen = uleb128.decode(buf.slice(offset));
 			const bytesLen = strlen.length + strlen.value;
 			const str = buf.toString(
 				'utf-8', offset + strlen.length, offset + bytesLen);
 
-			return { str : str, length : bytesLen + 1 };
+			return { str: str, length: bytesLen + 1 };
 		} catch (e) {
 			console.log(e);
 		}
@@ -70,13 +70,10 @@ class OsuDBReader {
 		}
 	}
 
-	async readOsuDB(path, outputFilePath, progressCallback) {
+	async readOsuDB(osudbPath, md5Array) {
 		try {
-			const scoresData = await fsPromises.readFile(outputFilePath, 'utf-8');
-			const scores = JSON.parse(scoresData);
-
-			const buf = await fsPromises.readFile(path);
-
+			let outputCollection = [];
+			const buf = await fsPromises.readFile(osudbPath);
 			if (!buf) {
 				throw new Error('Failed to open osu!.db');
 			}
@@ -84,11 +81,9 @@ class OsuDBReader {
 			const player = this.readString(buf, 17);
 			const beatmapCount = buf.readInt32LE(17 + player.length);
 			let offset = 21 + player.length;
-
 			const beatmaps = [];
 			for (var i = 0; i < beatmapCount; i++) {
 				var beatmap = {};
-
 				var gets1 = [
 					'artist', 'artistUnicode', 'title', 'titleUnicode',
 					'creator', 'difficulty', 'audioFilename', 'md5', 'osuPath'
@@ -98,14 +93,7 @@ class OsuDBReader {
 					beatmap[gets1[get]] = strobj.str;
 					offset += strobj.length;
 				}
-
-				beatmap.rankedStatus = buf[offset++];
-				beatmap.hitcircleCount = buf.readUInt16LE((offset += 2) - 2);
-				beatmap.sliderCount = buf.readUInt16LE((offset += 2) - 2);
-				beatmap.spinnerCount = buf.readUInt16LE((offset += 2) - 2);
-				beatmap.lastModificationWindows = this.readLongStr(buf, (offset += 8) - 8);
-				beatmap.lastModificationMs = this.winTickToMs(beatmap.lastModificationWindows);
-
+				offset += 15
 				if (version < 20140609) {
 					beatmap.AR = buf[offset++];
 					beatmap.CS = buf[offset++];
@@ -118,116 +106,74 @@ class OsuDBReader {
 					beatmap.OD = buf.readFloatLE((offset += 4) - 4);
 				}
 
-				beatmap.sliderVelocity = buf.readDoubleLE((offset += 8) - 8);
-
+				buf.readDoubleLE((offset += 8) - 8);
 				if (version >= 20140609) {
 					for (let j = 0; j < 4; j++) {
 						var unknownNumCount = buf.readInt32LE((offset += 4) - 4);
 						for (let k = 0; k < unknownNumCount; k++) {
 							if (buf[offset++] != 0x08)
 								throw 'Invalid beatmap!';
-							var unknownNum = buf.readInt32LE((offset += 4) - 4);
+							buf.readInt32LE((offset += 4) - 4);
 							if (buf[offset++] != 0x0D)
 								throw 'Invalid beatmap!';
-							var unknownDub = buf.readDoubleLE((offset += 8) - 8);
+							buf.readDoubleLE((offset += 8) - 8);
 						}
 					}
 				}
-
-				beatmap.drainTime = buf.readInt32LE((offset += 4) - 4);
-				beatmap.totalTime = buf.readInt32LE((offset += 4) - 4);
-				beatmap.audioPreviewTime = buf.readInt32LE((offset += 4) - 4);
-
-				beatmap.timingPoints = [];
+				offset += 12
+				let timingPoints = [];
 				var timingPointCount = buf.readInt32LE((offset += 4) - 4);
 				for (let j = 0; j < timingPointCount; j++) {
-					beatmap.timingPoints[j] = {
-						msPerBeat : buf.readDoubleLE((offset += 8) - 8),
-						offset : buf.readDoubleLE((offset += 8) - 8),
-						inherited : buf[offset++]
+					timingPoints[j] = {
+						msPerBeat: buf.readDoubleLE((offset += 8) - 8),
+						offset: buf.readDoubleLE((offset += 8) - 8),
+						inherited: buf[offset++]
 					};
 				}
-
 				beatmap.beatmapId = buf.readInt32LE((offset += 4) - 4);
 				beatmap.beatmapSetId = buf.readInt32LE((offset += 4) - 4);
-				beatmap.threadId = buf.readInt32LE((offset += 4) - 4);
-
-				offset += 4;
-
-				beatmap.localBeatmapOffset = buf.readUInt16LE((offset += 2) - 2);
-				beatmap.stackLeniency = buf.readFloatLE((offset += 4) - 4);
-				beatmap.mode = buf[offset++];
-
+				offset += 15;
 				var source = this.readString(buf, offset);
 				offset += source.length;
-				beatmap.source = source.str;
 				var tags = this.readString(buf, offset);
 				offset += tags.length;
-				beatmap.tags = tags.str;
-
-				beatmap.onlineTags = buf.readUInt16LE((offset += 2) - 2);
-
+				buf.readUInt16LE((offset += 2) - 2);
 				var font = this.readString(buf, offset);
 				offset += font.length;
-				beatmap.font = font.str;
-
-				beatmap.isUnplayed = buf[offset++];
-
-				beatmap.lastPlayedWindows = this.readLongStr(buf, (offset += 8) - 8);
-				beatmap.lastPlayedMs = this.winTickToMs(beatmap.lastPlayedWindows);
-
-				beatmap.isOsz2 = buf[offset++];
-
+				buf[offset++];
+				this.readLongStr(buf, (offset += 8) - 8);
+				this.winTickToMs(beatmap.lastPlayedWindows);
+				buf[offset++];
 				var beatmapFolder = this.readString(buf, offset);
 				offset += beatmapFolder.length;
 				beatmap.beatmapFolder = beatmapFolder.str;
-
-				beatmap.lastCheckWindows = this.readLongStr(buf, (offset += 8) - 8);
-				beatmap.lastCheckMs = this.winTickToMs(beatmap.lastCheckWindows);
-
-				beatmap.ignoreHitsounds = buf[offset++];
-				beatmap.ignoreSkin = buf[offset++];
-				beatmap.disableStoryboard = buf[offset++];
-				beatmap.disableVideo = buf[offset++];
-				beatmap.visualOverride = buf[offset++];
-
+				this.readLongStr(buf, (offset += 8) - 8);
+				this.winTickToMs(beatmap.lastCheckWindows);
+				buf[offset += 5]; 
 				if (version < 20140609)
 					offset++;
-				offset += 4;
-
-				beatmap.maniaScrollSpeed = buf[offset++];
+				offset += 5;
 
 				beatmaps.push(beatmap);
-				progressCallback({
-					title : beatmap.title,
-					artist : beatmap.artist
-
-				});
-
-				const matchingScores = scores[beatmap.md5];
-
-				if (matchingScores) {
-					matchingScores.forEach(score => {
-						score.beatmap = beatmap;
-					});
+				if (md5Array.includes(beatmap.md5)) {
+					outputCollection.push(beatmap);
 				}
 			}
 
-			const updatedScoresData = JSON.stringify(scores, null, 2);
-			await fsPromises.writeFile('./scores.json', updatedScoresData);
-			return true;
+			return outputCollection
 		} catch (e) {
 			console.error(e);
 			throw e;
 		}
 	}
-	readCollectionDB(path, callback) {
-		fs.readFile(path, (err, buf) => {
+	async readCollectionDB(collectionDB, osuDB, callback) {
+		fs.readFile(collectionDB, async (err, buf) => {
 			if (err || !buf) {
 				console.log('Failed to open collection.db')
 				return;
 			}
 
+			var md5Array = []
 			var collections = {};
 			var collectionCount = buf.readInt32LE(4);
 			var offset = 8;
@@ -243,10 +189,26 @@ class OsuDBReader {
 					var md5 = this.readString(buf, offset);
 					offset += md5.length;
 					collections[name.str].push(md5.str);
+					md5Array.push(md5.str)
+
 				}
 			}
+			let beatmaps = await this.readOsuDB(osuDB, md5Array);
+			let beatmapDict = {};
+			beatmaps.forEach(beatmap => {
+				beatmapDict[beatmap.md5] = beatmap;
+			});
 
-			callback(collections);
+			let updatedCollections = {};
+			for (let collection in collections) {
+				updatedCollections[collection] = collections[collection].map(md5 => {
+					if (beatmapDict[md5]) {
+						return { md5: md5, data: beatmapDict[md5] };
+					}
+					return { md5: md5 };
+				}); 
+			}
+			callback(updatedCollections);
 		});
 	}
 
@@ -257,15 +219,15 @@ class OsuDBReader {
 		buf.writeInt32LE(Object.keys(collections).length, 4);
 
 		for (var name in collections) {
-			buf = Buffer.concat([ buf, this.createString(name) ]);
+			buf = Buffer.concat([buf, this.createString(name)]);
 
 			var beatmapCountBuf = new Buffer(4);
 			beatmapCountBuf.writeInt32LE(collections[name].length);
-			buf = Buffer.concat([ buf, beatmapCountBuf ]);
+			buf = Buffer.concat([buf, beatmapCountBuf]);
 
 			for (let j = 0; j < collections[name].length; j++) {
 				buf = Buffer.concat(
-					[ buf, this.createString(collections[name][j]) ]);
+					[buf, this.createString(collections[name][j])]);
 			}
 		}
 
@@ -298,7 +260,7 @@ class OsuDBReader {
 						score.mode = buf[offset++];
 						score.version = buf.readInt32LE((offset += 4) - 4);
 
-						var gets = [ 'beatmapMd5', 'player', 'replayMd5' ];
+						var gets = ['beatmapMd5', 'player', 'replayMd5'];
 						for (var get in gets) {
 							var strobj = this.readString(buf, offset);
 							score[gets[get]] = strobj.str;
