@@ -54,7 +54,7 @@ let openBtn = document.getElementById('OpenBtn')
 const bg = document.getElementById('root');
 const windowWidth = window.innerWidth / 5;
 const windowHeight = window.innerHeight / 5;
-
+let CollectionList
 var bm_stats_holders = {
 	hp: document.getElementById('bm_stats_hp'),
 	od: document.getElementById('bm_stats_od'),
@@ -284,7 +284,7 @@ miniPlayerEl.allBtns.forEach(btn => {
 			playerEvents.originalInfo = this.getAttribute('data-info')
 			playerEvents.dragTimeout = setTimeout(() => {
 				startDrag(this, e);
-				
+
 			}, 1000);
 		}
 	});
@@ -491,7 +491,7 @@ document.querySelectorAll('.btn').forEach(function (btn) {
 						let number = parseFloat(element.getAttribute('data-value').replace(/\s/g, ''));
 
 						let formattedNumber = '';
-				
+
 						switch (btn.getAttribute('data-option')) {
 							case '100s':
 								formattedNumber = number.toLocaleString('fr-FR');
@@ -510,7 +510,7 @@ document.querySelectorAll('.btn').forEach(function (btn) {
 								formattedNumber = (number / 1000000).toLocaleString('fr-FR') + " M";
 								break;
 							default:
-							
+
 								formattedNumber = number.toString();
 						}
 
@@ -542,7 +542,7 @@ document.querySelectorAll('.btn').forEach(function (btn) {
 					break;
 				case 'Reset':
 					break;
-				default:
+					default:
 					break;
 			}
 		} else {
@@ -652,6 +652,57 @@ function showScoreContextMenu(element) {
 	createBtn('Cancel', 'cancel', null)
 
 }
+
+function showCollectionContextMenu(element) {
+	document.querySelector('.context-menu').classList.add('show')
+	document.querySelector('.context-menu').innerHTML = ''
+	function createBtn(label, action, collectionName) {
+
+		let div = document.createElement('div')
+		div.classList.add('button-context')
+		div.textContent = label
+		div.onclick = function () {
+			switch (action) {
+				case 'cancel':
+					div.onclick = function () {
+						document.querySelector('.context-menu').classList.remove('show')
+						document.querySelector('.context-menu').innerHTML = ""
+					}
+					break;
+				case 'export-osudb':
+
+					break;
+				case 'export-clbf': 
+					ipcRenderer.invoke('select-output-directory').then(outputDirectory => {
+						ipcRenderer.send('export-clbf', outputDirectory, element.getAttribute('name'))
+						document.querySelector('.context-menu').classList.remove('show')
+						document.querySelector('.context-menu').innerHTML = ""
+					})
+
+					
+					break;
+				case 'exports-all': {
+
+					break;
+				}
+			
+				default:
+					break;
+			}
+		}
+		
+
+		document.querySelector('.context-menu').appendChild(div)
+	}
+
+	createBtn('Export to collection.db', 'export-osudb', element.getAttribute('name'))
+	createBtn('Export to collection.clbf', 'export-clbf', element.getAttribute('name'))
+	createBtn('Filters beatmaps', 'filters', element.getAttribute('name'))
+	createBtn('Exports all beatmaps to .zip', 'exports-all', element.getAttribute('name'))
+	createBtn('Cancel', 'cancel', null)
+
+}
+
 scores.forEach(function (element) {
 	element.addEventListener('click', function () {
 		showScoreContextMenu(element);
@@ -699,16 +750,16 @@ function setInputKey(keyNumber) {
 	let key = document.getElementById(`key${keyNumber}`).innerHTML;
 
 	function handleKeyDown(event) {
-		
+
 
 		if (event.key === "Enter") {
 
 			document.getElementById('changeKeyBind').classList.remove('show');
 			document.getElementById(`key${keyNumber}`).innerText = key;
 			document.removeEventListener('keydown', handleKeyDown);
-			
+
 		} else {
-		
+
 
 			key = event.key;
 
@@ -918,6 +969,13 @@ ipcRenderer.on('settings', (event, data, software_info) => {
 	console.log(data);
 	document.getElementById('software_infos').innerText = `v${software_info}`
 })
+ipcRenderer.on('collections', (event, collections) => {
+	CollectionList = collections
+	createCollectionsHandler(collections)
+})
+ipcRenderer.on('importCLBFDone', (event, importedCollection) => {
+	console.log(importedCollection)
+})
 left_menu.addEventListener('click', function (event) {
 	if (event.target.getAttribute('id') == 'side_left_menu' &&
 		event.offsetX >= left_menu.offsetWidth - 12) {
@@ -951,6 +1009,243 @@ bg.addEventListener('mousemove', (e) => {
 	bg.style.backgroundPositionX = `${mouseX}%`;
 	bg.style.backgroundPositionY = `${mouseY + 20}%`;
 });
+document.getElementById('importCLBF').addEventListener('click', function (event){
+	ipcRenderer.send('open-directory-clbf')
+})
+function createCollectionsHandler(collectionsList) {
+
+	let nbMaps = 0
+
+
+	Object.keys(collectionsList).forEach(collectionName => {
+
+		let CollectionList = document.getElementById('lcollection')
+
+		let collectionElement = document.createElement('div');
+		collectionElement.classList.add('collection-name');
+		collectionElement.setAttribute('name', collectionName)
+		collectionElement.classList.add('added')
+
+		let span = document.createElement('span');
+		let input = document.createElement('input');
+		input.setAttribute('disabled', 'disabled')
+		input.setAttribute('type', 'text');
+		input.setAttribute('value', `${collectionName}`);
+		input.setAttribute('defaultValue',collectionName)
+	
+		// (${collectionsList[collectionName].length})
+		span.appendChild(input);
+
+		let m1 = document.createElement('m');
+		let m2 = document.createElement('m');
+		let m3 = document.createElement('m')
+
+		m1.classList.add('pencil-square');
+		m1.classList.add('glass-grey');
+		m2.classList.add('folder-minus');
+		m2.classList.add('soft-red');
+		m3.classList.add('ellipsis-horizontal-circle');
+		m3.classList.add('glass-grey');
+
+		m1.setAttribute('data-event', 'Edit name');
+		m2.setAttribute('data-event', 'Delete');
+		m1.setAttribute('data-info', 'Edit name');
+		m2.setAttribute('data-info', 'Delete');
+		m3.setAttribute('data-info', 'More options');
+		m3.setAttribute('data-event', 'more');
+
+		collectionElement.appendChild(span)
+		collectionElement.appendChild(m1)
+		collectionElement.appendChild(m2)
+		collectionElement.appendChild(m3)
+
+		CollectionList.insertBefore(collectionElement, (CollectionList.children[1]));
+		setTimeout(() => {
+			collectionElement.classList.remove('added')
+
+		}, 40);
+		input.focus();
+
+		input.addEventListener('blur', function () {
+			m1.classList.add('pencil-square');
+			m1.classList.remove('soft-green');
+			m1.classList.add('glass-grey');
+			m2.classList.add('folder-minus');
+			m2.classList.add('soft-red');
+		});
+
+		function SaveNewCollection() {
+			
+			if(input.getAttribute('defaultvalue') !== input.value){
+				
+				input.setAttribute('defaultValue', input.value)
+				if (oldKey in collectionsList) {
+					data[newKey] = data[oldKey];
+					
+					delete data[oldKey];
+				  }
+
+			}
+
+			m2.setAttribute('data-event', 'Delete');
+			m2.setAttribute('data-info', 'Delete');
+			m1.setAttribute('data-event', 'Edit name');
+			m1.setAttribute('data-info', 'Edit name');
+
+			m1.classList.add('pencil-square');
+			m1.classList.add('glass-grey');
+			m2.classList.add('folder-minus');
+			
+
+			m1.classList.remove('check');
+			m1.classList.remove('soft-green');
+			m2.classList.remove('arrow-uturn-left');
+		
+			
+			
+			input.disabled = true
+			//Write Collection in collection.db
+		}
+
+		document.addEventListener('keydown', function (event) {
+			if(m1.getAttribute('data-event') === "Save"){
+				if (event.key === 'Enter') {
+					console.log('save')
+					SaveNewCollection()
+					// document.removeEventListener('keydown');
+				}
+			}
+			
+		})
+
+		m1.addEventListener('click', function () {
+			if(m1.getAttribute('data-event') === "Edit name"){
+
+				m1.classList.remove('pencil-square');
+				m1.classList.remove('glass-grey');
+				m2.classList.remove('folder-minus');
+				m2.classList.remove('soft-red');
+
+				m1.classList.add('check');
+				m1.classList.add('soft-green');
+				m2.classList.add('arrow-uturn-left');
+				m2.classList.add('soft-red');
+
+				m1.setAttribute('data-event', 'Save');
+				m2.setAttribute('data-event', 'Cancel');
+				m1.setAttribute('data-info', 'Save');
+				m2.setAttribute('data-info', 'Cancel');
+
+				input.removeAttribute('disabled')
+			} else {
+				console.log('save')
+				SaveNewCollection()
+			}
+			
+		});
+
+		m2.addEventListener('click', function (event) {
+			if(m1.getAttribute('data-event') === "Cancel"){
+				
+			} else {
+				CollectionList.removeChild(collectionElement);
+				delete collectionsList[collectionElement.getAttribute('name')]
+	
+				ipcRenderer.send('updateCollectionDB', collectionsList)
+	
+				boxInfo.classList.remove('show');
+			}
+			
+		});
+		m3.addEventListener('click', function (event) {
+			showCollectionContextMenu(collectionElement)
+		})
+		m1.addEventListener('mouseover', function (event) {
+			handleMouseOver(event, m1);
+		});
+		m1.addEventListener('mouseout', handleMouseOut);
+
+		m2.addEventListener('mouseover', function (event) {
+			handleMouseOver(event, m2);
+		});
+		m2.addEventListener('mouseout', handleMouseOut);
+		nbMaps = collectionsList[collectionName].length
+	})
+
+	let lastCollectionName = null;
+	for (let collectionName in collectionsList) {
+		lastCollectionName = collectionName;
+	}
+
+
+	document.getElementById('currentCollectionName').innerText = `${lastCollectionName} (${nbMaps})`
+	let arrayCollections = Object.entries(collectionsList).map(([key, value]) => {
+		return { [key]: value };
+	});
+	let lastElement = arrayCollections[arrayCollections.length - 1];
+
+	let keyOfLastElement = Object.keys(lastElement)[0];
+	let itemsOfLastCollection = lastElement[keyOfLastElement];
+
+	itemsOfLastCollection.forEach(item => {
+
+		let beatmapElement = document.createElement("div");
+		beatmapElement.className = "beatmap-element";
+		beatmapElement.setAttribute("data-bmid", "3082320");
+		beatmapElement.setAttribute("data-scoreid", "2479538123");
+		beatmapElement.setAttribute("data-timestamp", "1710022620");
+		beatmapElement.setAttribute("data-pp", "157");
+		beatmapElement.setAttribute("data-accuracy", "96.88");
+		beatmapElement.setAttribute("data-difficulty", "5.20");
+		beatmapElement.setAttribute("data-note", "4");
+
+
+		let bmInfos = document.createElement("div");
+		bmInfos.className = "elem bm_infos";
+
+		let mapTitle = document.createElement("span");
+		mapTitle.className = "map_title";
+		mapTitle.textContent = item.data.title;
+
+		let underInfos = document.createElement("span");
+		underInfos.className = "under-infos";
+
+		let level = document.createElement("l");
+		level.textContent = item.data.difficulty;
+
+		let date = document.createElement("d");
+		date.textContent = null
+
+		let stars = document.createElement("span");
+		stars.textContent = "? ★ ";
+
+		let innerStars = document.createElement("i");
+		innerStars.textContent = null
+
+		underInfos.appendChild(level);
+		underInfos.appendChild(document.createTextNode(" - "));
+		underInfos.appendChild(date);
+		underInfos.appendChild(document.createTextNode(" - "));
+		underInfos.appendChild(stars);
+		underInfos.appendChild(innerStars);
+
+		// Assemblage du contenu de bmInfos
+		bmInfos.appendChild(mapTitle);
+		bmInfos.appendChild(underInfos);
+
+
+		beatmapElement.appendChild(bmInfos);
+		document.getElementById('collectionItemList').insertBefore(beatmapElement, (document.getElementById('collectionItemList').children[1]));
+
+	});
+
+
+
+
+
+
+
+}
 document.getElementById('createCollectionBtn').addEventListener('click', function () {
 	let CollectionList = document.getElementById('lcollection')
 

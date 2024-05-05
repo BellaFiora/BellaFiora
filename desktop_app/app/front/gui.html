@@ -31,7 +31,7 @@
             </div>
 
             <div class="menu-list">
-                <div class="menuBtn navigate-page active" target="home_page">
+                <div class="menuBtn navigate-page  active" target="home_page">
                     <m class="white home"></m><span>
                         <trs key="Home">Home</trs>
                     </span>
@@ -97,7 +97,7 @@
             <div class="ui-actions windows-nav">
                 <!-- <img src="./12345.png"> -->
             </div>
-            <div id="home_page" class="page no-toggle">
+            <div id="home_page" class="page">
                 <div class="box user-basic-infos">
                     <div class="title">
                         <trs key="Your Game Statistics">Your Game Statistics</trs>
@@ -820,19 +820,27 @@
                         <span class="subtitle">
                             <m class="soft-green s3 folder-plus" id="createCollectionBtn" data-event="info"
                                 data-info="Create a new collection" style="margin-top: 2px;"></m>
+                            <m class="glass-grey  s3 arrow-down-tray" id="importCLBF" data-event="info"
+                                data-info="Import .CLBF" style="margin-top: 2px;"></m>
                         </span>
+
                     </div>
-                    <div class="collection-name added">
-                        <span>
-                            <input type="text" disabled value="Collection Name">
-                        </span>
-                        <m class="glass-grey pencil-square" data-event="info" data-info="Edit Name"></m>
-                        <m class="soft-red folder-minus" data-event="info" data-info="Delete"></m>
+                    <div class="collection-name">
+                        
+                        <span><input type="text"/></span>
+                        <m></m>
+                        <m></m>
                     </div>
+
                 </div>
-                <div class="box transparent collection-view">
-                    <div class="title">Collection Name</div>
+                <div class="box transparent collection-view" id="collectionItemList">
+                    <div class="title" id="currentCollectionName">Collection Name</div>
                 </div>
+                
+                
+
+
+
             </div>
             <div id="chatbot_page" class="page no-toggle">
                 <div class="box chatbot">
@@ -898,7 +906,7 @@
                     </div>
                 </div>
             </div>
-            <div id="spectacle_page" class="page">
+            <div id="spectacle_page" class="page no-toggle">
                 <div class="box full spectate">
                     <div class="title">Spectate a Player</div>
                     <div class="setupPlayer"></div>
@@ -916,12 +924,12 @@
                                         <span class="btn btn-player timestamp">
                                             <txt>0:00:00 - 0:00:00</txt>
                                         </span>
-                                        <span class="button btn-player" btn-slot="1" data-info="" onclick="playerEvent(event)"
-                                            event="null">•</span>
-                                        <span class="button btn-player" btn-slot="2" data-info=""onclick="playerEvent(event)"
-                                            event="null">•</span>
-                                        <span class="button btn-player" btn-slot="3" data-info=""onclick="playerEvent(event)"
-                                            event="rewind">
+                                        <span class="button btn-player" btn-slot="1" data-info=""
+                                            onclick="playerEvent(event)" event="null">•</span>
+                                        <span class="button btn-player" btn-slot="2" data-info=""
+                                            onclick="playerEvent(event)" event="null">•</span>
+                                        <span class="button btn-player" btn-slot="3" data-info=""
+                                            onclick="playerEvent(event)" event="rewind">
                                             <m class="white arrow-uturn-left"></m>
                                         </span>
                                         <span class="button btn-player" btn-slot="4" data-info="" event="play"
@@ -932,24 +940,24 @@
                                             onclick="playerEvent(event)">
                                             <m class="white arrow-uturn-right">
                                         </span>
-                                        <span class="button btn-player" btn-slot="6" data-info="" onclick="playerEvent(event)"
-                                            event="null">•</span>
-                                        <span class="button btn-player" btn-slot="7" data-info="" onclick="playerEvent(event)"
-                                            event="null">•</span>
-                                        <span class="button btn-player" btn-slot="8" data-info="" onclick="playerEvent(event)"
-                                            event="cursor-trail">
+                                        <span class="button btn-player" btn-slot="6" data-info=""
+                                            onclick="playerEvent(event)" event="null">•</span>
+                                        <span class="button btn-player" btn-slot="7" data-info=""
+                                            onclick="playerEvent(event)" event="null">•</span>
+                                        <span class="button btn-player" btn-slot="8" data-info=""
+                                            onclick="playerEvent(event)" event="cursor-trail">
                                             <m class="white sparkles"></m>
                                         </span>
-                                        <span class="button btn-player" btn-slot="9" data-info="" onclick="playerEvent(event)"
-                                            event="settings">
+                                        <span class="button btn-player" btn-slot="9" data-info=""
+                                            onclick="playerEvent(event)" event="settings">
                                             <m class="white wrench-screwdriver"></m>
                                         </span>
-                                        <span class="button btn-player" btn-slot="10" data-info="" onclick="playerEvent(event)"
-                                            event="detach-screen">
+                                        <span class="button btn-player" btn-slot="10" data-info=""
+                                            onclick="playerEvent(event)" event="detach-screen">
                                             <m class="white arrow-top-right-on-square"></m>
                                         </span>
-                                        <span class="button btn-player" btn-slot="11" data-info="" onclick="playerEvent(event)"
-                                            event="full-screen">
+                                        <span class="button btn-player" btn-slot="11" data-info=""
+                                            onclick="playerEvent(event)" event="full-screen">
                                             <m class="white arrows-pointing-out"></m>
                                         </span>
                                     </div>
@@ -1073,7 +1081,7 @@
 </body>
 <script>
 
-    
+
 
 
 </script>

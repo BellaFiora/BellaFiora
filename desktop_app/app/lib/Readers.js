@@ -166,50 +166,53 @@ class OsuDBReader {
 			throw e;
 		}
 	}
-	async readCollectionDB(collectionDB, osuDB, callback) {
-		fs.readFile(collectionDB, async (err, buf) => {
-			if (err || !buf) {
-				console.log('Failed to open collection.db')
-				return;
-			}
-
-			var md5Array = []
-			var collections = {};
-			var collectionCount = buf.readInt32LE(4);
-			var offset = 8;
-			for (var i = 0; i < collectionCount; i++) {
-				var name = this.readString(buf, offset);
-				offset += name.length;
-				collections[name.str] = [];
-
-				var beatmapCount = buf.readInt32LE(offset);
-				offset += 4;
-
-				for (let j = 0; j < beatmapCount; j++) {
-					var md5 = this.readString(buf, offset);
-					offset += md5.length;
-					collections[name.str].push(md5.str);
-					md5Array.push(md5.str)
-
+	async readCollectionDB(collectionDB, osuDB) {
+		return new Promise((resolve, reject) => {
+			fs.readFile(collectionDB, async (err, buf) => {
+				if (err || !buf) {
+					console.log('Failed to open collection.db')
+					return;
 				}
-			}
-			let beatmaps = await this.readOsuDB(osuDB, md5Array);
-			let beatmapDict = {};
-			beatmaps.forEach(beatmap => {
-				beatmapDict[beatmap.md5] = beatmap;
-			});
-
-			let updatedCollections = {};
-			for (let collection in collections) {
-				updatedCollections[collection] = collections[collection].map(md5 => {
-					if (beatmapDict[md5]) {
-						return { md5: md5, data: beatmapDict[md5] };
+	
+				var md5Array = []
+				var collections = {};
+				var collectionCount = buf.readInt32LE(4);
+				var offset = 8;
+				for (var i = 0; i < collectionCount; i++) {
+					var name = this.readString(buf, offset);
+					offset += name.length;
+					collections[name.str] = [];
+	
+					var beatmapCount = buf.readInt32LE(offset);
+					offset += 4;
+	
+					for (let j = 0; j < beatmapCount; j++) {
+						var md5 = this.readString(buf, offset);
+						offset += md5.length;
+						collections[name.str].push(md5.str);
+						md5Array.push(md5.str)
+	
 					}
-					return { md5: md5 };
-				}); 
-			}
-			callback(updatedCollections);
-		});
+				}
+				let beatmaps = await this.readOsuDB(osuDB, md5Array);
+				let beatmapDict = {};
+				beatmaps.forEach(beatmap => {
+					beatmapDict[beatmap.md5] = beatmap;
+				});
+	
+				let updatedCollections = {};
+				for (let collection in collections) {
+					updatedCollections[collection] = collections[collection].map(md5 => {
+						if (beatmapDict[md5]) {
+							return { md5: md5, data: beatmapDict[md5] };
+						}
+						return { md5: md5 };
+					}); 
+				}
+				resolve(updatedCollections);
+			});
+		})
+		
 	}
 
 	writeCollectionDB(path, collections, callback) {

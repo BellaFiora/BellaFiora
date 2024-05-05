@@ -20,9 +20,11 @@ const Settings = require('./app/lib/Settings')
 const {Files} = require('./app/lib/Files')
 const {OsuParse} = require('./app/lib/Parsers')
 const { GenerateUID} = require('./app/lib/Utils')
+const collectionManager = require('./app/lib/Collections')
 
 const packageJson = require('./package.json');
 const OsuDBReader = require('./app/lib/Readers');
+const CollectionManager = require('./app/lib/Collections');
 
 
 let mainWindow = {}
@@ -66,6 +68,10 @@ app.whenReady().then(async () => {
     await checkLocalApp()
     await loadTranslation(null, ipcMain)
     await LaunchLoading();
+
+    
+
+    // await collectionManager.ScanAndSave()
     // await checkingUpdate()
 
     await ServerConnection()
@@ -74,9 +80,9 @@ app.whenReady().then(async () => {
     })
    
     // await osuConnect();
-    await osuHandler(collections);
+    collections = await osuHandler(collections);
     await LaunchGUI();
-    await sendCache();
+    await sendCache(collections);
     ipcMain.on('getLang', async (event, lang) => { mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary)});
 
     // Declaring API endpoints for external plugins
@@ -664,7 +670,7 @@ async function tLaunch() {
         });
     });
 };
-async function osuHandler(collections) {
+async function osuHandler() {
     // Check if execution should continue
     if (!continueExecute) return
     // logFile.background('test', app)
@@ -674,12 +680,12 @@ async function osuHandler(collections) {
         // Create new osuFiles and configuration objects
         const osuFiles = new OsuParse();
         const osudbReader = new OsuDBReader
-        osudbReader.readCollectionDB(
+        collections = await osudbReader.readCollectionDB(
             path.join(Conf.getConf('osu_path'), '/collection.db'), 
-            path.join(Conf.getConf('osu_path'), '/osu!.db'),
-            (callback)=>{
-            collections = callback
-        })
+            path.join(Conf.getConf('osu_path'), '/osu!.db'))
+
+  
+       
         // Check if beatmaps.json file exists in the specified path
         if (fs.existsSync(path.join(AppData, '/beatmaps.json'))) {
             // Log message for updating scores
@@ -687,7 +693,7 @@ async function osuHandler(collections) {
 
             // Update scores using the osuFiles object
             osuFiles.updateScores(mainWindow).then(() => {
-                resolve(true);
+                resolve(collections);
             });
         } else {
             // Log message for scanning beatmaps
@@ -701,7 +707,7 @@ async function osuHandler(collections) {
                 // Parse score database and update scores using osuFiles object
                 osuFiles.scoreDbParse(mainWindow).then(() => {
                     osuFiles.updateScores(mainWindow).then(() => {
-                        resolve(true);
+                        resolve(collections);
                     });
                 });
             });
@@ -911,6 +917,65 @@ ipcMain.on('open-directory-dialog', (event, pathId) => {
         console.log('Error selecting directory:', err);
     });
 });
+ipcMain.on('open-directory-clbf', (event, pathId) => {
+    const window = BrowserWindow.getFocusedWindow();
+    dialog.showOpenDialog(window, {
+        properties: ['openFile'],
+        filters: [{ name: 'CLBF Files', extensions: ['clbf'] }] 
+    }).then(result => {
+        if (!result.canceled && result.filePaths.length > 0) {
+           
+            console.log('Selected file:', result.filePaths[0]);
+            event.reply('selected-file', result.filePaths[0]); 
+        }
+    }).catch(err => {
+        console.log('Error selecting file:', err);
+    });
+});
+ipcMain.handle('select-output-directory', async (event) => {
+    const window = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showOpenDialog(window, {
+        properties: ['openDirectory']  
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths[0]; 
+    } else {
+        throw new Error('No directory selected');
+    }
+});
+ipcMain.on('export-clbf', async (event, output, collectionName) => {
+    let collectionManager = new CollectionManager()
+    let files = new Files()
+    mainWindow.webContents.send('notification', 'Start of export', 'info')
+    collectionManager.getCollections().then(collection => {
+        if(collection[collectionName]){
+            files.exportCLBF(collection[collectionName], collectionName).then(result => {
+                const filePath = path.join(output, `${collectionName.replace(/[\W_]+/g,"_")}.clbf`);
+                fs.writeFile(filePath, JSON.stringify(result, null, 4), (err) => {
+                    if (err) {
+                        mainWindow.webContents.send('notification', `Error during export to "${collectionName}"`, 'warning')
+                    } else {
+                        mainWindow.webContents.send('notification', `${collectionName} has been exported !`, 'info')
+                        shell.openPath(output)
+                        .then(result => {
+                           
+                        })
+                        .catch(err => {
+                           
+                        });
+                    }
+                });
+            })
+        } else {
+            mainWindow.webContents.send('notification', `Cannot get collection "${collectionName}"`, 'warning')
+        }
+    })
+
+})
+ipcMain.on('updateCollectionDB', (event, updatedCollection)=>{
+    const collectionManager = new CollectionManager()
+    collectionManager.UpdateCollectionDB(updatedCollection)
+})
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     const dialogOpts = {
         type: 'info',
