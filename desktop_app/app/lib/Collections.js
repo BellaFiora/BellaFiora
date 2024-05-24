@@ -6,12 +6,17 @@ const crypto = require('crypto');
 const reader = require('./Readers')
 
 class CollectionManager{
-    constructor(){
+    constructor(isTest = false){
         this.conf = new Conf()
         this.reader = new OsuDBReader
         this.osuDB = path.join(this.conf.getConf('osu_path'), '/osu!.db')
         this.collectionDB = path.join(this.conf.getConf('osu_path'), '/collection.db')
-        this.collectionDBTest = path.join(this.conf.getConf('osu_path'), '/collectionTest.db')
+
+        if(isTest){
+            this.osuDB = '../../tests/src/osu!.test.db'
+            this.collectionDB = '../../tests/src/collection.test.db'
+        }
+        
 
         this.reader = new reader()
         
