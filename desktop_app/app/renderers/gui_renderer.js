@@ -7,6 +7,8 @@ const ReconnectingWebSocket = require('../server/gosumemory_handler');
 const Highcharts = require('highcharts');
 require('highcharts/modules/exporting')(Highcharts);
 const { ipcRenderer } = require('electron');
+const moment = require('moment');
+require('moment-timezone');
 
 let currentIndex = 0;
 let currentBeatmapId = null;
@@ -109,14 +111,14 @@ const resizingHandles = {
 	ovr2: document.getElementById('ovr2'),
 	ovr3: document.getElementById('ovr3'),
 	ovr4: document.getElementById('ovr4')
-};
+}
 miniPlayerEl.overlay.onmousedown = function (event) {
 	event.preventDefault();
 	miniPlayerPos.startX = event.clientX - miniPlayerEl.miniPlayer.getBoundingClientRect().left;
 	miniPlayerPos.startY = event.clientY - miniPlayerEl.miniPlayer.getBoundingClientRect().top;
 	document.addEventListener('mousemove', onMouseMovePlayer);
 	document.addEventListener('mouseup', stopDragPlayer);
-};
+}
 function onMouseMovePlayer(event) {
 	let newX = event.clientX - miniPlayerPos.startX;
 	let newY = event.clientY - miniPlayerPos.startY;
@@ -133,11 +135,11 @@ function onMouseMovePlayer(event) {
 
 	miniPlayerEl.miniPlayer.style.left = newX + 'px';
 	miniPlayerEl.miniPlayer.style.top = newY + 'px';
-};
+}
 function stopDragPlayer() {
 	document.removeEventListener('mousemove', onMouseMovePlayer);
 	document.removeEventListener('mouseup', stopDragPlayer);
-};
+}
 document.querySelectorAll('.overlayResizing').forEach(handle => {
 	handle.addEventListener('mousedown', function (event) {
 		event.preventDefault();
@@ -150,13 +152,13 @@ document.querySelectorAll('.overlayResizing').forEach(handle => {
 		document.addEventListener('mousemove', startResize);
 		document.addEventListener('mouseup', stopResize);
 	});
-});
+})
 function startResize(event) {
 	window.cancelAnimationFrame(miniPlayerPos.aspectRatio);
 	miniPlayerPos.aspectRatio = window.requestAnimationFrame(function () {
 		resize(event);
 	});
-};
+}
 function resize(event) {
 	const deltaX = event.clientX - miniPlayerPos.startX;
 	const deltaY = event.clientY - miniPlayerPos.startY;
@@ -169,20 +171,20 @@ function resize(event) {
 		miniPlayerEl.miniPlayer.style.width = `${newWidth}px`;
 		miniPlayerEl.miniPlayer.style.height = `${newHeight}px`;
 	}
-};
+}
 function stopResize() {
 	document.removeEventListener('mousemove', startResize);
 	document.removeEventListener('mouseup', stopResize);
 	window.cancelAnimationFrame(miniPlayerPos.aspectRatio);
 	updateHandles();
-};
+}
 function updateHandles() {
 	const bounds = miniPlayerEl.miniPlayer.getBoundingClientRect();
 	resizingHandles.ovr1.classList.toggle('allow', bounds.right + 8 <= 1392 && bounds.top - 8 >= 18);
 	resizingHandles.ovr2.classList.toggle('allow', bounds.right + 8 <= 1392 && bounds.bottom + 8 <= 692);
 	resizingHandles.ovr3.classList.toggle('allow', bounds.left - 8 >= 18 && bounds.top - 8 >= 18);
 	resizingHandles.ovr4.classList.toggle('allow', bounds.left - 8 >= 18 && bounds.bottom + 8 <= 692);
-};
+}
 function playerEvent(e) {
 	var event = e.currentTarget.getAttribute('event');
 	var currentTime = miniPlayerEl.playerMain.currentTime;
@@ -275,7 +277,7 @@ function playerEvent(e) {
 		default:
 			break;
 	}
-};
+}
 miniPlayerEl.allBtns.forEach(btn => {
 	btn.addEventListener('mousedown', function (e) {
 		if (this.querySelector('m')) {
@@ -294,7 +296,7 @@ miniPlayerEl.allBtns.forEach(btn => {
 			playerEvents.dragTimeout = null;
 		}
 	});
-});
+})
 function startDrag(element, e) {
 	if (!playerEvents.dragTimeout) return;
 	playerEvents.draggeable = true
@@ -311,16 +313,16 @@ function startDrag(element, e) {
 	});
 	document.addEventListener('mousemove', onMouseMove);
 	document.addEventListener('mouseup', stopDrag);
-};
+}
 function onMouseMove(e) {
 	if (playerEvents.draggedItem) {
 		updateDraggedItemPosition(e);
 	}
-};
+}
 function updateDraggedItemPosition(e) {
 	playerEvents.draggedItem.style.left = e.pageX - playerEvents.draggedItem.offsetWidth / 2 + 'px';
 	playerEvents.draggedItem.style.top = e.pageY - playerEvents.draggedItem.offsetHeight / 2 + 'px';
-};
+}
 function stopDrag(e) {
 	if (playerEvents.draggedItem) {
 		document.removeEventListener('mousemove', onMouseMove);
@@ -346,7 +348,7 @@ function stopDrag(e) {
 	});
 	playerEvents.draggeable = false
 	document.removeEventListener('mouseup', stopDrag);
-};
+}
 const callToActionsEmbed = document.getElementById('callToActionsEmbed');
 const callToActions = document.getElementById('callToActions');
 function player_toolbar_handleMouseOver() {
@@ -354,13 +356,13 @@ function player_toolbar_handleMouseOver() {
 		callToActions.classList.add('show');
 		resetTimer();
 	}
-};
+}
 function player_toolbar_handleMouseMove() {
 	if (!playerEvents.allowAddClass) {
 		callToActions.classList.add('show');
 		resetTimer();
 	}
-};
+}
 function resetTimer() {
 	if (!playerEvents.draggeable) {
 		clearTimeout(playerEvents.timeout);
@@ -369,14 +371,14 @@ function resetTimer() {
 			playerEvents.allowAddClass = false;
 		}, 8000);
 	}
-};
+}
 function player_toolbar_handleMouseLeave() {
 	if (!playerEvents.draggeable) {
 		clearTimeout(playerEvents.timeout);
 		callToActions.classList.remove('show');
 		playerEvents.allowAddClass = true;
 	}
-};
+}
 callToActionsEmbed.addEventListener('mouseover', player_toolbar_handleMouseOver);
 callToActionsEmbed.addEventListener('mouseleave', player_toolbar_handleMouseLeave);
 callToActionsEmbed.addEventListener('mousemove', player_toolbar_handleMouseMove)
@@ -465,11 +467,14 @@ function switchMode(mode) {
 }
 document.querySelectorAll('.btn').forEach(function (btn) {
 	btn.addEventListener('click', function () {
-		let siblings = btn.closest('.setting-element').querySelectorAll('.btn');
-		if (!btn.getAttribute('data-privilege')) {
-			siblings.forEach(function (sibling) {
-				sibling.classList.remove('active');
-			});
+		let siblings
+		if(btn.closest('.setting-element') && querySelectorAll('.btn')){
+			siblings = btn.closest('.setting-element').querySelectorAll('.btn');
+		} else {
+			siblings = null
+		}
+	
+			
 			btn.classList.add('active');
 
 			let value = btn.getAttribute('data-option')
@@ -540,16 +545,17 @@ document.querySelectorAll('.btn').forEach(function (btn) {
 					break;
 				case 'setMusicSync':
 					break;
+				case "openBrowser":
+					Link('openBrowser', `https://shop.bellafiora.fr/credits/`)
+					break;
 				case 'Reset':
 					break;
 					default:
 					break;
 			}
-		} else {
-			showNotificationBox('Please subscribe Osu!Supporter for enable this option', 'info')
-		}
+		
 	});
-});
+})
 function showNotificationBox(content, type) {
 
 	notificationBox.style.left = '1145px';
@@ -593,7 +599,7 @@ document.getElementById("settings_menu").addEventListener("click", function (eve
 			}, 50);
 		}
 	}
-});
+})
 document.querySelectorAll('.menuBtn').forEach(function (element) {
 	element.addEventListener('click', function (event) {
 		if (element.getAttribute('disabled')) {
@@ -622,8 +628,7 @@ document.querySelectorAll('.menuBtn').forEach(function (element) {
 		}
 	})
 
-});
-
+})
 function showScoreContextMenu(element) {
 	document.querySelector('.context-menu').classList.add('show')
 	function createBtn(label, action, targetID) {
@@ -652,7 +657,6 @@ function showScoreContextMenu(element) {
 	createBtn('Cancel', 'cancel', null)
 
 }
-
 function showCollectionContextMenu(element) {
 	document.querySelector('.context-menu').classList.add('show')
 	document.querySelector('.context-menu').innerHTML = ''
@@ -677,6 +681,7 @@ function showCollectionContextMenu(element) {
 						ipcRenderer.send('export-clbf', outputDirectory, element.getAttribute('name'))
 						document.querySelector('.context-menu').classList.remove('show')
 						document.querySelector('.context-menu').innerHTML = ""
+						document.getElementById(`collection-${collectionName}`).classList.add('show')
 					})
 
 					
@@ -702,13 +707,11 @@ function showCollectionContextMenu(element) {
 	createBtn('Cancel', 'cancel', null)
 
 }
-
 scores.forEach(function (element) {
 	element.addEventListener('click', function () {
 		showScoreContextMenu(element);
 	});
-});
-
+})
 function handleMouseOver(event, element) {
 	boxInfo.innerHTML = element.getAttribute('data-info')
 	updateBoxInfoPosition(event.clientX, event.clientY, calcHeight(element.getAttribute('data-info')));
@@ -736,7 +739,7 @@ document.querySelectorAll('[data-event="info"]').forEach(function (element) {
 		handleMouseOver(event, element);
 	});
 	element.addEventListener('mouseout', handleMouseOut);
-});
+})
 function handleMouseOut(event) { boxInfo.classList.remove('show'); }
 
 var pollrateGameplay = 250
@@ -775,32 +778,40 @@ function setInputKey(keyNumber) {
 
 	document.addEventListener('keydown', handleKeyDown);
 }
-async function IntroduceDataPlayer(defaultMod = false) {
-	var defaultMod
+async function IntroduceDataPlayer(data) {
+	var defaultMod = false
 
 	if (!defaultMod) {
-		defaultMod = (basic_infos.playmode === 'osu') ? 0 : (basic_infos.playmode === 'mania') ? 3 : (basic_infos.playmode === 'ctb') ? 2 : (basic_infos.playmode === 'taiko') ? 1 : '?';
+		defaultMod = (data.default_mode === 'osu') ? 0 : (data.default_mode  === 'mania') ? 3 : (data.default_mode  === 'fruits') ? 2 : (data.default_mode  === 'taiko') ? 1 : '?';
 	}
 	else {
-		defaultMod = (defaultMod === 'osu') ? 0 : (defaultMod === 'mania') ? 3 : (defaultMod === 'ctb') ? 2 : (defaultMod === 'taiko') ? 1 : '?';
+		defaultMod = (defaultMod === 'osu') ? 0 : (defaultMod === 'mania') ? 3 : (defaultMod === 'fruits') ? 2 : (defaultMod === 'taiko') ? 1 : '?';
 	}
 
-	document.getElementById('userAvatar').src = basic_infos.avatar_url
-	document.getElementById('welcomePseudo').innerText = basic_infos.username
-	document.getElementById('welcomeRank').innerText = `Rank: ${gameplay['m' + defaultMod].global_rank} (${gameplay['m' + defaultMod].country_rank} ${basic_infos.country})`
-	document.getElementById('welcomePP').innerText = `${parseInt(gameplay['m' + defaultMod].pp)} PP`
-	document.getElementById('userStat_classedPlays').innerText = `${gameplay['m' + defaultMod].plays_count}`;
-	document.getElementById('userphPStats.totalScore').innerText = `${gameplay['m' + defaultMod].total_score}`;
-	document.getElementById('userphPStats.accuracy').innerText = `${(parseFloat(gameplay['m' + defaultMod].accuracy)).toFixed(2)} %`;
-	document.getElementById('userStat_nbClick').innerText = `${gameplay['m' + defaultMod].clicks}`;
-	document.getElementById('userStat_maxCombo').innerText = `${gameplay['m' + defaultMod].combo_max}`
+	// defaultMod === 'fruits' ? defaultMod = 'ctb' : defaultMod
+	let rank_history = JSON.parse(data.games[data.default_mode].rank_history)
+	let globalRank = rank_history[rank_history.length - 1];
 
-	document.getElementById('userStat_nb_ssh').innerText = `${gameplay['m' + defaultMod].notes.ssh}`;
-	document.getElementById('userStat_nb_ss').innerText = `${gameplay['m' + defaultMod].notes.ss}`;
-	document.getElementById('userStat_nb_sh').innerText = `${gameplay['m' + defaultMod].notes.sh}`;
-	document.getElementById('userStat_nb_s').innerText = `${gameplay['m' + defaultMod].notes.s}`;
-	document.getElementById('userStat_nb_a').innerText = `${gameplay['m' + defaultMod].notes.a}`;
-	rankHistoryUpdate(gameplay['m' + defaultMod].history_rank)
+
+	console.log(data.games[`${data.default_mode}`])
+	document.getElementById('stats_refresh_dt').innerText = data.last_update
+	document.getElementById('playerInfo_AvatarUrl').src = data.avatar_url
+	document.getElementById('username').innerText = data.username
+	document.getElementById('stat_CountryRank').innerText = data.games[data.default_mode].country_rank
+	document.getElementById('stat_GlobalRank').innerText = globalRank
+	document.getElementById('stat_pp').innerText = parseInt(data.games[data.default_mode].statistics.pp)
+	document.getElementById('stat_ClassedScore').innerText = 0;
+	document.getElementById('stat_TotalScore').innerText = data.games[data.default_mode].statistics.scores.total
+	document.getElementById('stat_Accuracy').innerText = `${(parseFloat(data.games[data.default_mode].statistics.accuracy)).toFixed(2)} %`;
+	// document.getElementById('stat_Clicks').innerText = 0;
+	document.getElementById('stat_ComboMax').innerText = data.games[data.default_mode].statistics.max_combo
+	document.getElementById('stat_PlayCount').innerText = 0
+	// document.getElementById('userStat_nb_ssh').innerText = data.games[data.default_mode].statistics.notes.ssh
+	// document.getElementById('userStat_nb_ss').innerText = data.games[data.default_mode].statistics.notes.ss
+	// document.getElementById('userStat_nb_sh').innerText = data.games[data.default_mode].statistics.notes.sh
+	// document.getElementById('userStat_nb_s').innerText = data.games[data.default_mode].statistics.notes.s
+	// document.getElementById('userStat_nb_a').innerText = data.games[data.default_mode].statistics.notes.a
+	// rankHistoryUpdate(gameplay['m' + defaultMod].history_rank)
 }
 
 let tosuWebSocket = new ReconnectingWebSocket('ws://127.0.0.1:24050/ws');
@@ -848,170 +859,6 @@ function tr(key, ifUpdate) {
 	return ifUpdate ? newTranslations[key] || key : translations[key] || key
 	// return translations[key] || "<err>"+key+"</err>"
 }
-setTimeout(() => {
-	setInterval(async () => {
-		document.getElementById('currentTimeMusic').innerText = ctm(wsData.menu.bm.time.current, wsData.menu.bm.time.full)
-		document.getElementById('totalTimeMusic').innerText = ctm(wsData.menu.bm.time.full, wsData.menu.bm.time.full)
-		let backgroundCurrentMap = document.getElementById('backgroundCurrentMap')
-		if (currentBeatmapId !== wsData.menu.bm.id) {
-
-			document.getElementById('musicAuthor').innerText = wsData.menu.bm.metadata.artist
-			document.getElementById('musicMapper').innerText = wsData.menu.bm.metadata.mapper
-			document.getElementById('musicTitle').innerText = wsData.menu.bm.metadata.title
-			let rs = (wsData.menu.bm.rankedStatus).toString()
-
-			switch (rs) {
-				case "6":
-					rs = "Qualified"
-					break;
-				case "2":
-					rs = "WIP/Graveyard"
-					break;
-				case "4":
-					rs = "Ranked"
-					break;
-				case "1":
-					rs = "Graveyard"
-					break;
-				case "5":
-					rs = "Qualified"
-					break;
-				case "7":
-					rs = "Loved"
-					break;
-				default:
-					break;
-			}
-			bm_stats_holders.hp.innerText = wsData.menu.bm.stats.HP
-			bm_stats_holders.od.innerText = wsData.menu.bm.stats.OD
-			bm_stats_holders.cs.innerText = wsData.menu.bm.stats.CS
-			bm_stats_holders.ar.innerText = wsData.menu.bm.stats.AR
-			bm_stats_holders.sr.innerText = wsData.menu.bm.stats.fullSR
-			bm_stats_holders.bpm.innerText = wsData.menu.bm.stats.BPM.common
-			bm_stats_holders.difficulty.innerText = wsData.menu.bm.metadata.difficulty
-			bm_stats_holders.fc95.innerText = (parseInt(wsData.menu.pp['95'])).toFixed(2) + " PP"
-			bm_stats_holders.fc98.innerText = (parseInt(wsData.menu.pp['98'])).toFixed(2) + " PP"
-			bm_stats_holders.fc100.innerText = (parseInt(wsData.menu.pp['100'])).toFixed(2) + " PP"
-			bm_stats_holders.mapStatus.innerText = rs
-			currentBeatmapId = wsData.menu.bm.id
-			shareBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
-			shareBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
-			shareBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
-
-			openBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
-			openBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
-			openBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
-		}
-
-		if (backgroundCurrentMap.getAttribute('src') !== `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`) {
-			backgroundCurrentMap.setAttribute('src', `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`)
-			var basePath = wsData.settings.folders.songs.replace(/\\/g, '/');
-			var imagePath = wsData.menu.bm.path.full.replace(/\\/g, '/');
-			var fullUrl = encodeURI(`${basePath}/${imagePath}`);
-			document.getElementById('root').style.backgroundImage = `url('${fullUrl}')`;
-		}
-	}, pollrateGameplay);
-}, 2000);
-
-updateHandles();
-
-ipcRenderer.on('player-data', (event, data) => {
-	const player_data = data
-	basic_infos = player_data.basic_informations
-	gameplay = player_data.gameplay
-	// IntroduceDataPlayer(basic_infos.playmode)
-})
-ipcRenderer.on('notification', (event, content, type) => {
-	showNotificationBox(content, type)
-})
-ipcRenderer.on('newDevice', (event, data) => {
-	showNotificationBox(`${data.model} Connected`, "info")
-
-	document.getElementById('noDevice').classList.add('noshow')
-	document.getElementById('deviceInfos').classList.remove('noshow')
-
-	document.getElementById('deviceName').innerText = data.model
-	if (data.keys === 2) {
-		document.getElementById('keyBindList').innerHTML = `
-			<div class="btn keybind" onClick="setInputKey(1)" data-value="Q" id="key1">Q</div>
-			<div class="btn keybind" onClick="setInputKey(2)" data-value="S" id="key2">S</div>
-			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
-			`
-	} else {
-		document.getElementById('keyBindList').innerHTML = `
-			<div class="btn keybind" onClick="setInputKey(1)" data-value="D" id="key1">D</div>
-			<div class="btn keybind" onClick="setInputKey(2)" data-value="F" id="key2">F</div>
-			<div class="btn keybind" onClick="setInputKey(3)" data-value="J" id="key3">J</div>
-			<div class="btn keybind" onClick="setInputKey(4)" data-value="K" id="key4">K</div>
-			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
-			`
-	}
-})
-ipcRenderer.on('deviceDisconnected', (event, data) => {
-	showNotificationBox(`${data} Disconnected`, "info")
-	document.getElementById('keyBindList').innerHTML = ''
-	document.getElementById('noDevice').classList.remove('noshow')
-	document.getElementById('deviceInfos').classList.add('noshow')
-})
-ipcRenderer.on('api', (event, data) => {
-	if (data.event === 'createHTMLObject') {
-		document.getElementById('endOfNav').insertAdjacentHTML('afterend', data.HTML);
-	}
-});
-ipcRenderer.on('selected-directory', (event, pathId, path) => {
-	document.getElementById(pathId).value = path;
-});
-ipcRenderer.on('file-check-failed', (event, pathId) => {
-	showNotificationBox('Please select an Osu! Folder', 'warning')
-});
-ipcRenderer.on('settings', (event, data, software_info) => {
-	loadSettings(data)
-	console.log(data);
-	document.getElementById('software_infos').innerText = `v${software_info}`
-})
-ipcRenderer.on('collections', (event, collections) => {
-	CollectionList = collections
-	createCollectionsHandler(collections)
-})
-ipcRenderer.on('importCLBFDone', (event, importedCollection) => {
-	console.log(importedCollection)
-})
-left_menu.addEventListener('click', function (event) {
-	if (event.target.getAttribute('id') == 'side_left_menu' &&
-		event.offsetX >= left_menu.offsetWidth - 12) {
-		if (toggles.left_menu) {
-			left_menu.classList.add('hide');
-			content.classList.add('full')
-			left_menu.style.setProperty('--after-content', '""')
-			setTimeout(() => {
-				left_menu.style.setProperty('--after-content', '"❭"')
-				left_menu.style.setProperty('--after-content-width-left', '1%')
-				toggles.left_menu = false
-			}, 150);
-		} else {
-			left_menu.classList.remove('hide');
-			content.classList.remove('full')
-			left_menu.style.setProperty('--after-content', '""')
-			setTimeout(() => {
-				left_menu.style.setProperty('--after-content', '"❬"')
-				left_menu.style.setProperty('--after-content-width-left', '13.4%')
-				toggles.left_menu = true
-			}, 150)
-		}
-	}
-});
-window.addEventListener('resize', updateHandles);
-document.addEventListener('mousemove', updateHandles);
-bg.addEventListener('mousemove', (e) => {
-	const mouseX = e.clientX / windowWidth;
-	const mouseY = e.clientY / windowHeight;
-
-	bg.style.backgroundPositionX = `${mouseX}%`;
-	bg.style.backgroundPositionY = `${mouseY + 20}%`;
-});
-document.getElementById('importCLBF').addEventListener('click', function (event){
-	ipcRenderer.send('open-directory-clbf')
-})
 function createCollectionsHandler(collectionsList) {
 
 	let nbMaps = 0
@@ -1025,7 +872,10 @@ function createCollectionsHandler(collectionsList) {
 		collectionElement.classList.add('collection-name');
 		collectionElement.setAttribute('name', collectionName)
 		collectionElement.classList.add('added')
-
+		let holder = document.createElement('div')
+		holder.classList.add('holder')
+		holder.innerText = "Exportation.."
+		holder.setAttribute('id',`collection-${collectionName}`)
 		let span = document.createElement('span');
 		let input = document.createElement('input');
 		input.setAttribute('disabled', 'disabled')
@@ -1058,6 +908,7 @@ function createCollectionsHandler(collectionsList) {
 		collectionElement.appendChild(m1)
 		collectionElement.appendChild(m2)
 		collectionElement.appendChild(m3)
+		collectionElement.appendChild(holder)
 
 		CollectionList.insertBefore(collectionElement, (CollectionList.children[1]));
 		setTimeout(() => {
@@ -1239,13 +1090,173 @@ function createCollectionsHandler(collectionsList) {
 
 	});
 
-
-
-
-
-
-
 }
+setTimeout(() => {
+	setInterval(async () => {
+		document.getElementById('currentTimeMusic').innerText = ctm(wsData.menu.bm.time.current, wsData.menu.bm.time.full)
+		document.getElementById('totalTimeMusic').innerText = ctm(wsData.menu.bm.time.full, wsData.menu.bm.time.full)
+		let backgroundCurrentMap = document.getElementById('backgroundCurrentMap')
+		if (currentBeatmapId !== wsData.menu.bm.id) {
+
+			document.getElementById('musicAuthor').innerText = wsData.menu.bm.metadata.artist
+			document.getElementById('musicMapper').innerText = wsData.menu.bm.metadata.mapper
+			document.getElementById('musicTitle').innerText = wsData.menu.bm.metadata.title
+			let rs = (wsData.menu.bm.rankedStatus).toString()
+
+			switch (rs) {
+				case "6":
+					rs = "Qualified"
+					break;
+				case "2":
+					rs = "WIP/Graveyard"
+					break;
+				case "4":
+					rs = "Ranked"
+					break;
+				case "1":
+					rs = "Graveyard"
+					break;
+				case "5":
+					rs = "Qualified"
+					break;
+				case "7":
+					rs = "Loved"
+					break;
+				default:
+					break;
+			}
+			bm_stats_holders.hp.innerText = wsData.menu.bm.stats.HP
+			bm_stats_holders.od.innerText = wsData.menu.bm.stats.OD
+			bm_stats_holders.cs.innerText = wsData.menu.bm.stats.CS
+			bm_stats_holders.ar.innerText = wsData.menu.bm.stats.AR
+			bm_stats_holders.sr.innerText = wsData.menu.bm.stats.fullSR
+			bm_stats_holders.bpm.innerText = wsData.menu.bm.stats.BPM.common
+			bm_stats_holders.difficulty.innerText = wsData.menu.bm.metadata.difficulty
+			bm_stats_holders.fc95.innerText = (parseInt(wsData.menu.pp['95'])).toFixed(2) + " PP"
+			bm_stats_holders.fc98.innerText = (parseInt(wsData.menu.pp['98'])).toFixed(2) + " PP"
+			bm_stats_holders.fc100.innerText = (parseInt(wsData.menu.pp['100'])).toFixed(2) + " PP"
+			bm_stats_holders.mapStatus.innerText = rs
+			currentBeatmapId = wsData.menu.bm.id
+			shareBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
+			shareBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
+			shareBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
+
+			openBtn.setAttribute('data-beatmapId', wsData.menu.bm.id)
+			openBtn.setAttribute('data-beatmapsetId', wsData.menu.bm.set)
+			openBtn.setAttribute('data-gamemode', wsData.menu.gameMode)
+		}
+
+		if (backgroundCurrentMap.getAttribute('src') !== `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}` && toggles.global_page === "gameplay_page") {
+			backgroundCurrentMap.setAttribute('src', `${wsData.settings.folders.songs}\\${wsData.menu.bm.path.full}`)
+			var basePath = wsData.settings.folders.songs.replace(/\\/g, '/');
+			var imagePath = wsData.menu.bm.path.full.replace(/\\/g, '/');
+			var fullUrl = encodeURI(`${basePath}/${imagePath}`);
+			document.getElementById('root').style.backgroundImage = `url('${fullUrl}')`;
+		}
+	}, pollrateGameplay);
+}, 2000)
+
+updateHandles();
+ipcRenderer.on('player-data', (event, data) => {
+	
+	IntroduceDataPlayer(data)
+})
+ipcRenderer.on('notification', (event, content, type) => {
+	showNotificationBox(content, type)
+})
+ipcRenderer.on('newDevice', (event, data) => {
+	showNotificationBox(`${data.model} Connected`, "info")
+
+	document.getElementById('noDevice').classList.add('noshow')
+	document.getElementById('deviceInfos').classList.remove('noshow')
+
+	document.getElementById('deviceName').innerText = data.model
+	if (data.keys === 2) {
+		document.getElementById('keyBindList').innerHTML = `
+			<div class="btn keybind" onClick="setInputKey(1)" data-value="Q" id="key1">Q</div>
+			<div class="btn keybind" onClick="setInputKey(2)" data-value="S" id="key2">S</div>
+			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
+			`
+	} else {
+		document.getElementById('keyBindList').innerHTML = `
+			<div class="btn keybind" onClick="setInputKey(1)" data-value="D" id="key1">D</div>
+			<div class="btn keybind" onClick="setInputKey(2)" data-value="F" id="key2">F</div>
+			<div class="btn keybind" onClick="setInputKey(3)" data-value="J" id="key3">J</div>
+			<div class="btn keybind" onClick="setInputKey(4)" data-value="K" id="key4">K</div>
+			<div class="btn" data-event="setInputDefaultOsu">Set Osu! Keys</div>
+			`
+	}
+})
+ipcRenderer.on('deviceDisconnected', (event, data) => {
+	showNotificationBox(`${data} Disconnected`, "info")
+	document.getElementById('keyBindList').innerHTML = ''
+	document.getElementById('noDevice').classList.remove('noshow')
+	document.getElementById('deviceInfos').classList.add('noshow')
+})
+ipcRenderer.on('api', (event, data) => {
+	if (data.event === 'createHTMLObject') {
+		document.getElementById('endOfNav').insertAdjacentHTML('afterend', data.HTML);
+	}
+})
+ipcRenderer.on('selected-directory', (event, pathId, path) => {
+	document.getElementById(pathId).value = path;
+})
+ipcRenderer.on('file-check-failed', (event, pathId) => {
+	showNotificationBox('Please select an Osu! Folder', 'warning')
+})
+ipcRenderer.on('settings', (event, data, software_info) => {
+	loadSettings(data)
+	console.log(data);
+	document.getElementById('software_infos').innerText = `v${software_info}`
+})
+ipcRenderer.on('collections', (event, collections) => {
+	CollectionList = collections
+	createCollectionsHandler(collections)
+})
+ipcRenderer.on('importCLBFDone', (event, importedCollection) => {
+	console.log(importedCollection)
+})
+ipcRenderer.on('export-finished', (event, collectionName) => {
+	document.getElementById(`collection-${collectionName}`).classList.remove('show')
+})
+left_menu.addEventListener('click', function (event) {
+	if (event.target.getAttribute('id') == 'side_left_menu' &&
+		event.offsetX >= left_menu.offsetWidth - 12) {
+		if (toggles.left_menu) {
+			left_menu.classList.add('hide');
+			content.classList.add('full')
+			left_menu.style.setProperty('--after-content', '""')
+			setTimeout(() => {
+				left_menu.style.setProperty('--after-content', '"❭"')
+				left_menu.style.setProperty('--after-content-width-left', '1%')
+				toggles.left_menu = false
+			}, 150);
+		} else {
+			left_menu.classList.remove('hide');
+			content.classList.remove('full')
+			left_menu.style.setProperty('--after-content', '""')
+			setTimeout(() => {
+				left_menu.style.setProperty('--after-content', '"❬"')
+				left_menu.style.setProperty('--after-content-width-left', '13.4%')
+				toggles.left_menu = true
+			}, 150)
+		}
+	}
+})
+
+window.addEventListener('resize', updateHandles);
+document.addEventListener('mousemove', updateHandles);
+bg.addEventListener('mousemove', (e) => {
+	const mouseX = e.clientX / windowWidth;
+	const mouseY = e.clientY / windowHeight;
+
+	bg.style.backgroundPositionX = `${mouseX}%`;
+	bg.style.backgroundPositionY = `${mouseY + 20}%`;
+})
+document.getElementById('importCLBF').addEventListener('click', function (event){
+	ipcRenderer.send('open-directory-clbf')
+})
+
 document.getElementById('createCollectionBtn').addEventListener('click', function () {
 	let CollectionList = document.getElementById('lcollection')
 
@@ -1329,7 +1340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		translations = JSON.parse(dictionnary)
 		setTranslations()
 	})
-});
+})
 //    Nombre de jours
 // 	  const numDays = 90;
 // 	  const chartOptions = {
@@ -1470,5 +1481,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 // 	  Highcharts.chart('HitArrErr_highligh', chartOptions);
 //   }
 
+function getCountryTimeZone(countryCode) {
+	const countryTimeZones = {
+		'FR': 'Europe/Paris',    // France
+		'US': 'America/New_York', // USA
+		'GB': 'Europe/London',  // United Kingdom
+		'DE': 'Europe/Berlin',  // Germany
+		'CN': 'Asia/Shanghai',  // China
+		'IN': 'Asia/Kolkata',   // India
+		'JP': 'Asia/Tokyo',     // Japan
+		'BR': 'America/Sao_Paulo', // Brazil
+		'AU': 'Australia/Sydney',  // Australia
+		// Ajoutez d'autres pays et leurs fuseaux horaires ici
+	};
 
+	return countryTimeZones[countryCode] || 'UTC'; // Retourne 'UTC' si le code pays n'est pas trouvé
+}
 
+function getLocalizedTime(data) {
+	let format = "DD/MM/YYYY HH[h]mm";
+	let timeZone = getCountryTimeZone(data.country_code);
+
+	// Convertir et formater la date
+	let localizedTime = moment(data.last_update).tz(timeZone).format(format);
+	return localizedTime;
+}
