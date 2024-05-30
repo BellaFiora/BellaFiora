@@ -111,6 +111,9 @@ err {
     background-color: transparent!important;
     backdrop-filter: blur(15px);
 }
+.pointer {
+    cursor: pointer;
+}
 .white-text {
     color: white;
 }
@@ -1309,7 +1312,7 @@ l {
 }
 .collections-list .title {
     position: sticky;
-    z-index: 1000;
+    z-index: 10;
     min-height: 41px;
     top: 0;
     background-color: var(--background-box);
@@ -1325,7 +1328,50 @@ l {
     overflow: hidden;
     display: flex;
     transition: all 0.08s ease-in;
+    position: relative; 
 }
+
+.collection-name .holder {
+    position: absolute;
+    height: 45px;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: absolute;
+    background-image: linear-gradient(-45deg, #5d24e263 25%, rgba(255, 154, 26, 0) 25%, rgba(255, 154, 26, 0) 50%, #5d24e263 50%, #5d24e263 75%, rgba(255, 154, 26, 0) 75%);
+    background-size: 45px 45px;
+    animation: move 2s linear infinite;
+}
+
+.collection-name .holder.show {
+    display: flex;
+}
+
+
+.collection-name .holder::before {
+    content: " ";
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background-color: #000;
+    background-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 1px 0 rgba(0, 0, 0, 0.1);
+    z-index: -1;
+}
+
+
+
+@keyframes move {
+    0%   { background-position: 0 0; }
+    100% { background-position: 45px 45px; }
+}
+
 .collection-name span {
     width: 95%;
     color: var(--text-color-inactive);
