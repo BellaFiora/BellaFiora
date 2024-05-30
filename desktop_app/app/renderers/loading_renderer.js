@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 const ReconnectingWebSocket = require('../server/gosumemory_handler')
 
 ipcRenderer.on('progress_loading', (event, stat, afterError) => {
-	document.getElementById('loading_error').innerText = ``
+	document.getElementById('loading_error').innerHTML = ``
 
 	const lastElm = document.getElementById('progress_loading').lastElementChild
 	if (lastElm) {
@@ -11,9 +11,9 @@ ipcRenderer.on('progress_loading', (event, stat, afterError) => {
 		loadingStat.classList.add('ok')
 		console.log(afterError)
 		if(afterError){
-			loadingStat.innerText = '❌'
+			loadingStat.innerHTML = '❌'
 		} else {
-			loadingStat.innerText = '✓'
+			loadingStat.innerHTML = '✓'
 		}
 		
 		lastElm.classList.add('reduce')
@@ -59,7 +59,7 @@ ipcRenderer.on('ws_connect', (event) => {
 
 ipcRenderer.on(
 	'loading_err',
-	(event, error) => { document.getElementById('loading_error').innerText = `${error}` })
+	(event, error) => { document.getElementById('loading_error').innerHTML = error })
 
 ipcRenderer.on(
 	'client_informations',
