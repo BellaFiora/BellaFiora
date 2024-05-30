@@ -13,7 +13,7 @@ class Files {
      * @param {string} name - The name of the file to be created, without the extension.
      * @param {Object} obj - The object containing the data to write into the INI file.
      */
-    async createIni(name, obj){
+    async createIni(name, obj) {
         let iniString = '';
         for (const section in obj) {
             iniString += `[${section}]\n`;
@@ -22,10 +22,10 @@ class Files {
             }
             iniString += '\n';
         }
-        fs.writeFile(path.join(AppData,`${name}.ini`), iniString, (err) => {
+        fs.writeFile(path.join(AppData, `${name}.ini`), iniString, (err) => {
             if (err) {
                 return false
-            } 
+            }
         });
     }
     /**
@@ -33,12 +33,15 @@ class Files {
      * @param {string} filePath - The full path of the file to check.
      * @returns {Promise<boolean>}
      */
-    async check(filePath){
-        if (fs.existsSync(filePath)) {
-            return true
-        } else {
-            return false
-        }
+    async check(filePath) {
+        return new Promise((resolve, reject) => {
+            if (fs.existsSync(filePath)) {
+                resolve(true)
+            } else {
+                resolve(false)
+            }
+        })
+
     }
 
     /**
