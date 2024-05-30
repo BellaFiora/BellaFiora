@@ -9,6 +9,7 @@ const path = require('path');
 const url = require('url');
 const http = require('http');
 const readFile = util.promisify(fs.readFile);
+const system = require('./app/lib/System');
 
 // *** App Libs *** // 
 const { AppError, PluginError } = require('./app/lib/Errors')
@@ -17,10 +18,11 @@ const conf = require('./app/lib/priv/credentials');
 // const LocalServer = require('./app/lib/Servers');
 // const Artisan = require('./app/lib/Web_Builder')
 const Settings = require('./app/lib/Settings')
-const {Files} = require('./app/lib/Files')
-const {OsuParse} = require('./app/lib/Parsers')
-const { GenerateUID} = require('./app/lib/Utils')
+const { Files } = require('./app/lib/Files')
+const { OsuParse } = require('./app/lib/Parsers')
+const { GenerateUID } = require('./app/lib/Utils')
 const collectionManager = require('./app/lib/Collections')
+const { Login, Register, ServerLog, Update, Synchronization} = require('./app/lib/NetAnchor')
 
 const packageJson = require('./package.json');
 const OsuDBReader = require('./app/lib/Readers');
@@ -44,11 +46,10 @@ let collections
 
 
 const AppData = path.join(process.env.LOCALAPPDATA, 'Bella Fiora Desktop');
-if (!fs.existsSync(AppData)){fs.mkdirSync(AppData, { recursive: true })} 
+if (!fs.existsSync(AppData)) { fs.mkdirSync(AppData, { recursive: true }) }
 
 const Conf = new conf();
 const File = new Files()
-const RemoteSrv = new remoteSrv();
 
 Conf.setConf('client_version', packageJson.version);
 Conf.setConf('AppPath', app.getAppPath().replace("\\resources\\app.asar", ""));
@@ -56,34 +57,26 @@ Conf.setConf('LocalPath', AppData);
 
 
 app.whenReady().then(async () => {
-    app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); 
-    globalShortcut.register('F11', () => {})
-
-    if (process.platform === "win32") { execSync('chcp 65001 > nul')};
-    if (!Conf.getConf('AlreadyInstalled')){isFirstTime = false};
-    isFirstTime = false
-   
-    if(!Conf.getConf('client_id') && isFirstTime){ client_id = GenerateUID()}
- 
+    app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+    globalShortcut.register('F11', () => { })
+    if (process.platform === "win32") { execSync('chcp 65001 > nul') };
+    if (Conf.getConf('AlreadyInstalled')) { isFirstTime = false };
+    if (!Conf.getConf('client_id') && isFirstTime) { client_id = GenerateUID(); Conf.setConf('client_id', client_id) }
     await checkLocalApp()
     await loadTranslation(null, ipcMain)
     await LaunchLoading();
-
-    
-
     // await collectionManager.ScanAndSave()
     // await checkingUpdate()
-
     await ServerConnection()
-    await tLaunch(isFirstTime).then(async (stat)=> {
-        await wsConnect(stat);
-    })
-   
-    // await osuConnect();
+
+    await tLaunch(isFirstTime).then(async (stat) => { await wsConnect(stat)})
+
+    await osuConnect();
     collections = await osuHandler(collections);
     await LaunchGUI();
+
     await sendCache(collections);
-    ipcMain.on('getLang', async (event, lang) => { mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary)});
+    ipcMain.on('getLang', async (event, lang) => { mainWindow.webContents.send('lang', lang ? await loadTranslation(lang) : dictionnary) });
 
     // Declaring API endpoints for external plugins
     // const pluginAPI = {
@@ -173,38 +166,18 @@ async function osuConnect() {
     return new Promise(async (resolve, reject) => {
         // Check if Osu token exists in configuration
         if (Conf.getConf('osu_token')) {
+            let update = new Update()
+            await update.try()
+            Log(tr('Data Synchronization'))
+            await SyncData();
+            resolve()
 
-            RemoteSrv.checkToken(Conf.getConf('osu_token'), Conf.getConf('client_id')).then(resp => {
-                if(!resp.isValide){
-                    AuthService().then(result => {
-                        // console.log(result)
-                        // await SyncData();
-                        resolve()
-                    })
-                }
-            })
-            // // Make a GET request to Osu! API to fetch user data
-            // axios.get('https://osu.ppy.sh/api/v2/me', {
-            //     headers: { 'Authorization': `Bearer ${Conf.getConf('osu_token')}` },
-            // }).then(async response => {
-    
-
-            //     // Resolve if user ID exists in the response
-            //     if (response.data.id)
-            //         // Call SyncData function
-            //         Log(tr('Data Synchronization'))
-
-            //     await SyncData();
-            //     resolve(true);
-            // }).catch(error => {
-
-            //     console.error('Error fetching data:', error.message);
-            //     reject(error);
-            // });
-           
         } else {
             // If Osu token doesn't exist, perform authentication and sync data
             await AuthService();
+            
+            let update = new Update()
+            await update.try()
             Log(tr('Data Synchronization'))
             await SyncData();
             resolve(true);
@@ -217,30 +190,32 @@ async function osuConnect() {
             // Open external URL for Osu! OAuth authorization
             shell.openExternal('https://osu.ppy.sh/oauth/authorize?client_id=30165&redirect_uri=https://techalchemy.fr/oAuth2/Bellafiora/index.php&response_type=code&scope=public identify');
             let osuConnectError = setTimeout(() => {
-                Log('Vous devez vous connecter sur Osu! Pour continuer',true, true)
+                Log('Vous devez vous connecter sur Osu! Pour continuer', true, true)
             }, 5000);
             // Create a server for handling the authorization callback
             const server = http.createServer((req, res) => {
                 const parsedUrl = url.parse(req.url, true);
                 const queryParameters = parsedUrl.query;
-                if(queryParameters.error){
-                    Log('Vous devez vous connecter sur Osu! Pour continuer',true, true)
-                    mainWindow.webContents.send('osuError', tr('Connect your Osu!Account')); 
+                if (queryParameters.error) {
+                    Log('Vous devez vous connecter sur Osu! Pour continuer', true, true)
+                    mainWindow.webContents.send('osuError', tr('Connect your Osu!Account'));
                     server.close();
                 } else {
                     clearTimeout(osuConnectError)
                     axios.get('https://osu.ppy.sh/api/v2/me', { headers: { 'Authorization': `Bearer ${queryParameters.token}` } })
-                    .then(response => {
-                        // Resolve if user ID exists in the response
-                        if (response.data.id) {
-                            // Save Osu ID and token in configuration
-                            Conf.setConf('osu_id', response.data.id);
-                            Conf.setConf('osu_token', queryParameters.token);
-                            Conf.setConf('refresh_token', queryParameters.refresh_token);
+                        .then(response => {
+                            // Resolve if user ID exists in the response
+                            if (response.data.id) {
+                                // Save Osu ID and token in configuration
+                                Conf.setConf('osu_id', response.data.id);
+                                Conf.setConf('osu_token', queryParameters.token);
+                                Conf.setConf('refresh_token', queryParameters.refresh_token);
 
-                            // Close the authorization window
-                            res.writeHead(200, { 'content-Type': 'text/html' })
-                            res.write(`
+                                
+
+                                // Close the authorization window
+                                res.writeHead(200, { 'content-Type': 'text/html' })
+                                res.write(`
                             <!DOCTYPE html>
                                 <html lang="en">
                                 <head>
@@ -293,23 +268,26 @@ async function osuConnect() {
                                 </body>
                                 <script>setTimeout(()=> {window.close()}, 5000)
                                 </html>`);
-                            const closeWindowScript = '';
-                            res.end(closeWindowScript);
-                            // res.end(closeWindowScript);
-                            setTimeout(() => { server.close(); }, 500);
-                            resolve(true);
-                        } else {
-                            console.log(response)
-                        }
+                                const closeWindowScript = '';
+                                res.end(closeWindowScript);
+                                // res.end(closeWindowScript);
+                                setTimeout(() => { server.close(); }, 500);
+                                resolve(true);
+                            } else {
+                                console.log(response)
+                            }
 
-                     
-                    }).catch(error => {
-                        // Close the authorization window in case of error
-                        const closeWindowScript = '<script>window.close();</script>';
-                        res.end(closeWindowScript);
-                        server.close();
-                        resolve(false)
-                    });
+
+                        }).catch(error => {
+                       
+                            // Close the authorization window in case of error
+                            const closeWindowScript = '<script>window.close();</script>';
+                            res.end(closeWindowScript);
+                            server.close();
+                            resolve(false)
+                        });
+                        let update = new Update()
+                        update.try()
 
                 }
 
@@ -324,25 +302,17 @@ async function osuConnect() {
     // Function to synchronize data
     async function SyncData() {
         const Conf = new conf();
-        
 
         return new Promise(async (resolve, reject) => {
-            try {
-                // Make a GET request to a server for data synchronization
-                await RemoteSrv.sync(Conf.getConf('client_id'), Conf.getConf('osu_token'), Conf.getConf('osu_id')).then(resp => {
+           try {
+            let sync = new Synchronization()
+            let response = await sync.try()
+            player_data = response.data
+            resolve()
+           } catch(e){
 
-                    if (!resp) {
-                        Log(tr('Unauthorised on the server'), true, true)
-                        continueExecute = false
-                    } else {
-                        player_data = JSON.parse(resp)
-                    }
-                    resolve(true)
-                })
-            } catch (error) {
-                console.error('Error making HTTP request:', error);
-                reject(error);
-            };
+           }
+            
         });
     };
 };
@@ -583,10 +553,8 @@ async function LaunchGUI() {
 async function ServerConnection() {
     // Check if execution should continue
     if (!continueExecute) return
-
     // Create new configuration and remote server objects
     const Conf = new conf();
-    const RemoteSrv = new remoteSrv();
 
     // Fetch the client's IP address using an external API
     try {
@@ -600,18 +568,43 @@ async function ServerConnection() {
 
     return new Promise(async (resolve, reject) => {
 
-        if(!Conf.getConf('AlreadyInstalled')){ 
+        if (isFirstTime) {
             Log(tr('Server Register'));
-            RemoteSrv.Reg(client_id).then(result => {
-                resolve({ stat: result.stat, err: result.err });
-            });
+            let register = new Register()
+            let result = await register.try()
+            if (result === "server_error") {
+                AppError(mainWindow, tr('Please Enable Internet Connection'));
+                continueExecute = false
+            }
+
+            if (result.data.private_key) {
+                Conf.setConf('private_key', result.data.private_key)
+                Conf.setConf('AlreadyInstalled', true)
+                resolve()
+            } else {
+                Conf.setConf('client_id', null)
+                Conf.setConf('AlreadyInstalled', false)
+                Conf.setConf('osu_token', null)
+                Conf.setConf('osu_token', null)
+                Conf.setConf('osu_id', null);
+                Conf.setConf('osu_token', null);
+                Conf.setConf('refresh_token', null);
+                await ServerConnection()
+            }
+
         } else {
-            Log(tr('Server Synchronization..'));
-            RemoteSrv.Login(client_id).then(result => {
-                resolve({ stat: result.stat, err: result.err });
-            });
+            Log(tr('Server Synchronization..'))
+            let login = new Login()
+            let result = await login.try()
+            if (result === "server_error") {
+                AppError(mainWindow, tr('Please Enable Internet Connection'));
+                continueExecute = false
+            }
+            resolve()
+
+
         }
-    
+
     });
 };
 async function tLaunch() {
@@ -627,42 +620,78 @@ async function tLaunch() {
                 const externalProcess = spawn(path.join(Conf.getConf('AppPath'), "tosu.exe"));
                 const outputHandler = (data) => {
                     output = data.toString();
-                    if (output.includes('ALL PATTERNS ARE RESOLVED')) { isOsuLanuched = true}
-                    if (output.includes('Searching for osu!')) { Log('Wait Osu!')}
-                    if (output.includes("Web server started")) { tsIsReady = true}
+                    if (output.includes('ALL PATTERNS ARE RESOLVED')) { isOsuLanuched = true }
+                    if (output.includes('Searching for osu!')) { Log('Wait Osu!') }
+                    if (output.includes("Web server started")) { tsIsReady = true }
                 };
+                console.log('test:'+Conf.getConf('osu_path'))
                 externalProcess.stdout.on("data", outputHandler);
-                if(!isFirstTime){
-                    setTimeout(() => { 
-                      if(!isOsuLanuched){
-                        mainWindow.webContents.send('EventError', tr('Wait Osu!')); 
-                        resolve(true)
-                      } else {
-                        resolve(false)  
-                      }
-                    }, 5000);
+                if (!isFirstTime ) {
+                    if(Conf.getConf('osu_path') == false || Conf.getConf('osu_path') == null){
+                        console.log('condition 640')
+                        setTimeout(() => {  
+                            if (!isOsuLanuched) {
+                                Log(tr("Please start Osu! and restart Bella Fiora Desktop"), true, true);
+                            } else {
+                                resolve(false);
+                            }
+                        }, 5000)
+                    } else {
+                        console.log('condition 630')
+                        setTimeout(() => {
+                            if (!isOsuLanuched) {
+                                mainWindow.webContents.send('EventError', tr('Wait Osu!'));
+                                resolve(true)
+                            } else {
+                                resolve(false)
+                            }
+                        }, 5000);
+                    }
+                    
                 } else {
-                    setTimeout(() => { 
-                        if (!isOsuLanuched) {  
-                            Log(tr("Please start Osu! and restart Bella Fiora Desktop"), true, true); 
-                        } else {
-                            resolve(false); 
-                        }
-                    }, 5000)
+                    if(Conf.getConf('osu_path') == false || Conf.getConf('osu_path') == null){
+                        console.log('condition 640')
+                        setTimeout(() => {  
+                            if (!isOsuLanuched) {
+                                mainWindow.webContents.send('EventError', tr('Wait Osu!'));
+                                Log(tr("Please start Osu! and restart Bella Fiora Desktop"), true, true);
+                            } else {
+                                resolve(false);
+                            }
+                        }, 5000)
+                    } else {
+                        setTimeout(() => {
+                            if (!isOsuLanuched) {
+                                resolve(true)
+                            } else {
+                                resolve(false)
+                            }
+                        }, 5000);
+                    }
+                    
                 }
+
+
+
                 setTimeout(() => {
                     if (!isOsuLanuched) {
-                        if (isFirstTime) {
-                            mainWindow.webContents.send('EventError', tr('Wait Osu!')); 
-                            let awaitOsu = setInterval(() => {
-                                if(output.includes('ALL PATTERNS ARE RESOLVED')){
-                                    clearTimeout(awaitOsu)
-                                    resolve(false)   
-                                }
-                            }, 850);    
-                        } else {
+                        if (isFirstTime || Conf.getConf('osu_path') == false || Conf.getConf('osu_path') == null) {
+                            console.log('condition 655')
+                            mainWindow.webContents.send('EventError', tr('Wait Osu!'));
                             mainWindow.webContents.send('EventError', tr('Wait Osu!'))
-                            resolve(true);  
+                            
+                            let awaitOsu = setInterval(() => {
+                                if (output.includes('ALL PATTERNS ARE RESOLVED')) {
+                                    console.log('resolved')
+                                    clearTimeout(awaitOsu)
+                                    resolve(false)
+                                }
+                            }, 850);
+                        } else {
+                            console.log('condition 664')
+
+                            mainWindow.webContents.send('EventError', tr('Wait Osu!'))
+                            resolve(true);
                         }
                     }
                 }, 8000);
@@ -676,16 +705,16 @@ async function osuHandler() {
     // logFile.background('test', app)
     // Return a Promise
     return new Promise(async (resolve, reject) => {
-        
+
         // Create new osuFiles and configuration objects
         const osuFiles = new OsuParse();
         const osudbReader = new OsuDBReader
         collections = await osudbReader.readCollectionDB(
-            path.join(Conf.getConf('osu_path'), '/collection.db'), 
+            path.join(Conf.getConf('osu_path'), '/collection.db'),
             path.join(Conf.getConf('osu_path'), '/osu!.db'))
 
-  
-       
+
+
         // Check if beatmaps.json file exists in the specified path
         if (fs.existsSync(path.join(AppData, '/beatmaps.json'))) {
             // Log message for updating scores
@@ -720,7 +749,7 @@ async function wsConnect(isAfterError) {
     Log(tr('Connection to the Websocket'), true, false, true, isAfterError);
     // Create a new configuration object
     const Conf = new conf();
- 
+
     mainWindow.webContents.send('ws_connect', true);
     // // Return a Promise
     return new Promise((resolve) => {
@@ -760,22 +789,23 @@ async function Log(e, show = true, err = false, toServ = true, afterErr = false)
         };
     };
 
-    if (toServ) RemoteSrv.Log(e);
+    // if (toServ) RemoteSrv.Log(e);
 };
 async function sendCache() {
     if (!continueExecute) return
     return new Promise((e, n) => {
         setTimeout(async () => {
             let settingsManager = new Settings()
+            console.log(player_data)
             mainWindow.webContents.send('player-data', player_data);
             mainWindow.webContents.send('collections', collections);
 
             mainWindow.webContents.send('settings', settingsManager.getAll(), Conf.getConf('client_version'));
-            if(Conf.getConf('Updated')){
+            if (Conf.getConf('Updated')) {
                 mainWindow.webContents.send('notification', `Bella Fiora Desktop has been successfully updated to ${Conf.getConf('client_version')}`, 'info');
-                Conf.setConf('Updated',false)
+                Conf.setConf('Updated', false)
             }
-            
+
             e(true);
         }, 1000);
     });
@@ -879,11 +909,11 @@ async function loadTranslation(lang = null) {
     await settingsManager.load()
     Conf.setConf('lang', settingsManager.get('General', 'setLanguage'));
     let setLang = Conf.getConf('lang')
-    if (lang) { setLang = lang; }
+    if (lang) { setLang = lang; } else { setLang = 'en-EN'}
     const e = fs.readFileSync(`${Conf.getConf('AppPath')}/app/locales/${setLang}.json`, "utf-8");
     translations = JSON.parse(e)
     dictionnary = e
-    
+
     return e
 };
 function tr(key) {
@@ -921,12 +951,12 @@ ipcMain.on('open-directory-clbf', (event, pathId) => {
     const window = BrowserWindow.getFocusedWindow();
     dialog.showOpenDialog(window, {
         properties: ['openFile'],
-        filters: [{ name: 'CLBF Files', extensions: ['clbf'] }] 
+        filters: [{ name: 'CLBF Files', extensions: ['clbf'] }]
     }).then(result => {
         if (!result.canceled && result.filePaths.length > 0) {
-           
+
             console.log('Selected file:', result.filePaths[0]);
-            event.reply('selected-file', result.filePaths[0]); 
+            event.reply('selected-file', result.filePaths[0]);
         }
     }).catch(err => {
         console.log('Error selecting file:', err);
@@ -935,10 +965,10 @@ ipcMain.on('open-directory-clbf', (event, pathId) => {
 ipcMain.handle('select-output-directory', async (event) => {
     const window = BrowserWindow.getFocusedWindow();
     const result = await dialog.showOpenDialog(window, {
-        properties: ['openDirectory']  
+        properties: ['openDirectory']
     });
     if (!result.canceled && result.filePaths.length > 0) {
-        return result.filePaths[0]; 
+        return result.filePaths[0];
     } else {
         throw new Error('No directory selected');
     }
@@ -948,21 +978,22 @@ ipcMain.on('export-clbf', async (event, output, collectionName) => {
     let files = new Files()
     mainWindow.webContents.send('notification', 'Start of export', 'info')
     collectionManager.getCollections().then(collection => {
-        if(collection[collectionName]){
+        if (collection[collectionName]) {
             files.exportCLBF(collection[collectionName], collectionName).then(result => {
-                const filePath = path.join(output, `${collectionName.replace(/[\W_]+/g,"_")}.clbf`);
+                const filePath = path.join(output, `${collectionName.replace(/[\W_]+/g, "_")}.clbf`);
                 fs.writeFile(filePath, JSON.stringify(result, null, 4), (err) => {
                     if (err) {
                         mainWindow.webContents.send('notification', `Error during export to "${collectionName}"`, 'warning')
                     } else {
                         mainWindow.webContents.send('notification', `${collectionName} has been exported !`, 'info')
+                        mainWindow.webContents.send('export-finished', collectionName)
                         shell.openPath(output)
-                        .then(result => {
-                           
-                        })
-                        .catch(err => {
-                           
-                        });
+                            .then(result => {
+
+                            })
+                            .catch(err => {
+
+                            });
                     }
                 });
             })
@@ -972,7 +1003,7 @@ ipcMain.on('export-clbf', async (event, output, collectionName) => {
     })
 
 })
-ipcMain.on('updateCollectionDB', (event, updatedCollection)=>{
+ipcMain.on('updateCollectionDB', (event, updatedCollection) => {
     const collectionManager = new CollectionManager()
     collectionManager.UpdateCollectionDB(updatedCollection)
 })
@@ -993,31 +1024,31 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
 async function checkingUpdate() {
     Log('Cheking updates');
     return new Promise((resolve, reject) => {
-        if(isDev){
+        if (isDev) {
             resolve()
             return
         }
         console.log(Conf.getConf('Updated'))
-        autoUpdater.on("update-available",() => {
+        autoUpdater.on("update-available", () => {
             Log('Download new version, application will quit to install.');
             autoUpdater.on('update-downloaded', () => {
                 Conf.setConf('Updated', true)
                 Log('Restart and install new version');
                 setTimeout(async () => {
-                autoUpdater.quitAndInstall();
-                    
+                    autoUpdater.quitAndInstall();
+
                 }, 1200);
             });
         });
 
-        autoUpdater.on("update-not-available",()=> {
+        autoUpdater.on("update-not-available", () => {
             console.log('No update available. Continuing application launch.');
-            resolve(); 
+            resolve();
         });
 
         autoUpdater.on('error', error => {
             console.error(`Error during Update: ${error}`);
-            reject(); 
+            reject();
         });
 
         autoUpdater.checkForUpdatesAndNotify().catch(err => {
@@ -1026,20 +1057,25 @@ async function checkingUpdate() {
         });
     });
 }
-async function checkLocalApp(){
+async function checkLocalApp() {
     await (async () => {
         return new Promise(async (resolve, reject) => {
             let userPreferencesBase = require('./app/common/arrays/array_userPreference')
             if (Conf.getConf('AlreadyInstalled')) {
                 await File.createIni("userPreferences", userPreferencesBase)
                 fs.mkdir('static', (e) => { if (!e) { return true } })
+                console.log('is already installed and file create')
                 resolve()
             }
-            if (!await File.check(path.join(Conf.getConf('LocalPath'), 'userPreferences.ini'))) {
+            let isExist = await File.check(path.join(Conf.getConf('LocalPath'), 'userPreferences.ini'))
+         
+            if (!isExist) {
                 await File.createIni("userPreferences", userPreferencesBase)
-                reject()
-                continueExecute = false
+            
+                resolve()
+
             } else {
+                console.log('file exist')
                 resolve()
             }
         })
