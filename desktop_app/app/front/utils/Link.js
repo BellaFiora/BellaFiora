@@ -2,7 +2,7 @@ const OsuUtils = require('../../lib/Osu_Utils')
 const { shell } = require('electron');
 let osuUtils = new OsuUtils()
 
-async function Link(event){
+async function Link(event, url){
     switch(event){
         case'CopyLink':
         let element = document.getElementById('shareBtn')
@@ -26,7 +26,10 @@ async function Link(event){
             showNotificationBox('This beatmap is not published', "info")
         } else {
             shell.openExternal(`https://osu.ppy.sh/beatmapsets/${nbeatmapsetId}#${osuUtils.ModeIntToString(nmode)}/${nbeatmapId}`); 
-        }
+        } 
+        break;
+        case 'openBrowser': 
+        shell.openExternal(`${url}`); 
     }
 }
 
