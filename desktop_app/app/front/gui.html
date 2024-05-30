@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data-1970-2030.min.js" defer></script> -->
     <!-- <link rel="stylesheet" href="index.css"> -->
     <link rel="stylesheet" href="../src/style.css">
     <!-- <link rel="stylesheet" href="../src/icons.scss"> -->
@@ -17,21 +19,21 @@
         <div id="side_left_menu">
             <div class="user-profil">
                 <div class="avatar-img">
-                    <img src="./pupariaAvatar.png" id="playerInfo_AvatarUrl">
+                    <img src="./defaultAvatar.png" id="playerInfo_AvatarUrl">
                 </div>
                 <div class="users_place">
-                    <span id="username" id="playerInfo_Username">Puparia</span>
+                    <span id="username">..</span>
                     <span id="player_infos" id="playerInfo_GamePreference">
                         <trs key="Standard Player"></trs>
                     </span>
-                    <span id="isSupporter" id="playerInfo_isSupporter">
-                        <m class="heart soft-red s1"></m>Supporter
+                    <span id="isSupporter" class="btn pointer"  data-event="openBrowser" data-link="">
+                        <m class="cube soft-red s1 "></m>0 Credits
                     </span>
                 </div>
             </div>
 
             <div class="menu-list">
-                <div class="menuBtn navigate-page  active" target="home_page">
+                <div class="menuBtn navigate-page active" target="home_page">
                     <m class="white home"></m><span>
                         <trs key="Home">Home</trs>
                     </span>
@@ -104,7 +106,7 @@
                         <span class="subtitle">
                             <m class="glass-grey s1 arrow-path" id="action_RefreshDataScores" data-event="info"
                                 data-info="Refresh Datas" style="margin-top: 2px;"></m>
-                            <f id="stats_refresh_dt">13/03/2024 03h05</f>
+                            <f id="stats_refresh_dt">..</f>
                         </span>
                     </div>
                     <div class="btn-gamemode">
@@ -121,11 +123,11 @@
                             <div>
                                 <span data-event="info" data-info="Country Ranking">
                                     <m class="flag-fr s2"></m>
-                                    <f id="stat_CountryRank">8 652</f>
+                                    <f id="stat_CountryRank">..</f>
                                 </span>
                                 <span data-event="info" data-info="Global Ranking">
                                     <m class="globe-europe-africa glass-grey" style="margin-right: -8px;"></m>
-                                    <f id="stat_GlobalRank">247 767</f>
+                                    <f id="stat_GlobalRank">..</f>
                                 </span>
                             </div>
                         </div>
@@ -133,7 +135,7 @@
                             <label>
                                 <trs key="Classed Score">Classed Score</trs>
                             </label>
-                            <span id="stat_ClassedScore" class="number" data-value="2875825285">2875825285</span>
+                            <span id="stat_ClassedScore" class="number" data-value="0">..</span>
                         </div>
                         <div class="unique-stat">
                             <label>
@@ -142,44 +144,44 @@
                                 </rtl>
                                 </rtl>
                             </label>
-                            <span id="stat_Accuracy">94.03 %</span>
+                            <span id="stat_Accuracy">00.00 %</span>
                         </div>
                         <div class="unique-stat">
                             <label>
                                 <trs key="Play Count">Play Count</trs>
                             </label>
-                            <span id="stat_PlayCount">20 989</span>
+                            <span id="stat_PlayCount">0</span>
                         </div>
                         <div class="unique-stat">
                             <label>
                                 <trs key="Total Score">Total Score</trs>
                             </label>
-                            <span id="stat_TotalScore" class="number" data-value="12875825285">12875825285</span>
+                            <span id="stat_TotalScore" class="number" data-value="0">0</span>
                         </div>
                         <div class="unique-stat">
                             <label>
-                                <trs key="Clicks">Clicks</trs>
+                                <trs key="PP">PP</trs>
                             </label>
-                            <span id="stat_Clicks" class="number" data-value="3450211">3450211</span>
+                            <span id="stat_pp" class="number" data-value="3450211">0</span>
                         </div>
                         <div class="unique-stat">
                             <label>
                                 <trs key="Combo Max">Combo Max</trs>
                             </label>
-                            <span id="stat_ComboMax">1 534</span>
+                            <span id="stat_ComboMax">0</span>
                         </div>
 
                         <div class="unique-stat">
                             <label data-event="info" data-info="The skillets you measure best">
                                 <trs key="Master Skillset">Master Skillset</trs>
                             </label>
-                            <span id="stat_MasterSkillset">Jump 4~5★ | DT 5~6★</span>
+                            <span id="stat_MasterSkillset">Uncalculated</span>
                         </div>
                         <div class="unique-stat">
                             <label>
                                 <trs key="AIM">AIM</trs>
                             </label>
-                            <span id="stat_AIM">65 %</span>
+                            <span id="stat_AIM">Uncalculated</span>
                         </div>
 
                         <div id="graph_rank">
@@ -200,215 +202,8 @@
                         <span class="sorted-by">Sort By PP<m class="bars-arrow-down white"></m></span>
                     </div>
                     <div class="list-score">
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1710022620" data-pp="157" data-accuracy="96.88" data-difficulty="5.20"
-                            data-note="4">
-                            <div class="elem rank">
-                                <note class="a"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Suisei Melody by Oshimizu Nako (CV: Toyosaki Aki)
-                                </span>
-                                <span class="under-infos">
-                                    <l>Insane</l> - <d>9 March 2024 22h17</d> - 5.20 ★ <i>(3.74 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt" data-event="info" data-info="Double Time"></j>
-                            </div>
-                            <div class="elem accu">96.88 %</div>
-                            <div class="elem pp">157 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1697238720" data-pp="155" data-accuracy="93.26" data-difficulty="5.55"
-                            data-note="4">
-                            <div class="elem rank">
-                                <note class="a"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Dear My Friend -Mada Minu Mirai e- (TV size) by ELISA
-                                </span>
-                                <span class="under-infos">
-                                    <l>Insane</l> - <d>13 October 2023 23h12</d> - 5.55 ★ <i>(4.09 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">93.26 %</div>
-                            <div class="elem pp">155 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1706912220" data-pp="140" data-accuracy="95.40" data-difficulty="5.24"
-                            data-note="3">
-                            <div class="elem rank">
-                                <note class="s"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    I Did It For Love by BoA
-                                </span>
-                                <span class="under-infos">
-                                    <l>Hard</l> - <d>2 Febuary 2024 22h17</d> - 5.24 ★ <i>(3.79 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">95.40 %</div>
-                            <div class="elem pp">140 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1706877720" data-pp="134" data-accuracy="93.62" data-difficulty="5.28"
-                            data-note="3">
-                            <div class="elem rank">
-                                <note class="s"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Apples To The Core (Remix) by Sim Gretina
-                                </span>
-                                <span class="under-infos">
-                                    <l>Insane</l> - <d>2 Febuary 2024 12h42</d> - 5.28 ★ <i>(3.84 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">93.62 %</div>
-                            <div class="elem pp">134 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1706916120" data-pp="134" data-accuracy="95.32" data-difficulty="5.24"
-                            data-note="4">
-                            <div class="elem rank">
-                                <note class="a"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Poker Face (TV Size) by Horie Yui
-                                </span>
-                                <span class="under-infos">
-                                    <l>Insane</l> - <d>2 Febuary 2024 23h22</d> - 5.24 ★ <i>(3.89 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">95.32 %</div>
-                            <div class="elem pp">134 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1696104180" data-pp="134" data-accuracy="91.11" data-difficulty="5.57"
-                            data-note="4">
-                            <div class="elem rank">
-                                <note class="a"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Sawakaze (TV Size) by Tanizawa Tomofumi
-                                </span>
-                                <span class="under-infos">
-                                    <l>Xenon's Insane</l> - <d>30 September 2023 20h03</d> - 5.57 ★ <i>(3.91 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">91.11 %</div>
-                            <div class="elem pp">134 PP</div>
-                        </div>
-
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1705444380" data-pp="133" data-accuracy="98.07" data-difficulty="5.20"
-                            data-note="3">
-                            <div class="elem rank">
-                                <note class="s"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Hello! (TV Size) by Nakajima Megumi
-                                </span>
-                                <span class="under-infos">
-                                    <l>Madoka</l> - <d>16 january 2024 22h33</d> <i> - 5.20 ★(3.59 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">98.07 %</div>
-                            <div class="elem pp">133 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1708661700" data-pp="130" data-accuracy="94.11" data-difficulty="5.68"
-                            data-note="4">
-                            <div class="elem rank">
-                                <note class="a"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Marshmary by MIMI feat. Hatsune Miku
-                                </span>
-                                <span class="under-infos">
-                                    <l>Horizon</l> - <d>23 Febuary 2024 04h15</d> - 5.68 ★ <i>(5.27 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="hr"></j>
-                            </div>
-                            <div class="elem accu">94.11 %</div>
-                            <div class="elem pp">130 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1696277700" data-pp="130" data-accuracy="96.90" data-difficulty="5.24"
-                            data-note="3">
-                            <div class="elem rank">
-                                <note class="s"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Goodbye by CircusP
-                                </span>
-                                <span class="under-infos">
-                                    <l>Goodbye</l> - <d>2 October 2023 20h15</d> - 5.24 ★ <i>(3.57 ★)</i>
-                                </span>
-                            </div>
-                            <div class="elem mods">
-                                <j class="dt"></j>
-                            </div>
-                            <div class="elem accu">96.90 %</div>
-                            <div class="elem pp">130 PP</div>
-                        </div>
-                        <!-- ------------ -->
-                        <div class="toprank-element" data-bmid="3082320" data-scoreid="2479538123"
-                            data-timestamp="1693542360" data-pp="130" data-accuracy="96.77" data-difficulty="5.08"
-                            data-note="3">
-                            <div class="elem rank">
-                                <note class="s"></note>
-                            </div>
-                            <div class="elem bm_infos">
-                                <span class="map_title">
-                                    Granat by Drop
-                                </span>
-                                <span class="under-infos">
-                                    <l>Extra</l> - <d>1 September 2023 04h26 </d> - 5.08 ★
-                                </span>
-                            </div>
-                            <div class="elem mods"></div>
-                            <div class="elem accu">96.77 %</div>
-                            <div class="elem pp">130 PP</div>
-                        </div>
+                
+                 
                     </div>
                 </div>
             </div>
@@ -823,15 +618,14 @@
                             <m class="glass-grey  s3 arrow-down-tray" id="importCLBF" data-event="info"
                                 data-info="Import .CLBF" style="margin-top: 2px;"></m>
                         </span>
-
                     </div>
-                    <div class="collection-name">
+                    <!-- <div class="collection-name">
                         
                         <span><input type="text"/></span>
-                        <m></m>
-                        <m></m>
-                    </div>
-
+                        <m class="glass-grey  s3 arrow-down-tray"></m>
+                        <m class="glass-grey  s3 arrow-down-tray"></m>
+                        <div class="holder">Exportation..</div>
+                    </div> -->
                 </div>
                 <div class="box transparent collection-view" id="collectionItemList">
                     <div class="title" id="currentCollectionName">Collection Name</div>
@@ -1052,7 +846,8 @@
             </div>
         </div>
 
-        <div class="context-menu">
+        <div class="context-menu" >
+            
         </div>
         <div class="player-spectacle-min" id="player-spectacle-min">
             <video id="player2" width="100%" height="100%">
